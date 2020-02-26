@@ -8,3 +8,5 @@
 /testerxp/testerxp-reporter/testerxp-reporter.iml
 /Proyecto-MISO4208.iml
 /.idea/
+# dependencies
+/node_modules
