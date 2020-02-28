@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
 const script = require('./Script');
 const tipoPrueba = sequelize.define(
-  'tipoPrueba',
+  'tipo_prueba',
   {
     id_tipo: {
       type: Sequelize.INTEGER,
@@ -25,6 +25,6 @@ const tipoPrueba = sequelize.define(
   }
 );
 
-tipoPrueba.hasMany(script, { foreignKey: 'script', sourceKey: 'id_script' });
-script.belongsTo(tipoPrueba, { foreignKey: 'script', sourceKey: 'id_script' });
+tipoPrueba.hasMany(script, { foreignKey: 'id_script', sourceKey: 'script' });
+script.belongsTo(tipoPrueba, { foreignKey: 'id_script', sourceKey: 'script' });
 module.exports = tipoPrueba;

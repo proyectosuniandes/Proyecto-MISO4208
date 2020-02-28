@@ -22,6 +22,6 @@ const app = sequelize.define(
   }
 );
 
-app.hasMany(tipoApp, { foreignKey: 'tipo_app', sourceKey: 'id_tipo_app' });
-tipoApp.belongsTo(app, { foreignKey: 'tipo_app', sourceKey: 'id_tipo_app' });
+app.hasMany(tipoApp, { foreignKey: 'id_tipo_app', sourceKey: 'tipo_app' });
+tipoApp.belongsTo(app, { foreignKey: 'id_tipo_app', sourceKey: 'tipo_app' });
 module.exports = app;

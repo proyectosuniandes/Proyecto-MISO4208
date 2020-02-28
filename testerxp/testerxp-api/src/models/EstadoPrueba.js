@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
 
 const estadoPrueba = sequelize.define(
-  'estadoPrueba',
+  'estado_prueba',
   {
     id_estado: {
       type: Sequelize.INTEGER,

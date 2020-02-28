@@ -4,7 +4,7 @@ const prueba = require('./Prueba');
 const estadoPrueba = require('./EstadoPrueba');
 
 const historicoPrueba = sequelize.define(
-  'historicoPrueba',
+  'historico_prueba',
   {
     id_his: {
       type: Sequelize.INTEGER,
@@ -18,10 +18,10 @@ const historicoPrueba = sequelize.define(
       type: Sequelize.INTEGER
     },
     fecha_inicio: {
-      type: Sequelize.TIMESTAMP
+      type: Sequelize.DATE
     },
     fecha_fin: {
-      type: Sequelize.TIMESTAMP
+      type: Sequelize.DATE
     }
   },
   {
@@ -31,16 +31,19 @@ const historicoPrueba = sequelize.define(
 );
 
 historicoPrueba.hasMany(prueba, {
-  foreignKey: 'prueba',
-  sourceKey: 'id_prueba'
+  foreignKey: 'id_prueba',
+  sourceKey: 'prueba'
 });
 historicoPrueba.hasMany(estadoPrueba, {
-  foreignKey: 'estado',
-  sourceKey: 'id_estado'
+  foreignKey: 'id_estado',
+  sourceKey: 'estado'
 });
 prueba.belongsTo(historicoPrueba, {
-  foreignKey: 'prueba',
-  sourceKey: 'id_prueba'
+  foreignKey: 'id_prueba',
+  sourceKey: 'prueba'
 });
-estadoPrueba.belongsTo({ foreignKey: 'estado', sourceKey: 'id_estado' });
+estadoPrueba.belongsTo(historicoPrueba, {
+  foreignKey: 'id_estado',
+  sourceKey: 'estado'
+});
 module.exports = historicoPrueba;
