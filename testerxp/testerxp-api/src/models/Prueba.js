@@ -14,7 +14,7 @@ const prueba = sequelize.define(
       type: Sequelize.INTEGER
     },
     app: {
-      TYPE: sequelize.INTEGER
+      type: Sequelize.INTEGER
     }
   },
   {
@@ -23,9 +23,9 @@ const prueba = sequelize.define(
   }
 );
 
-prueba.hasMany(tipoPrueba, { foreignKey: 'tipo', sourceKey: 'id_tipo' });
-prueba.hasMany(app, { foreignKey: 'app', sourceKey: 'id_app' });
-app.belongsTo(prueba, { foreignKey: 'app', sourceKey: 'id_app' });
-tipoPrueba.belongsTo(prueba, { foreignKey: 'tipo', sourceKey: 'id_tipo' });
+prueba.hasMany(tipoPrueba, { foreignKey: 'id_tipo', sourceKey: 'tipo' });
+prueba.hasMany(app, { foreignKey: 'id_app', sourceKey: 'app' });
+app.belongsTo(prueba, { foreignKey: 'id_app', sourceKey: 'app' });
+tipoPrueba.belongsTo(prueba, { foreignKey: 'id_tipo', sourceKey: 'tipo' });
 
 module.exports = prueba;

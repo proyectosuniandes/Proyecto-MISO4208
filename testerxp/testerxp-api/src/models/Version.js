@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const sequelize = require('../databse/database');
+const sequelize = require('../database/database');
 const app = require('./App');
 
 const version = sequelize.define(
@@ -26,7 +26,7 @@ const version = sequelize.define(
   }
 );
 
-version.hasMany(app, { foreignKey: 'app', sourceKey: 'id_app' });
-app.belongsTo(version, { foreignKey: 'app', sourceKey: 'id_app' });
+version.hasMany(app, { foreignKey: 'id_app', sourceKey: 'app' });
+app.belongsTo(version, { foreignKey: 'id_app', sourceKey: 'app' });
 
 module.exports = version;
