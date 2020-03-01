@@ -11,3 +11,6 @@
 # dependencies
 /node_modules
 testerxp/testerxp-api/node_modules/
+**/logs
+**/node_modules/
+**/errorShots
