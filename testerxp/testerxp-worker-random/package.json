@@ -1,0 +1,22 @@
+{
+  "name": "testmen-worker-random",
+  "version": "1.0.0",
+  "description": "Es proyecto utiliza Webdriver.io para inyectar el script de [gremlins.js](https://github.com/marmelab/gremlins.js/blob/master/README.md) a la página de [losestudiantes](https://losestudiantes.co) y realizar un ataque de Monkey testing.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node node_modules/webdriverio/bin/wdio wdio.conf.js"
+  },
+  "author": "Nelson Hurtado",
+  "license": "ISC",
+  "dependencies": {
+    "webdriverio": "^4.8.0"
+  },
+  "devDependencies": {
+    "wdio-jasmine-framework": "^0.3.2",
+    "wdio-selenium-standalone-service": "0.0.9",
+    "wdio-spec-reporter": "^0.1.2"
+  },
+  "directories": {
+    "test": "test"
+  }
+}
