@@ -5,6 +5,7 @@ module.exports = (app) => {
 
     // Create a new Application
     app.post('/applications', Applications.create);
+
     // Update a Application with AplicationId
     app.put('/applications/:applicationId', Applications.update);
 

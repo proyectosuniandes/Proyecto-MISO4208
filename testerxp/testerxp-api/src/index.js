@@ -18,7 +18,7 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Expose-Headers", "X-Total-Count");
-  res.header("Access-Control-Expose-Headers", "Content-Range")
+  res.header("Access-Control-Expose-Headers", "Content-Range");
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', true);
 

@@ -23,7 +23,7 @@ exports.findAll = async (req, res) => {
     try {
         const {range, sort, filter} = req.query;
         const [from, to] = range ? JSON.parse(range) : [0, 100];
-        const parsedFilter = filter ? parseFilter(filter) : {};
+        const parsedFilter = filter ? parseFilterTest(filter) : {};
         console.log(sort);
         console.log(filter);
         const {count, rows} = await Test.findAndCountAll({
@@ -99,7 +99,7 @@ exports.delete = async (req, res) => {
 
 };
 
-export const parseFilter = (filter: string) => {
+function parseFilterTest(filter)   {
     const filters = JSON.parse(filter)
     return Object.keys(filters)
         .map(key => {
