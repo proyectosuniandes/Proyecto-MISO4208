@@ -1,4 +1,6 @@
 const Test = require('../models/Prueba.js');
+const App = require('../models/App.js');
+const TypeTest = require('../models/TipoPrueba.js');
 
 // Create and Save a new Test
 exports.create = async (req, res) => {
@@ -19,7 +21,7 @@ exports.create = async (req, res) => {
 
 // Retrieve and return all Aplications from the database.
 exports.findAll = async (req, res) => {
-    console.log("FindAll");
+    console.log("**** FindAll Test *****");
     try {
         const {range, sort, filter} = req.query;
         const [from, to] = range ? JSON.parse(range) : [0, 100];
@@ -27,6 +29,14 @@ exports.findAll = async (req, res) => {
         console.log(sort);
         console.log(filter);
         const {count, rows} = await Test.findAndCountAll({
+            include: [
+                {
+                    model: App,
+                },
+                {
+                    model: TypeTest,
+                }
+            ],
             offset: from,
             limit: to - from + 1,
             order: [sort ? JSON.parse(sort) : ['id', 'ASC']],
@@ -35,8 +45,8 @@ exports.findAll = async (req, res) => {
         });
         res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
         res.set('X-Total-Count', `${count}`);
-        console.log({data: rows.map(resource => ({...resource, id: resource.id_app}))});
-        res.json(rows.map(resource => ({...resource, id: resource.id_app})));
+        console.log(rows.map(resource => ({...resource, id: resource.id_prueba})));
+        res.json(rows.map(resource => ({...resource, id: resource.id_prueba})));
     } catch (e) {
         console.log(e);
         res.status(500).json({message: "couldn't retrieve test"});

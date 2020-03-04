@@ -14,6 +14,7 @@ import theme from './layout/Theme';
 import NotFound from './layout/NotFound';
 
 import {ApplicationList, ApplicationEdit, ApplicationCreate} from './components/Applications';
+import {TestList} from './components/Tester';
 
 const dataProvider = simpleRestProvider('http://localhost:8080');
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
@@ -25,8 +26,14 @@ const App = () => (
            theme={theme}
            layout={Layout}
            catchAll={NotFound}>
-        <Resource name="applications" options={{label: 'Aplicaciones'}} list={ApplicationList} edit={ApplicationEdit}
+        <Resource name="applications" options={{label: 'Aplicaciones'}}
+                  list={ApplicationList}
+                  edit={ApplicationEdit}
                   create={ApplicationCreate}/>
+        <Resource name="strategy" options={{label: 'Estrategias de Prueba'}}
+                  list={TestList}/>
+        <Resource name="test"/>
+        <Resource name="results"  options={{label: 'Resultados'}}/>
     </Admin>
 );
 
