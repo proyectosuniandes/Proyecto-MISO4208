@@ -99,7 +99,7 @@ exports.delete = async (req, res) => {
 
 };
 
-export const parseFilter = (filter: string) => {
+/*export const parseFilter = (filter) => {
     const filters = JSON.parse(filter)
     return Object.keys(filters)
         .map(key => {
@@ -123,5 +123,5 @@ export const parseFilter = (filter: string) => {
             {}
         )
 };
-
+*/
 
