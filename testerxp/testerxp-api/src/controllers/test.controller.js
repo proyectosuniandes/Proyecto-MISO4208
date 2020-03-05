@@ -1,5 +1,5 @@
 const Test = require('../models/Prueba.js');
-const TestType = require('../models/TipoApp.js');
+const TestType = require('../models/TipoPrueba.js');
 const Application = require('../models/App.js');
 const Script = require('../models/Script.js');
 
