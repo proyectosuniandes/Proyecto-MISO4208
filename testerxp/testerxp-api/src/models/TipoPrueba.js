@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const script = require('./Script');
+
 const tipoPrueba = sequelize.define(
   'tipo_prueba',
   {
@@ -14,9 +14,6 @@ const tipoPrueba = sequelize.define(
     },
     parametros: {
       type: Sequelize.TEXT
-    },
-    script: {
-      type: Sequelize.INTEGER
     }
   },
   {
@@ -25,6 +22,4 @@ const tipoPrueba = sequelize.define(
   }
 );
 
-tipoPrueba.hasMany(script, { foreignKey: 'id_script', sourceKey: 'script' });
-script.belongsTo(tipoPrueba, { foreignKey: 'id_script', sourceKey: 'script' });
 module.exports = tipoPrueba;
