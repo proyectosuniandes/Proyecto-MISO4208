@@ -20,6 +20,6 @@ const tipoPrueba = sequelize.define(
     timestamps: false,
     freezeTableName: true
   }
-);
+  );
 
 module.exports = tipoPrueba;

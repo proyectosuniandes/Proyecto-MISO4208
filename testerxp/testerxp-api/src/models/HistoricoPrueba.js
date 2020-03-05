@@ -28,7 +28,7 @@ const historicoPrueba = sequelize.define(
     timestamps: false,
     freezeTableName: true
   }
-);
+  );
 
 historicoPrueba.hasMany(prueba, {
   foreignKey: 'id_prueba',

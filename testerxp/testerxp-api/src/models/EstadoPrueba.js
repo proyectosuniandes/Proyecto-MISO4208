@@ -17,6 +17,6 @@ const estadoPrueba = sequelize.define(
     timestamps: false,
     freezeTableName: true
   }
-);
+  );
 
 module.exports = estadoPrueba;

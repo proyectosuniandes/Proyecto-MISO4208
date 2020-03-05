@@ -1,21 +1,18 @@
+module.exports = app => {
+  const Tests = require('../controllers/test.controller.js');
 
-module.exports = (app) => {
+  // Create a new Test
+  app.post('/tests', Tests.create);
 
-    const test = require('../controllers/test.controller.js');
+  // Update a Test with TestId
+  app.put('/tests/:testId', Tests.update);
 
-    // Create a new test
-    app.post('/test', test.create);
-    // Update a test with testId
-    app.put('/test/:testId', test.update);
+  // Delete a Test with TestId
+  app.delete('/tests/:testId', Tests.delete);
 
-    // Delete a test with testId
-    app.delete('/test/:testId', test.delete);
+  // Retrieve a single Test with TestId
+  app.get('/tests/:testId', Tests.findOne);
 
-    // Retrieve a single test with testId
-    app.get('/test/:testId', test.findOne);
-
-    // Retrieve all test
-    app.get('/test', test.findAll);
+  // Retrieve all Aplications
+  app.get('/tests', Tests.findAll);
 };
-
-
