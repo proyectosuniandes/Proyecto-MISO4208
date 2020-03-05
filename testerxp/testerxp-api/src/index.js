@@ -42,12 +42,11 @@ require('./routes/strategy.routes.js')(app);
 app.use('/script', require('./routes/script'));
 app.use('/estado-prueba', require('./routes/estado-prueba'));
 app.use('/tipo-prueba', require('./routes/tipo-prueba'));
-//app.use('/tipo-app', require('./routes/tipo-app'));
-//app.use('/app', require('./routes/app'));
 app.use('/version', require('./routes/version'));
-//app.use('/prueba', require('./routes/prueba'));
 app.use('/historico-prueba', require('./routes/historico-prueba'));
-app.use('/queue', require('./routes/queue'));
+
+//dispatcher worker
+app.use('/queue', require('./dispatcher/queue'));
 
 
 // define a simple route

@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import IconEvent from '@material-ui/icons/Event';
+import { ExpandMore, ExpandLess } from "@material-ui/icons";
 
 import {
     List,
@@ -28,7 +29,7 @@ export const TestList = (props) => (
                 </SingleFieldList>
             </ReferenceManyField>
             {/*<EditButton/>*/}
-            <Button icon={IconEvent} color="primary" key="Ejecutar" onClick={() => { alert('Estrategia de Pruebas Ejecutandose ....');}}>
+            <Button   color="primary" key="Ejecutar" onClick={() => { alert('Estrategia de Pruebas Ejecutandose ....');}}>
                 Ejecutar
             </Button>
         </Datagrid>
