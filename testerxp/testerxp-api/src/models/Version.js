@@ -24,7 +24,7 @@ const version = sequelize.define(
     timestamps: false,
     freezeTableName: true
   }
-);
+  );
 
 version.hasMany(app, { foreignKey: 'id_app', sourceKey: 'app' });
 app.belongsTo(version, { foreignKey: 'id_app', sourceKey: 'app' });
