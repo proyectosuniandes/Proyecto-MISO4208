@@ -46,6 +46,7 @@ require('./routes/application.routes.js')(app);
 require('./routes/version.routes.js')(app);
 require('./routes/test.routes.js')(app);
 require('./routes/historicaltest.routes.js')(app);
+require('./routes/result.routes.js')(app);
 require('./routes/strategy.routes.js')(app);
 
 //app.use('/queue', require('./routes/queue'));
