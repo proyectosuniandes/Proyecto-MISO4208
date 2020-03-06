@@ -17,20 +17,22 @@ var task=cron.schedule("* * * * *", function() {
   //busca execuciones en estado Registrado
   HistoricoPrueba.findOne(
     { 
-      where: {estado : 1}
+      where: {
+        estado : 1        
+      }
     }
   ).then(exec => {
     var pathSript;
-    if(exec){
+    if(exec){      
       console.log("-execs-"+exec);
       //consulta el Prueba para obtener el script
       Prueba.findOne(
         { 
           where: {
             id_prueba : exec.prueba,
-            tipo : 1
+            tipo : 2
           }
-        }
+        } 
       ).then(test =>{
         HistoricoPrueba.update({
           estado : 2,
@@ -51,7 +53,7 @@ var task=cron.schedule("* * * * *", function() {
           console.log("The file "+exec.prueba+" was saved!");
           console.log("Running Cypress");
           //var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/"+exec.prueba+".js\"";
-          var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/simple_spec.js\"";
+          var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/monkey_testing_ripper_random_spec.js\"";
           if (shell.exec(pathTest).code !== 0) {
             shell.exit(1);
             HistoricoPrueba.update({
