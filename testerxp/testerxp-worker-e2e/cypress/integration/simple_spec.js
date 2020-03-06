@@ -8,7 +8,7 @@ describe('Mantisby login', function() {
         cy.get('.dropdown-toggle').contains('administrator')
     })
 
-     it('Add Project succesfull', function() {
+    it('Add Project succesfull', function() {
         cy.visit('http://localhost/login_page.php')
         cy.get('.login-container').find('input[name="username"]').click().type("administrator")
         cy.get('.login-container').find('input[type="submit"]').click()
@@ -25,7 +25,10 @@ describe('Mantisby login', function() {
             cy.visit('http://localhost/'+href)
         })
         cy.get('.form-inline').contains('Create New Project').click()
-        cy.get('.form-container').find('input[name="name"]').click().type("Pruebas Automaticas 2")
+        const uuid = () => Cypress._.random(0, 1e6)
+        const id = uuid()
+        const testname = 'Pruebas Automaticas ' + id
+        cy.get('.form-container').find('input[name="name"]').click().type(testname)
         cy.get('.form-container').find('textarea[name="description"]').click().type("Ejemplo pruebas Automaticas")
         cy.get('.form-container').find('input[type="submit"]').click()
         cy.get('.table-responsive').contains('Pruebas Automaticas')
