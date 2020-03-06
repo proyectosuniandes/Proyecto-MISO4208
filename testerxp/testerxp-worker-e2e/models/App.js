@@ -20,8 +20,7 @@ const app = sequelize.define(
     timestamps: false,
     freezeTableName: true
   }
-);
-
+  );
 app.hasMany(tipoApp, { foreignKey: 'id_tipo_app', sourceKey: 'tipo_app' });
 tipoApp.belongsTo(app, { foreignKey: 'id_tipo_app', sourceKey: 'tipo_app' });
 module.exports = app;

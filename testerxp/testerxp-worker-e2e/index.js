@@ -41,6 +41,14 @@ var task=cron.schedule("* * * * *", function() {
   ).then(exec => {
     var pathSript;
     if(exec){
+      HistoricoPrueba.update({
+        estado : 2,
+        fecha_inicio : new Date()
+      },{
+        where: {id_his: exec.id_his}
+      }).then(u=>{
+        console.log("HistoricoPrueba id:" +exec.id_his+" Pending.");
+      });
       console.log("-execs-"+exec);
       //consulta el Prueba para obtener el script
       Prueba.findByPk(exec.prueba, 
@@ -56,15 +64,25 @@ var task=cron.schedule("* * * * *", function() {
           });
           console.log("The file "+exec.prueba+" was saved!");
           console.log("Running Cypress");
-          var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/"+exec.prueba+".js\"";
+          //var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/"+exec.prueba+".js\"";
+          var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/simple_spec.js\"";
           if (shell.exec(pathTest).code !== 0) {
             shell.exit(1);
-            HistoricoPrueba.updateOne({ id_his: exec.id_his }, { estado: '1' }).then(u=>{
+            HistoricoPrueba.update({
+              estado: 1
+            },{
+              where: {id_his: exec.id_his}
+            }).then(u=>{
               console.log("HistoricoPrueba id:" +exec.id_his+" Failed.");
             });
           } else {
             shell.echo("Cypress complete");
-            HistoricoPrueba.updateOne({ id_his: exec.id_his }, { estado: '3' }).then(u=>{
+            HistoricoPrueba.update({
+              estado: 3,
+              fecha_fin : new Date()
+            },{
+              where: {id_his: exec.id_his}
+            }).then(u=>{
               console.log("HistoricoPrueba id:" +exec.id_his+" Executed.");
             });
           }
@@ -111,19 +129,6 @@ var task=cron.schedule("* * * * *", function() {
 });
 task.start();
 app.listen("3128");
-
-//mongoose.Promise = global.Promise;
-// Connecting to the database
-//mongoose.connect(dbConfig.url, {
-//  useNewUrlParser: true,
-//  useFindAndModify: false,
-//  useUnifiedTopology: true
-//}).then(() => {
-//  console.log("Successfully connected to the database");
-//}).catch(err => {
-//  console.log('Could not connect to the database. Exiting now...', err);
-//  process.exit();
-//});
 
 //  console.log("Running Cypress");
 //  var pathTest="./node_modules/.bin/cypress run --spec \"./cypress/integration/simple_spec.js\"";

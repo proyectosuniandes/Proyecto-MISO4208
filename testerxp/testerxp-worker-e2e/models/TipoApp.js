@@ -17,5 +17,5 @@ const tipoApp = sequelize.define(
     timestamps: false,
     freezeTableName: true
   }
-);
+  );
 module.exports = tipoApp;

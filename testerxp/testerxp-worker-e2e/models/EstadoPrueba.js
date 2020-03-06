@@ -10,13 +10,13 @@ const estadoPrueba = sequelize.define(
       autoIncrement: true
     },
     descripcion: {
-      type: Sequelize.TEXT
+      type: Sequelize.ENUM('REGISTRADA','PENDIENTE','EJECUTADA')
     }
   },
   {
     timestamps: false,
     freezeTableName: true
   }
-);
+  );
 
 module.exports = estadoPrueba;
