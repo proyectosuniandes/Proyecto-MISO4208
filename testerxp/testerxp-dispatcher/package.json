@@ -1,0 +1,24 @@
+{
+  "name": "testerxp-dispatcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.636.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "sequelize": "^5.21.5",
+    "express-sequelize-crud": "^3.3.1",
+    "node-rest-client": "^3.1.0",
+    "nodemon": "^1.19.4",
+    "xmlhttprequest": "^1.8.0"
+  }
+}
