@@ -49,7 +49,7 @@ var task=cron.schedule("* * * * *", function() {
           });
           console.log("The file "+exec.prueba+" was saved!");
           console.log("Running Cucumber");
-          var pathTest="npm test";
+          var pathTest="node ./node_modules/selenium-cucumber-js/index.js";
           if (shell.exec(pathTest).code !== 0) {
             shell.exit(1);
             HistoricoPrueba.update({
