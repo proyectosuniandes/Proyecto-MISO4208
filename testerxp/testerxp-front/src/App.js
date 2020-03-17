@@ -1,36 +1,40 @@
-import React, { Component } from 'react';
-import { HashRouter, Route, Switch } from 'react-router-dom';
-// import { renderRoutes } from 'react-router-config';
-import './App.scss';
+import React from 'react';
+//import postgrestRestProvider from '@raphiniert/ra-data-postgrest';
+//import jsonServerProvider from 'ra-data-json-server';
 
-const loading = () => <div className="animated fadeIn pt-3 text-center">Loading...</div>;
+import simpleRestProvider from 'ra-data-simple-rest';
 
-// Containers
-const DefaultLayout = React.lazy(() => import('./containers/DefaultLayout'));
+import Dashboard from './components/Dashboard';
+import {Admin, Resource} from 'react-admin';
 
-// Pages
-const Login = React.lazy(() => import('./views/Pages/Login'));
-const Register = React.lazy(() => import('./views/Pages/Register'));
-const Page404 = React.lazy(() => import('./views/Pages/Page404'));
-const Page500 = React.lazy(() => import('./views/Pages/Page500'));
+import spanishMessages from '@blackbox-vision/ra-language-spanish';
+import polyglotI18nProvider from 'ra-i18n-polyglot';
+import Layout from './layout/Layout';
+import theme from './layout/Theme';
+import NotFound from './layout/NotFound';
 
-class App extends Component {
+import {ApplicationList, ApplicationEdit, ApplicationCreate} from './components/Applications';
+import {TestList} from './components/Tester';
 
-  render() {
-    return (
-      <HashRouter>
-          <React.Suspense fallback={loading()}>
-            <Switch>
-              <Route exact path="/login" name="Login Page" render={props => <Login {...props}/>} />
-              <Route exact path="/register" name="Register Page" render={props => <Register {...props}/>} />
-              <Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />
-              <Route exact path="/500" name="Page 500" render={props => <Page500 {...props}/>} />
-              <Route path="/" name="Home" render={props => <DefaultLayout {...props}/>} />
-            </Switch>
-          </React.Suspense>
-      </HashRouter>
-    );
-  }
-}
+const dataProvider = simpleRestProvider('http://localhost:8080');
+const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
+
+const App = () => (
+    <Admin dashboard={Dashboard}
+           dataProvider={dataProvider}
+           i18nProvider={i18nProvider}
+           theme={theme}
+           layout={Layout}
+           catchAll={NotFound}>
+        <Resource name="applications" options={{label: 'Aplicaciones'}}
+                  list={ApplicationList}
+                  edit={ApplicationEdit}
+                  create={ApplicationCreate}/>
+        <Resource name="strategy" options={{label: 'Estrategias de Prueba'}}
+                  list={TestList}/>
+        <Resource name="test"/>
+        <Resource name="results"  options={{label: 'Resultados'}}/>
+    </Admin>
+);
 
 export default App;
