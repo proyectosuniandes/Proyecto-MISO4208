@@ -1,7 +1,6 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const app = require('./App');
-
+const app = require('./app');
 const version = sequelize.define(
   'version',
   {
@@ -10,23 +9,20 @@ const version = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
+    id_app: {
+      type: Sequelize.INTEGER,
+      primaryKey: true
+    },
     descripcion: {
       type: Sequelize.TEXT
     },
     ruta_app: {
       type: Sequelize.TEXT
-    },
-    app: {
-      type: Sequelize.INTEGER
     }
   },
   {
     timestamps: false,
     freezeTableName: true
   }
-  );
-
-version.hasMany(app, { foreignKey: 'id_app', sourceKey: 'app' });
-app.belongsTo(version, { foreignKey: 'id_app', sourceKey: 'app' });
-
+);
 module.exports = version;

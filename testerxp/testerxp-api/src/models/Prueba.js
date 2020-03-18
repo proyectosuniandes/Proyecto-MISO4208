@@ -1,9 +1,6 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const tipoPrueba = require('./TipoPrueba');
-const app = require('./App');
-const script = require('./Script');
-
+const version = require('./version');
 const prueba = sequelize.define(
   'prueba',
   {
@@ -12,14 +9,17 @@ const prueba = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    tipo: {
+    id_version: {
       type: Sequelize.INTEGER
     },
-    app: {
-      type: Sequelize.INTEGER
+    id_app: {
+      type: Sequelize.Integer
     },
-    script: {
-      type: Sequelize.INTEGER
+    tipo_prueba: {
+      type: Sequelize.ENUM('E2E', 'random', 'BDT', 'VRT')
+    },
+    modo_prueba: {
+      type: Sequelize.ENUM('headless', 'headful')
     }
   },
   {
@@ -27,11 +27,4 @@ const prueba = sequelize.define(
     freezeTableName: true
   }
 );
-
-prueba.hasMany(tipoPrueba, { foreignKey: 'id_tipo', sourceKey: 'tipo' });
-prueba.hasMany(app, { foreignKey: 'id_app', sourceKey: 'app' });
-prueba.hasMany(script, { foreignKey: 'id_script', sourceKey: 'script' });
-app.belongsTo(prueba, { foreignKey: 'id_app', sourceKey: 'app' });
-tipoPrueba.belongsTo(prueba, { foreignKey: 'id_tipo', sourceKey: 'tipo' });
-script.belongsTo(prueba, { foreignKey: 'id_script', sourceKey: 'script' });
 module.exports = prueba;

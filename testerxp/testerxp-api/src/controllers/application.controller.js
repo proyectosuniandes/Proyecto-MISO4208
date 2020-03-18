@@ -1,5 +1,4 @@
-const Application = require('../models/App.js');
-const TypeApp = require('../models/TipoApp.js');
+const Application = require('../models/app.js');
 
 // Create and Save a new Application
 exports.create = async (req, res) => {
@@ -24,7 +23,6 @@ exports.findAll = async (req, res) => {
     const [from, to] = range ? JSON.parse(range) : [0, 100];
     const parsedFilter = filter ? parseFilterApplication(filter) : {};
     const { count, rows } = await Application.findAndCountAll({
-      include: TypeApp,
       offset: from,
       limit: to - from + 1,
       order: [sort ? JSON.parse(sort) : ['id_app', 'ASC']],
@@ -38,7 +36,7 @@ exports.findAll = async (req, res) => {
     res.json(rows.map(resource => ({ ...resource, id: resource.id_app })));
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "couldn't retrieve Applications" });
+    res.status(500).json({ message: 'error retrieving Applications' });
   }
 };
 
@@ -56,7 +54,7 @@ exports.findOne = async (req, res) => {
     res.json(record);
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "couldn't retrieve Application" });
+    res.status(500).json({ message: 'error retrieving Application' });
   }
 };
 
@@ -78,7 +76,7 @@ exports.update = async (req, res) => {
     res.json(data);
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "couldn't update Application" });
+    res.status(500).json({ message: 'error updating Application' });
   }
 };
 
@@ -92,38 +90,6 @@ exports.delete = async (req, res) => {
     res.json({ id: req.params.applicationId });
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "couldn't delete Application" });
+    res.status(500).json({ message: 'error deleting Application' });
   }
 };
-
-/*export const parseFilter = (filter) => {
-    const filters = JSON.parse(filter)
-
-function parseFilterApplication(filter)  {
-    console.log("Application Filter --->"+filter.replace("id","id_app"));
-
-    const filters = JSON.parse(filter.replace("id","id_app"));
-
-    return Object.keys(filters)
-        .map(key => {
-            if (
-                typeof filters[key] === 'string' &&
-                filters[key].indexOf('%') !== -1
-            ) {
-                return {
-                    [key]: {[Op.like]: filters[key]},
-                }
-            }
-            return {
-                [key]: filters[key],
-            }
-        })
-        .reduce(
-            (whereAttributes, whereAttribute) => ({
-                ...whereAttributes,
-                ...whereAttribute,
-            }),
-            {}
-        )
-};
-*/

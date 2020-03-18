@@ -1,6 +1,4 @@
-
-module.exports = (app) => {
-
+module.exports = app => {
   const Applications = require('../controllers/application.controller.js');
 
   // Create a new Application
