@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const app = require('./app');
+const prueba = require('./prueba');
+
 const version = sequelize.define(
   'version',
   {
@@ -25,4 +26,16 @@ const version = sequelize.define(
     freezeTableName: true
   }
 );
+
+version.hasMany(prueba, { foreignKey: 'id_version', sourceKey: 'id_version' });
+version.hasMany(prueba, { foreignKey: 'id_app', sourceKey: 'id_app' });
+prueba.belongsTo(version, {
+  foreignKey: 'id_version',
+  sourceKey: 'id_version'
+});
+prueba.belongsTo(version, {
+  foreignKey: 'id_version',
+  sourceKey: 'id_version'
+});
+
 module.exports = version;

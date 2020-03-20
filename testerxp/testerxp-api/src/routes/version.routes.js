@@ -1,18 +1,18 @@
 module.exports = app => {
   const Versions = require('../controllers/version.controller.js');
 
-  // Create a new Version
+  //Create a new Parameter
   app.post('/versions', Versions.create);
 
-  // Update a Version with VersionId
+  //Update a Parameter with ParameterId
   app.put('/versions/:versionId/:appId', Versions.update);
 
-  // Delete a Version with VersionId
+  //Delete a Parameter with ParameterId
   app.delete('/versions/:versionId/:appId', Versions.delete);
 
-  // Retrieve a single Version with VersionId
+  //Retrieve a sigle Parameter with ParameterId
   app.get('/versions/:versionId/:appId', Versions.findOne);
 
-  // Retrieve all Version
+  //Retrieve all Versions
   app.get('/versions', Versions.findAll);
 };
