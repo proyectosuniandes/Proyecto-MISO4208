@@ -20,7 +20,12 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   console.log('***** Update StrategyTest *****');
   try {
-    const record = await StrategyTest.findByPk(req.params.strategyId, {
+    const record = await StrategyTest.findOne({
+      where: {
+        id_estrategia: req.params.strategyId,
+        id_prueba: req.params.testId
+      },
+
       raw: true
     });
     if (!record) {
@@ -49,7 +54,10 @@ exports.delete = async (req, res) => {
         id_prueba: req.params.testId
       }
     });
-    res.json({ id_estrategia: req.params.strategyId });
+    res.json({
+      id_estrategia: req.params.strategyId,
+      id_prueba: req.params.testId
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'Error deleting StrategyTest' });
@@ -60,7 +68,11 @@ exports.delete = async (req, res) => {
 exports.findOne = async (req, res) => {
   console.log('***** FindOne StrategyTest *****');
   try {
-    const record = await StrategyTest.findByPk(req.params.strategyId, {
+    const record = await StrategyTest.findOne({
+      where: {
+        id_estrategia: req.params.strategyId,
+        id_prueba: req.params.testId
+      },
       include: [
         { model: Test, as: 'prueba' },
         { model: Strategy, as: 'estrategia' }

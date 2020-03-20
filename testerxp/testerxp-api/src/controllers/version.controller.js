@@ -42,7 +42,8 @@ exports.update = async (req, res) => {
         where: {
           id_version: req.params.versionId,
           id_app: req.params.appId
-        }
+        },
+        raw: true
       });
       if (!record) {
         return res.status(404).json({ error: 'Version not found' });
@@ -79,7 +80,8 @@ exports.delete = async (req, res) => {
       where: {
         id_version: req.params.versionId,
         id_app: req.params.appId
-      }
+      },
+      raw: true
     });
     if (!record) {
       return res.status(404).json({ error: 'Version not found' });
@@ -107,7 +109,9 @@ exports.findOne = async (req, res) => {
       where: {
         id_version: req.params.versionId,
         id_app: req.params.appId
-      }
+      },
+      include: App,
+      raw: true
     });
     if (!record) {
       return res.status(404).json({ error: 'Version not found' });
