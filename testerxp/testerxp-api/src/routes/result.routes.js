@@ -1,18 +1,18 @@
 module.exports = app => {
   const Results = require('../controllers/result.controller.js');
 
-  // Create a new Result
+  //Create a new Parameter
   app.post('/results', Results.create);
 
-  // Update a Result with ResultId
+  //Update a Parameter with ParameterId
   app.put('/results/:resultId', Results.update);
 
-  // Delete a Result with ResultId
+  //Delete a Parameter with ParameterId
   app.delete('/results/:resultId', Results.delete);
 
-  // Retrieve a single Result with ResultId
+  //Retrieve a sigle Parameter with ParameterId
   app.get('/results/:resultId', Results.findOne);
 
-  // Retrieve all Result
+  //Retrieve all Results
   app.get('/results', Results.findAll);
 };
