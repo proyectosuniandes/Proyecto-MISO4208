@@ -1,86 +1,76 @@
-const Test = require('../models/Prueba.js');
-const Application = require('../models/App.js');
-const TypeTest = require('../models/TipoPrueba.js');
-const TypeApp = require('../models/TipoApp.js');
+const Strategy = require('../models/estrategia');
 
-const { Op } = require("sequelize");
-
-// Retrieve and return all Strategy from the database.
-exports.findAll = async (req, res) => {
-    console.log("**** FindAll Strategy **** ");
-    try {
-        const {range, sort, filter} = req.query;
-        console.log(filter);
-        const [from, to] = range ? JSON.parse(range) : [0, 100];
-        const parsedFilter = filter ? parseFilterApplication(filter) : {};
-
-        const {count, rows} = await Application.findAndCountAll({
-            include: [{
-                model: Test,
-                attributes: [['app', 'id_app']],
-                required:true,
-            }, {
-                model: TypeApp,
-            }],
-            offset: from,
-            limit: to - from + 1,
-            order: [sort ? JSON.parse(sort) : ['id_app', 'ASC']],
-            where: parsedFilter,
-            raw: true,
-        });
-        res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
-        res.set('X-Total-Count', `${count}`);
-        console.log(rows.map(resource => ({...resource, id: resource.id_app})));
-        res.json(rows.map(resource => ({...resource, id: resource.id_app})));
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({message: "couldn't retrieve Applications"});
-    }
+//Create and Save a new Strategy
+exports.create = async (req, res) => {
+  console.log('***** Create Strategy *****');
+  try {
+    const record = await Strategy.create(req.body, {
+      raw: true
+    });
+    res.status(201).json(record);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Strategy not created' });
+  }
 };
 
-// Find a single Application with a AplicationId
+//Delete a Strategy identified by the strategyId in the request
+exports.delete = async (req, res) => {
+  console.log('***** Delete Strategy *****');
+  try {
+    await Strategy.destroy({
+      where: { id_estrategia: req.params.strategyId }
+    });
+    res.json({ id_estrategia: req.params.strategyId });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error deleting Strategy' });
+  }
+};
+
+//Retrieve a Strategy identified by the strategyId in the request
 exports.findOne = async (req, res) => {
-    console.log(req.params);
-    try {
-        console.log("****** FindOne Application ********");
-        const record = await Application.findByPk(req.params.applicationId, {
-            raw: true,
-        })
-        if (!record) {
-            return res.status(404).json({error: 'Record not found'})
-        }
-        res.json(record)
-    } catch (error) {
-        console.log(e);
-        res.status(500).json({message: "couldn't retrieve Application"});
+  console.log('***** FindOne Strategy *****');
+  try {
+    const record = await Strategy.findByPk(req.params.strategyId, {
+      raw: true
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Strategy not found' });
     }
+    res.status(200).json(record);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error retrieving Strategy' });
+  }
 };
 
+// Retrieve all Strategies from the database.
+exports.findAll = async (req, res) => {
+  console.log('***** FindAll Strategies *****');
+  try {
+    const { range, sort, filter } = req.query;
+    console.log(filter);
+    const [from, to] = range ? JSON.parse(range) : [0, 100];
+    const parsedFilter = filter ? parseFilterVersion(filter) : {};
+    const { count, rows } = await Strategy.findAndCountAll({
+      offset: from,
+      limit: to - from + 1,
+      order: [sort ? JSON.parse(sort) : ['id_estrategia', 'ASC']],
+      where: parsedFilter,
+      raw: true
+    });
+    res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
+    res.set('X-Total-Count', `${count}`);
 
-
-function parseFilterApplication(filter)  {
-    console.log("Application Filter --->"+filter.replace("id","id_app"));
-
-    const filters = JSON.parse(filter.replace("id","id_app"));
-    return Object.keys(filters)
-        .map(key => {
-            if (
-                typeof filters[key] === 'string' &&
-                filters[key].indexOf('%') !== -1
-            ) {
-                return {
-                    [key]: {[Op.like]: filters[key]},
-                }
-            }
-            return {
-                [key]: filters[key],
-            }
-        })
-        .reduce(
-            (whereAttributes, whereAttribute) => ({
-                ...whereAttributes,
-                ...whereAttribute,
-            }),
-            {}
-        )
+    console.log(
+      rows.map(resource => ({ ...resource, id: resource.id_estrategia }))
+    );
+    res.json(
+      rows.map(resource => ({ ...resource, id: resource.id_estrategia }))
+    );
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'error retrieving Strategies' });
+  }
 };
