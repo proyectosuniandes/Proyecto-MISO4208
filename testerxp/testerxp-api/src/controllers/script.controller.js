@@ -1,28 +1,125 @@
-const Script = require('../models/Script.js');
+const Script = require('../models/script');
+const Test = require('../models/prueba');
+const formidable = require('formidable');
+const AWS = require('aws-sdk');
+const fs = require('fs');
+const path = require('path');
 
-// Create and Save a new Script
+//Create and Save a new Script
 exports.create = async (req, res) => {
-  console.log('***** Create Scripts ******');
+  console.log('***** Create Script *****');
   try {
-    const record = await Script.create(req.body, {
-      raw: true
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        res.status(500).json({ message: 'File not parsed' });
+      }
+      uploadFile(
+        files.ruta_script.path,
+        files.ruta_script.name,
+        fields,
+        async fields => {
+          const record = await Script.create(fields, {
+            raw: true
+          });
+          res.status(201).json(record);
+        }
+      );
     });
-    res.status(201).json(record);
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: 'Scripts not created' });
+    res.status(500).json({ message: 'Script not created' });
   }
 };
 
-// Retrieve and return all Scripts from the database.
+//Update a Script identified by the scriptId in the request
+exports.update = async (req, res) => {
+  console.log('***** Update Script *****');
+  try {
+    const form = formidable({ multiples: true });
+    form.parse(req, async (err, fields, files) => {
+      const record = await Script.findByPk(req.params.scriptId, {
+        raw: true
+      });
+      if (!record) {
+        return res.status(404).json({ error: 'Script not found' });
+      }
+      const persist = async fields => {
+        await Script.update(fields, {
+          where: { id_script: req.params.scriptId }
+        });
+        res.status(200).json(fields);
+      };
+      if (Object.keys(files).length > 0) {
+        const upload = () => {
+          uploadFile(
+            files.ruta_script.path,
+            files.ruta_script.name,
+            fields,
+            persist
+          );
+        };
+        deleteFile(record.ruta_script, upload);
+      } else {
+        persist(fields);
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error updating Script' });
+  }
+};
+
+//Delete a Script identified by the scriptId in the request
+exports.delete = async (req, res) => {
+  console.log('***** Delete Script *****');
+  try {
+    const record = await Script.findByPk(req.params.scriptId, {
+      raw: true
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Script not found' });
+    }
+    deleteFile(record.ruta_script, async () => {
+      await Script.destroy({
+        where: { id_script: req.params.scriptId }
+      });
+      res.json({ id_script: req.params.scriptId });
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error deleting Script' });
+  }
+};
+
+//Retrieve a Script identified by the scriptId in the request
+exports.findOne = async (req, res) => {
+  console.log('***** FindOne Script *****');
+  try {
+    const record = await Script.findByPk(req.params.scriptId, {
+      include: Test,
+      raw: true
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Script not found' });
+    }
+    res.status(200).json(record);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error retrieving Script' });
+  }
+};
+
+// Retrieve all Scripts from the database.
 exports.findAll = async (req, res) => {
   console.log('**** FindAll Scripts **** ');
   try {
     const { range, sort, filter } = req.query;
     console.log(filter);
     const [from, to] = range ? JSON.parse(range) : [0, 100];
-    const parsedFilter = filter ? parseFilterScript(filter) : {};
+    const parsedFilter = filter ? parseFilterVersion(filter) : {};
     const { count, rows } = await Script.findAndCountAll({
+      include: Test,
       offset: from,
       limit: to - from + 1,
       order: [sort ? JSON.parse(sort) : ['id_script', 'ASC']],
@@ -38,88 +135,45 @@ exports.findAll = async (req, res) => {
     res.json(rows.map(resource => ({ ...resource, id: resource.id_script })));
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "couldn't retrieve Scripts" });
+    res.status(500).json({ message: 'error retrieving Scripts' });
   }
 };
 
-// Find a single Script with a ScriptId
-exports.findOne = async (req, res) => {
-  console.log(req.params);
-  try {
-    console.log('****** FindOne Script ********');
-    const record = await Script.findByPk(req.params.scriptId, {
-      raw: true
-    });
-    if (!record) {
-      return res.status(404).json({ error: 'Record not found' });
+async function uploadFile(filePath, fileName, fields, persist) {
+  const s3 = new AWS.S3();
+  //Read content from file
+  const fileContent = fs.readFileSync(filePath);
+  //Setting up S3 upload parameters
+  const params = {
+    Bucket: 'miso-4208-grupo3/script',
+    Key: fileName,
+    Body: fileContent
+  };
+  //Uploading files to the bucket
+  await s3.upload(params, async (err, data) => {
+    if (err) {
+      return err;
     }
-    res.json(record);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "couldn't retrieve Script" });
-  }
-};
+    console.log('File uploaded successfully ' + data.Location);
+    fields.ruta_script = data.Location;
+    persist(fields);
+  });
+}
 
-// Update a Script identified by the ScriptId in the request
-exports.update = async (req, res) => {
-  console.log('****** Update Scripts *****');
-
-  try {
-    const record = await Script.findByPk(req.params.scriptId, {
-      raw: true
-    });
-    if (!record) {
-      return res.status(404).json({ error: 'Script not found' });
+function deleteFile(rutaScript, next) {
+  const s3 = new AWS.S3();
+  const oldFile = path.posix.basename(rutaScript);
+  // Setting up S3 delete parameters
+  const paramsD = {
+    Bucket: 'miso-4208-grupo3/script',
+    Key: oldFile
+  };
+  // Deleting files to the bucket
+  s3.deleteObject(paramsD, async function(err, data) {
+    if (err) {
+      throw err;
     }
-    const data = req.body;
-    await Script.update(data, { where: { id_script: req.params.scriptId } });
-    res.json(data);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "couldn't update Script" });
-  }
-};
-
-// Delete a Script with the specified ScriptId in the request
-exports.delete = async (req, res) => {
-  console.log('***** Delete Script*******');
-  try {
-    await Script.destroy({ where: { id_script: req.params.scriptId } });
-    res.json({ id: req.params.scriptId });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: "couldn't delete Script" });
-  }
-};
-
-/*export const parseFilter = (filter) => {
-    const filters = JSON.parse(filter)
-
-function parseFilterScript(filter)  {
-    console.log("Script Filter --->"+filter.replace("id","id_script"));
-
-    const filters = JSON.parse(filter.replace("id","id_script"));
-
-    return Object.keys(filters)
-        .map(key => {
-            if (
-                typeof filters[key] === 'string' &&
-                filters[key].indexOf('%') !== -1
-            ) {
-                return {
-                    [key]: {[Op.like]: filters[key]},
-                }
-            }
-            return {
-                [key]: filters[key],
-            }
-        })
-        .reduce(
-            (whereAttributes, whereAttribute) => ({
-                ...whereAttributes,
-                ...whereAttribute,
-            }),
-            {}
-        )
-};
-*/
+    console.log('File deleted successfully. ' + data);
+    next();
+  });
+}

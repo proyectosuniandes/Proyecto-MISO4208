@@ -1,22 +1,15 @@
+module.exports = app => {
+  const Strategies = require('../controllers/strategy.controller.js');
 
-module.exports = (app) => {
+  //Create a new Parameter
+  app.post('/strategies', Strategies.create);
 
-    const Strategy = require('../controllers/strategy.controller.js');
+  //Delete a Parameter with ParameterId
+  app.delete('/strategies/:strategyId', Strategies.delete);
 
-    // Create a new Strategy
-   // app.post('/strategy', Strategy.create);
+  //Retrieve a sigle Parameter with ParameterId
+  app.get('/strategies/:strategyId', Strategies.findOne);
 
-    // Update a Strategy with StrategyId
-   // app.put('/strategy/:strategyId', Strategy.update);
-
-    // Delete a Strategy with StrategyId
-    //app.delete('/strategy/:strategyId', Strategy.delete);
-
-    // Retrieve a single Strategy with StrategyId
-  //  app.get('/strategy/:strategyId', Strategy.findOne);
-
-    // Retrieve all Strategy
-    app.get('/strategy', Strategy.findAll);
+  //Retrieve all Strategies
+  app.get('/strategies', Strategies.findAll);
 };
-
-

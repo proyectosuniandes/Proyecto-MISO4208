@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const tipoApp = require('./TipoApp');
+const version = require('./version');
+
 const app = sequelize.define(
   'app',
   {
@@ -13,14 +14,16 @@ const app = sequelize.define(
       type: Sequelize.TEXT
     },
     tipo_app: {
-      type: Sequelize.INTEGER
+      type: Sequelize.ENUM('movil', 'web')
     }
   },
   {
     timestamps: false,
     freezeTableName: true
   }
-  );
-app.hasMany(tipoApp, { foreignKey: 'id_tipo_app', sourceKey: 'tipo_app' });
-tipoApp.belongsTo(app, { foreignKey: 'id_tipo_app', sourceKey: 'tipo_app' });
+);
+
+app.hasMany(version, { foreignKey: 'id_app', sourceKey: 'id_app' });
+version.belongsTo(app, { foreignKey: 'id_app', sourceKey: 'id_app' });
+
 module.exports = app;
