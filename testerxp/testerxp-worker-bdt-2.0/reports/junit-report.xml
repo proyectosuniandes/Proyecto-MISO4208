@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testsuite name="login-into-losestudiantes;login-successful" tests="5" failures="0" skipped="0">
+        <properties>
+            <property name="URI" value="C:/Users/NicX/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature">
+            </property>
+        </properties>
+        <testcase name="Given I go to losestudiantes home screen" classname="login-into-losestudiantes;login-successful" time="0.0017548">
+        </testcase>
+        <testcase name="When I open the login screen" classname="login-into-losestudiantes;login-successful" time="0.000420001">
+        </testcase>
+        <testcase name="And I fill a right email and password" classname="login-into-losestudiantes;login-successful" time="0.001190301">
+        </testcase>
+        <testcase name="And I try to login" classname="login-into-losestudiantes;login-successful" time="0.0005782">
+        </testcase>
+        <testcase name="Then I already logged" classname="login-into-losestudiantes;login-successful" time="0.000142601">
+        </testcase>
+    </testsuite>
+</testsuites>
