@@ -6,10 +6,10 @@ const path = require('path');
 const fs = require('fs');
 let shell = require('shelljs');
 
-//initializations
+//Initializations
 const app = express();
 
-//settings
+//Settings
 app.set('port', process.env.PORT || 8080);
 AWS.config.update({ region: 'us-east-1' });
 const queueURL = 'https://sqs.us-east-1.amazonaws.com/973067341356/bdt.fifo';
@@ -127,69 +127,33 @@ async function updateExecution(executionId, estado) {
   );
 }
 
-//execute random script with cypress
+//execute test
 async function executeWeb(rutaScript, mode, executionId) {
-  const s3 = new AWS.S3();
   const script = path.posix.basename(rutaScript);
 
-  console.log(script + ' route!');
+  downloadFile(script, '.js', 'step-definitions');
+  downloadFile(script, '.feature', 'features');
+  console.log('Scripts "' + script + '" downloaded!');
 
-  const params = {
-    Bucket: 'miso-4208-grupo3/script/bdt',
-    Key: script + ".js"
-  };
-  s3.getObject(params, (err, data) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    fs.writeFileSync(
-      path.join(__dirname, '../step-definitions', script),
-      data.Body.toString()
-    );
-    console.log(script + ' has been created!');
-  });
-  /*await cypress.run({
-    headless: mode,
-    spec: path.join(__dirname, '../cypress/integration', script),
-    chromeWebSecurity: false,
-    reporter: 'mochawesome',
-    reporterOptions: {
-      reportFilename: script,
-      reportDir: path.join(__dirname, '../cypress/results'),
-      overwrite: false,
-      html: false,
-      json: true,
-      quiet: true
-    }
-  });
-  const video = fs.readFileSync(
-    path.join(__dirname, '../cypress/videos', script + '.mp4')
-  );
+  console.log('Running Cucumber...');
+  var pathTest = 'node ./node_modules/selenium-cucumber-js/index.js';
+  if (shell.exec(pathTest).code !== 0) {
+    shell.exit(1);
+    console.log('Cucumber failed. ' + err);
+  }
+  else {
+    console.log('Cucumber complete. ');
+  }
+
+  //Uploading report to the bucket
+  const s3 = new AWS.S3();
   const report = fs.readFileSync(
-    path.join(__dirname, '../cypress/results', script.split('.')[0] + '.json')
+    path.join(__dirname, '../reports/cucumber-report.html')
   );
-  //Uploading video to the bucket
   s3.upload(
     {
-      Bucket: 'miso-4208-grupo3/results',
-      Key: script + '.mp4',
-      Body: video
-    },
-    async (err, data) => {
-      if (err) {
-        return err;
-      }
-      console.log('File uploaded successfully ' + data.Location);
-      await persist({ id_ejecucion: executionId, ruta_archivo: data.Location });
-      await updateExecution(executionId, 'ejecutado');
-    }
-  );
-  //Uploading json to the bucket
-  s3.upload(
-    {
-      Bucket: 'miso-4208-grupo3/results',
-      Key: script + '.json',
+      Bucket: 'miso-4208-grupo3/results/bdt',
+      Key: script + '.html',
       Body: report
     },
     async (err, data) => {
@@ -199,10 +163,29 @@ async function executeWeb(rutaScript, mode, executionId) {
       console.log('File uploaded successfully ' + data.Location);
       await persist({ id_ejecucion: executionId, ruta_archivo: data.Location });
     }
-  );*/
+  );
 }
 
-//persist results
+async function downloadFile(script, ext, target) {
+  const s3 = new AWS.S3();
+  const params = {
+    Bucket: 'miso-4208-grupo3/script/bdt',
+    Key: script + ext
+  };
+  s3.getObject(params, (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    fs.writeFileSync(
+      path.join(__dirname, '../' + target, script + ext),
+      data.Body.toString()
+    );
+    console.log(script + ext + ' has been created!');
+  });
+}
+
+//Persist results
 async function persist(fields) {
   await Result.create(fields, { raw: true });
 }
