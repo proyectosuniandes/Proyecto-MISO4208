@@ -145,7 +145,7 @@ async function uploadFile(filePath, fileName, fields, persist) {
   const fileContent = fs.readFileSync(filePath);
   //Setting up S3 upload parameters
   const params = {
-    Bucket: 'miso-4208-grupo3/script',
+    Bucket: 'miso-4208-grupo3/script/' + fields.id_prueba,
     Key: fileName,
     Body: fileContent
   };
@@ -155,25 +155,37 @@ async function uploadFile(filePath, fileName, fields, persist) {
       return err;
     }
     console.log('File uploaded successfully ' + data.Location);
-    fields.ruta_script = data.Location;
+    fields.ruta_script = path.dirname(data.Location);
     persist(fields);
   });
 }
 
 function deleteFile(rutaScript, next) {
   const s3 = new AWS.S3();
-  const oldFile = path.posix.basename(rutaScript);
-  // Setting up S3 delete parameters
-  const paramsD = {
-    Bucket: 'miso-4208-grupo3/script',
-    Key: oldFile
+  const split = rutaScript.split('.com/');
+  const bucket = 'miso-4208-grupo3';
+  const prefix = split[1];
+  // Setting up S3 list parameters
+  const paramsL = {
+    Bucket: bucket,
+    Prefix: prefix
   };
-  // Deleting files to the bucket
-  s3.deleteObject(paramsD, async function(err, data) {
+  s3.listObjects(paramsL, (err, data) => {
     if (err) {
       throw err;
     }
-    console.log('File deleted successfully. ' + data);
-    next();
+    // Setting up S3 delete parameters
+    let paramsD = { Bucket: bucket, Delete: { Objects: [] } };
+    data.Contents.forEach(d => {
+      paramsD.Delete.Objects.push({ Key: d.Key });
+    });
+    // Deleting files to the bucket
+    s3.deleteObjects(paramsD, async function(err, data) {
+      if (err) {
+        throw err;
+      }
+      console.log('File deleted successfully. ' + data);
+      next();
+    });
   });
 }
