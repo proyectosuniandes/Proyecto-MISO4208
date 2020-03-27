@@ -14,17 +14,12 @@ exports.create = async (req, res) => {
       if (err) {
         res.status(500).json({ message: 'File not parsed' });
       }
-      uploadFile(
-        files.ruta_script.path,
-        files.ruta_script.name,
-        fields,
-        async fields => {
-          const record = await Script.create(fields, {
-            raw: true
-          });
-          res.status(201).json(record);
-        }
-      );
+      uploadFile(files.scripts, fields, async fields => {
+        const record = await Script.create(fields, {
+          raw: true
+        });
+        res.status(201).json(record);
+      });
     });
   } catch (e) {
     console.log(e);
@@ -52,12 +47,7 @@ exports.update = async (req, res) => {
       };
       if (Object.keys(files).length > 0) {
         const upload = () => {
-          uploadFile(
-            files.ruta_script.path,
-            files.ruta_script.name,
-            fields,
-            persist
-          );
+          uploadFile(files.scripts, fields, persist);
         };
         deleteFile(record.ruta_script, upload);
       } else {
@@ -139,25 +129,33 @@ exports.findAll = async (req, res) => {
   }
 };
 
-async function uploadFile(filePath, fileName, fields, persist) {
+async function uploadFile(scripts, fields, persist) {
+  if (scripts[0] === undefined) {
+    scripts = [scripts];
+  }
   const s3 = new AWS.S3();
-  //Read content from file
-  const fileContent = fs.readFileSync(filePath);
   //Setting up S3 upload parameters
-  const params = {
-    Bucket: 'miso-4208-grupo3/script/' + fields.id_prueba,
-    Key: fileName,
-    Body: fileContent
+  let params = {
+    Bucket: 'miso-4208-grupo3/script/' + fields.id_prueba
   };
-  //Uploading files to the bucket
-  await s3.upload(params, async (err, data) => {
-    if (err) {
-      return err;
-    }
-    console.log('File uploaded successfully ' + data.Location);
-    fields.ruta_script = path.dirname(data.Location);
-    persist(fields);
-  });
+  //Read content from file
+  for (let i = 0; i < scripts.length; i++) {
+    const fileContent = fs.readFileSync(scripts[i].path);
+    //Updating S3 upload parameters
+    params.Key = scripts[i].name;
+    params.Body = fileContent;
+    //Uploading files to the bucket
+    await s3.upload(params, async (err, data) => {
+      if (err) {
+        return err;
+      }
+      console.log('File uploaded successfully ' + data.Location);
+      if (i === scripts.length - 1) {
+        fields.ruta_script = path.dirname(data.Location);
+        persist(fields);
+      }
+    });
+  }
 }
 
 function deleteFile(rutaScript, next) {
