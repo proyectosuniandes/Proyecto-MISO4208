@@ -127,6 +127,10 @@ async function updateExecution(executionId, estado) {
   );
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 //execute test
 async function executeWeb(rutaScript, mode, executionId) {
   const script = path.posix.basename(rutaScript);
