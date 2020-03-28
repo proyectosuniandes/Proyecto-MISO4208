@@ -1,8 +1,8 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const tipoPrueba = require('./TipoPrueba');
-const app = require('./App');
-const script = require('./Script');
+const parametro = require('./parametro');
+const script = require('./script');
+const estrategiaPrueba = require('./estrategiaPrueba');
 
 const prueba = sequelize.define(
   'prueba',
@@ -12,14 +12,17 @@ const prueba = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    tipo: {
+    id_version: {
       type: Sequelize.INTEGER
     },
-    app: {
+    id_app: {
       type: Sequelize.INTEGER
     },
-    script: {
-      type: Sequelize.INTEGER
+    tipo_prueba: {
+      type: Sequelize.ENUM('E2E', 'random', 'BDT', 'VRT')
+    },
+    modo_prueba: {
+      type: Sequelize.ENUM('headless', 'headful')
     }
   },
   {
@@ -28,10 +31,20 @@ const prueba = sequelize.define(
   }
 );
 
-prueba.hasMany(tipoPrueba, { foreignKey: 'id_tipo', sourceKey: 'tipo' });
-prueba.hasMany(app, { foreignKey: 'id_app', sourceKey: 'app' });
-prueba.hasMany(script, { foreignKey: 'id_script', sourceKey: 'script' });
-app.belongsTo(prueba, { foreignKey: 'id_app', sourceKey: 'app' });
-tipoPrueba.belongsTo(prueba, { foreignKey: 'id_tipo', sourceKey: 'tipo' });
-script.belongsTo(prueba, { foreignKey: 'id_script', sourceKey: 'script' });
+prueba.hasMany(parametro, { foreignKey: 'id_prueba', sourceKey: 'id_prueba' });
+prueba.hasMany(script, { foreignKey: 'id_prueba', sourceKey: 'id_prueba' });
+prueba.hasMany(estrategiaPrueba, {
+  foreignKey: 'id_prueba',
+  sourceKey: 'id_prueba'
+});
+parametro.belongsTo(prueba, {
+  foreignKey: 'id_prueba',
+  sourceKey: 'id_prueba'
+});
+script.belongsTo(prueba, { foreignKey: 'id_prueba', sourceKey: 'id_prueba' });
+estrategiaPrueba.belongsTo(prueba, {
+  foreignKey: 'id_prueba',
+  sourceKey: 'id_prueba'
+});
+
 module.exports = prueba;

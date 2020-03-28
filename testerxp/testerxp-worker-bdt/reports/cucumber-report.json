@@ -1,0 +1,101 @@
+[
+  {
+    "description": "    As an user I want to authenticate myself within losestudiantes website in order to rate teachers",
+    "elements": [
+      {
+        "id": "login-into-losestudiantes;login-successful",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "Login successful",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "name": "I go to losestudiantes home screen",
+            "result": {
+              "status": "passed",
+              "duration": 1491001
+            },
+            "line": 5,
+            "match": {
+              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:2"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "name": "I open the login screen",
+            "result": {
+              "status": "passed",
+              "duration": 383100
+            },
+            "line": 6,
+            "match": {
+              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:9"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "name": "I fill a right email and password",
+            "result": {
+              "status": "passed",
+              "duration": 1636401
+            },
+            "line": 7,
+            "match": {
+              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:13"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "name": "I try to login",
+            "result": {
+              "status": "passed",
+              "duration": 596100
+            },
+            "line": 8,
+            "match": {
+              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:19"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "name": "I already logged",
+            "result": {
+              "status": "passed",
+              "duration": 539399
+            },
+            "line": 9,
+            "match": {
+              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:24"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "After ",
+            "result": {
+              "status": "failed",
+              "duration": 7132634201,
+              "error_message": "NoSuchElementError: Unable to locate element: *[id=\"cuenta\"]\n    at Object.throwDecodedError (C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\node_modules\\selenium-webdriver\\lib\\error.js:514:15)\n    at parseHttpResponse (C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\node_modules\\selenium-webdriver\\lib\\http.js:519:13)\n    at C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\node_modules\\selenium-webdriver\\lib\\http.js:441:30\n    at processTicksAndRejections (internal/process/task_queues.js:97:5)\nFrom: Task: WebDriver.findElement(By(css selector, *[id=\"cuenta\"]))\n    at thenableWebDriverProxy.schedule (C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\node_modules\\selenium-webdriver\\lib\\webdriver.js:807:17)\n    at thenableWebDriverProxy.findElement (C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\node_modules\\selenium-webdriver\\lib\\webdriver.js:1014:17)\n    at createWorld.<anonymous> (C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:25:42)\n    at processTicksAndRejections (internal/process/task_queues.js:79:11)"
+            },
+            "hidden": true,
+            "match": {
+              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\runtime\\world.js:250"
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "login-into-losestudiantes",
+    "keyword": "Feature",
+    "line": 1,
+    "name": "Login into losestudiantes",
+    "tags": [],
+    "uri": "C:/Users/NicX/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt/features/login.feature"
+  }
+]
