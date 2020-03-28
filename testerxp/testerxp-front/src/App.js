@@ -1,6 +1,9 @@
 import React from 'react';
-//import postgrestRestProvider from '@raphiniert/ra-data-postgrest';
-//import jsonServerProvider from 'ra-data-json-server';
+
+import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
+import BeenhereIcon from '@material-ui/icons/Beenhere';
+
+
 
 import simpleRestProvider from 'ra-data-simple-rest';
 
@@ -14,10 +17,13 @@ import theme from './layout/Theme';
 import NotFound from './layout/NotFound';
 
 import {ApplicationList, ApplicationEdit, ApplicationCreate} from './components/Applications';
-import {TestList} from './components/Tester';
+import {TestList} from './components/Strategy';
 
 const dataProvider = simpleRestProvider('http://localhost:8080');
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
+
+
+
 
 const App = () => (
     <Admin dashboard={Dashboard}
@@ -26,15 +32,19 @@ const App = () => (
            theme={theme}
            layout={Layout}
            catchAll={NotFound}>
-        <Resource name="applications" options={{label: 'Aplicaciones'}}
+        <Resource name="applications" options={{label: 'Aplicaciones'}} icon={SettingsApplicationsIcon}
                   list={ApplicationList}
                   edit={ApplicationEdit}
                   create={ApplicationCreate}/>
-        <Resource name="strategy" options={{label: 'Estrategias de Prueba'}}
+        <Resource name="strategy" options={{label: 'Estrategias de Prueba'}} icon={BeenhereIcon}
                   list={TestList}/>
-        <Resource name="test"/>
-        <Resource name="results"  options={{label: 'Resultados'}}/>
+        <Resource name="tests"/>
+        <Resource name="historicalTests"/>
     </Admin>
 );
+
+
+
+
 
 export default App;

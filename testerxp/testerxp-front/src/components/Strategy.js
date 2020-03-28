@@ -1,8 +1,6 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import IconEvent from '@material-ui/icons/Event';
-import { ExpandMore, ExpandLess } from "@material-ui/icons";
+import ExecuteButton from './buttons/ExecuteStrategyButton.js';
+
 
 import {
     List,
@@ -10,7 +8,7 @@ import {
     TextField,
     ReferenceManyField,
     SingleFieldList,
-    ChipField, EditButton
+    ChipField
 
 
 } from 'react-admin';
@@ -21,17 +19,15 @@ export const TestList = (props) => (
             <TextField source="id"  label="No. Estrategia"/>
             <TextField source="nombre" label="Aplicación"/>
             <TextField source="tipo_apps.descripcion" label="Tipo Aplicación"/>
-
-            <ReferenceManyField label="Tipo de Pruebas" reference="test" target="app"
+            <ReferenceManyField label="Tipo de Pruebas"
+                                reference="tests"
+                                target="app"
                                 sort={{field: 'id_prueba', order: 'ASC'}}>
                 <SingleFieldList>
                     <ChipField source="tipo_pruebas.descripcion"/>
                 </SingleFieldList>
             </ReferenceManyField>
-            {/*<EditButton/>*/}
-            <Button   color="primary" key="Ejecutar" onClick={() => { alert('Estrategia de Pruebas Ejecutandose ....');}}>
-                Ejecutar
-            </Button>
+            <ExecuteButton />
         </Datagrid>
     </List>
 );
