@@ -1,0 +1,100 @@
+[
+  {
+    "description": "    As an user I want to authenticate myself within Mantis website",
+    "elements": [
+      {
+        "id": "login-into-mantis;login-successful",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "Login successful",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "name": "I go to Mantis home screen",
+            "result": {
+              "status": "passed",
+              "duration": 773601
+            },
+            "line": 5,
+            "match": {
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:2"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "name": "I fill username",
+            "result": {
+              "status": "passed",
+              "duration": 1444000
+            },
+            "line": 6,
+            "match": {
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:6"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "name": "I fill password",
+            "result": {
+              "status": "passed",
+              "duration": 382999
+            },
+            "line": 7,
+            "match": {
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:11"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "name": "I try to login",
+            "result": {
+              "status": "passed",
+              "duration": 387701
+            },
+            "line": 8,
+            "match": {
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:15"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "name": "I already logged",
+            "result": {
+              "status": "passed",
+              "duration": 1295000
+            },
+            "line": 9,
+            "match": {
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:19"
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "After ",
+            "result": {
+              "status": "passed",
+              "duration": 5388728399
+            },
+            "hidden": true,
+            "match": {
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\node_modules\\selenium-cucumber-js\\runtime\\world.js:250"
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "login-into-mantis",
+    "keyword": "Feature",
+    "line": 1,
+    "name": "Login into Mantis",
+    "tags": [],
+    "uri": "C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature"
+  }
+]
