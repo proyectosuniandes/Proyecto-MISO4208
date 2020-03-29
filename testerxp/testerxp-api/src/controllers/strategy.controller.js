@@ -1,6 +1,7 @@
 const Strategy = require('../models/estrategia');
 const sequelize = require('../database/database');
 const { QueryTypes } = require('sequelize');
+const Execution = require('../models/ejecucion');
 const AWS = require('aws-sdk');
 
 AWS.config.update({ region: 'us-east-1' });
@@ -16,6 +17,26 @@ exports.create = async (req, res) => {
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'Strategy not created' });
+  }
+};
+
+//Update a Strategy identified by the strategyId in the request
+exports.update = async (req, res) => {
+  console.log('***** Update Strategy *****');
+  try {
+    const record = await Strategy.findByPk(req.params.strategyId, {
+      raw: true
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Strategy not found' });
+    }
+    await Strategy.update(req.body, {
+      where: { id_estrategia: req.params.strategyId }
+    });
+    res.status(200).json(req.body);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error updating Execution' });
   }
 };
 
@@ -84,8 +105,18 @@ exports.findAll = async (req, res) => {
 exports.execute = async (req, res) => {
   console.log('*****Execute Strategy *****');
   try {
+    await Strategy.update(
+      { estado: 'pendiente' },
+      {
+        where: { id_estrategia: req.params.strategyId }
+      }
+    );
     const record = await sequelize.query(
-      'select e.id_estrategia , ep.id_ejecucion, p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, (select p2.param from parametro p2 where p2.id_prueba =p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba =p.id_prueba ) from estrategia e, estrategia_prueba ep , prueba p, "version" v where e.id_estrategia =$strategyId and e.id_estrategia =ep.id_estrategia and p.id_prueba =ep.id_prueba and v.id_version =p.id_version and v.id_app =p.id_app ',
+      'select p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, (select p2.param from parametro p2 where ' +
+        'p2.id_prueba =p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba ' +
+        '=p.id_prueba ) as ruta_script from estrategia_prueba ep, prueba p, "version" v where ' +
+        'ep.id_estrategia=$strategyId and ep.id_prueba =p.id_prueba and p.id_version =v.id_version and ' +
+        'p.id_app =v.id_app',
       {
         bind: {
           strategyId: req.params.strategyId
@@ -99,22 +130,41 @@ exports.execute = async (req, res) => {
     }
     const sqs = new AWS.SQS();
     for (let i = 0; i < record.length; i++) {
+      const executions = await Execution.create(
+        {
+          id_estrategia: req.params.strategyId,
+          id_prueba: record[i].id_prueba,
+          estado: 'registrado'
+        },
+        {
+          raw: true
+        }
+      );
       const params = {
-        MessageBody: JSON.stringify(record[i]),
+        MessageBody: JSON.stringify({
+          id_estrategia: req.params.strategyId,
+          id_ejecucion: executions.dataValues.id_ejecucion,
+          id_prueba: record[i].id_prueba,
+          id_app: record[i].id_app,
+          ruta_app: record[i].ruta_app,
+          tipo_prueba: record[i].tipo_prueba,
+          parametro: record[i].parametro,
+          ruta_script: record[i].ruta_script
+        }),
         QueueUrl:
           'https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo',
         MessageGroupId:
-          record[i].id_estrategia +
+          req.params.strategyId +
           '' +
-          record[i].id_ejecucion +
+          executions.dataValues.id_ejecucion +
           '' +
           record[i].id_prueba +
           '' +
           record[i].id_app,
         MessageDeduplicationId:
-          record[i].id_estrategia +
+          req.params.strategyId +
           '' +
-          record[i].id_ejecucion +
+          executions.dataValues.id_ejecucion +
           '' +
           record[i].id_prueba +
           '' +

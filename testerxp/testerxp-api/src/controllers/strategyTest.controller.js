@@ -16,34 +16,6 @@ exports.create = async (req, res) => {
   }
 };
 
-//Update a StrategyTest identified by the strategyId and the testId in the request
-exports.update = async (req, res) => {
-  console.log('***** Update StrategyTest *****');
-  try {
-    const record = await StrategyTest.findOne({
-      where: {
-        id_estrategia: req.params.strategyId,
-        id_prueba: req.params.testId
-      },
-
-      raw: true
-    });
-    if (!record) {
-      return res.status(404).json({ error: 'StrategyTest not found' });
-    }
-    await StrategyTest.update(req.body, {
-      where: {
-        id_estrategia: req.params.strategyId,
-        id_prueba: req.params.testId
-      }
-    });
-    res.status(200).json(req.body);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: 'Error updating StrategyTest' });
-  }
-};
-
 //Delete a StrategyTest identified by the strategyId and the testId in the request
 exports.delete = async (req, res) => {
   console.log('***** Delete StrategyTest *****');
