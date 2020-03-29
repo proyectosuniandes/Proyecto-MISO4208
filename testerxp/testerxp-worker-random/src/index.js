@@ -38,7 +38,6 @@ const Result = require('./models/resultado');
 const task = cron.schedule('* * * * *', () => {
   console.log('***** Initializing Cron *****');
   const sqs = new AWS.SQS();
-
   //Delete message from queue
   const deleteMessage = deleteParams => {
     sqs.deleteMessage(deleteParams, (err, data) => {
@@ -49,7 +48,6 @@ const task = cron.schedule('* * * * *', () => {
       }
     });
   };
-
   //Recieve message from queue
   sqs.receiveMessage(params, async (err, data) => {
     if (err) {
@@ -60,35 +58,41 @@ const task = cron.schedule('* * * * *', () => {
         QueueUrl: queueURL,
         ReceiptHandle: data.Messages[0].ReceiptHandle
       };
-      const strategyTest = await getStrategyTest(
-        message.Estrategia_ID,
-        message.Prueba_ID,
-        message.Aplicacion_ID
-      );
       deleteMessage(deleteParams);
+      const strategyTest = await getStrategyTest(
+        message.id_ejecucion,
+        message.id_prueba,
+        message.id_app
+      );
       if (!strategyTest) {
         console.log('estrategiaPrueba not found');
       } else {
-        console.log(strategyTest);
         if (strategyTest.estado === 'registrado') {
-          await updateExecution(strategyTest.id_ejecucion, 'pendiente');
-          let headless;
+          await updateExecution(message.id_ejecucion, 'pendiente');
+          let headless, headful;
           if (strategyTest.modo_prueba === 'headless') {
             headless = true;
+            headful=false;
           } else {
             headless = false;
+            headful=true;
           }
           if (strategyTest.tipo_app === 'web') {
             await executeWeb(
-              message.Script,
+              message.ruta_script,
               headless,
-              strategyTest.id_ejecucion
+              headful,
+              message.id_estrategia,
+              message.id_prueba,
+              message.id_ejecucion
             );
           } else {
             await executeMovil(
-              message.Ruta_Aplicacion,
-              message.Parametro,
-              strategyTest.id_ejecucion
+              message.ruta_app,
+              message.parametro,
+              message.id_estrategia,
+              message.id_prueba,
+              message.id_ejecucion
             );
           }
         }
@@ -98,13 +102,13 @@ const task = cron.schedule('* * * * *', () => {
 });
 
 //Find strategyTest given strategyId and testId
-async function getStrategyTest(strategyId, testId, appId) {
+async function getStrategyTest(executionId, testId, appId) {
   try {
     const record = await sequelize.query(
-      'select ep.id_ejecucion, e.estado, a.tipo_app, p.modo_prueba from estrategia_prueba ep, ejecucion e, app a, prueba p where ep.id_estrategia = $strategyId and ep.id_prueba = $testId and ep.id_ejecucion =e.id_ejecucion and a.id_app = $appId',
+      'select e.estado, p.modo_prueba, a.tipo_app from ejecucion e, prueba p, app a where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId',
       {
         bind: {
-          strategyId: strategyId,
+          executionId: executionId,
           testId: testId,
           appId: appId
         },
@@ -135,79 +139,121 @@ async function updateExecution(executionId, estado) {
 }
 
 //execute random script with cypress
-async function executeWeb(rutaScript, mode, executionId) {
+async function executeWeb(rutaScript, headless,headful, strategyId, testId, executionId) {
+  console.log('***** Executing Web Random *****');
   const s3 = new AWS.S3();
-  const script = path.posix.basename(rutaScript);
-  const params = {
-    Bucket: 'miso-4208-grupo3/script',
-    Key: script
+  const split = rutaScript.split('.com/');
+  const bucket = 'miso-4208-grupo3';
+  const prefix = split[1];
+  const paramsL = {
+    Bucket: bucket,
+    Prefix: prefix
   };
-  s3.getObject(params, (err, data) => {
+  s3.listObjects(paramsL, (err, data) => {
     if (err) {
-      console.error(err);
-      return;
+      throw err;
     }
-    fs.writeFileSync(
-      path.join(__dirname, '../cypress/integration', script),
-      data.Body.toString()
-    );
-    console.log(script + ' has been created!');
+    data.Contents.forEach(d => {
+      const paramsG = {
+        Bucket: bucket,
+        Key: d.Key
+      };
+      s3.getObject(paramsG, async (err, data) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        fs.mkdirSync(path.join(__dirname, '../cypress/integration', prefix), {
+          recursive: true
+        });
+        fs.writeFileSync(
+          path.join(__dirname, '../cypress/integration', d.Key),
+          data.Body.toString()
+        );
+        console.log(d.Key + ' has been created!');
+        await cypress.run({
+          headless: headless,
+          headed:headful,
+          spec: path.join(__dirname, '../cypress/integration', d.Key),
+          chromeWebSecurity: false,
+          reporter: 'mochawesome',
+          reporterOptions: {
+            reportFilename: d.Key,
+            reportDir: path.join(__dirname, '../cypress/results'),
+            //overwrite: false,
+            html: false,
+            json: true,
+            quiet: true
+          }
+        });
+        let nameScript = d.Key.split('/');
+        nameScript = nameScript[nameScript.length - 1];
+        const video = fs.readFileSync(
+          path.join(__dirname, '../cypress/videos', d.Key + '.mp4')
+        );
+        const report = fs.readFileSync(
+          path.join(
+            __dirname,
+            '../cypress/results',
+            d.Key.split('.')[0] + '.json'
+          )
+        );
+        //Uploading video to the bucket
+        let paramsU = {
+          Bucket:
+            'miso-4208-grupo3/results/' +
+            strategyId +
+            '/' +
+            testId +
+            '/' +
+            executionId,
+          Key: nameScript + '.mp4',
+          Body: video
+        };
+        s3.upload(paramsU, async (err, data) => {
+          if (err) {
+            return err;
+          }
+          console.log('File uploaded successfully ' + data.Location);
+          fs.unlinkSync(path.join(__dirname, '../cypress/videos', d.Key + '.mp4'));
+          await persist({
+            id_ejecucion: executionId,
+            ruta_archivo: path.dirname(data.Location)
+          });
+          await updateExecution(executionId, 'ejecutado');
+        });
+        paramsU.Key = nameScript.split('.')[0] + '.json';
+        paramsU.Body = report;
+        //Uploading json to the bucket
+        s3.upload(paramsU, async (err, data) => {
+          if (err) {
+            return err;
+          }
+          console.log('File uploaded successfully ' + data.Location);
+          fs.unlinkSync(path.join(
+            __dirname,
+            '../cypress/results',
+            d.Key.split('.')[0] + '.json'
+          ));
+          await persist({
+            id_ejecucion: executionId,
+            ruta_archivo: path.dirname(data.Location)
+          });
+        });
+      });
+    });
   });
-  await cypress.run({
-    headless: mode,
-    spec: path.join(__dirname, '../cypress/integration', script),
-    chromeWebSecurity: false,
-    reporter: 'mochawesome',
-    reporterOptions: {
-      reportFilename: script,
-      reportDir: path.join(__dirname, '../cypress/results'),
-      overwrite: false,
-      html: false,
-      json: true,
-      quiet: true
-    }
-  });
-  const video = fs.readFileSync(
-    path.join(__dirname, '../cypress/videos', script + '.mp4')
-  );
-  const report = fs.readFileSync(
-    path.join(__dirname, '../cypress/results', script.split('.')[0] + '.json')
-  );
-  //Uploading video to the bucket
-  s3.upload(
-    {
-      Bucket: 'miso-4208-grupo3/results',
-      Key: script + '.mp4',
-      Body: video
-    },
-    async (err, data) => {
-      if (err) {
-        return err;
-      }
-      console.log('File uploaded successfully ' + data.Location);
-      await persist({ id_ejecucion: executionId, ruta_archivo: data.Location });
-      await updateExecution(executionId, 'ejecutado');
-    }
-  );
-  //Uploading json to the bucket
-  s3.upload(
-    {
-      Bucket: 'miso-4208-grupo3/results',
-      Key: script + '.json',
-      Body: report
-    },
-    async (err, data) => {
-      if (err) {
-        return err;
-      }
-      console.log('File uploaded successfully ' + data.Location);
-      await persist({ id_ejecucion: executionId, ruta_archivo: data.Location });
-    }
-  );
 }
 
-////execute random test with adb
-async function executeMovil(appRoute, parameter, executionId) {
+//execute random test with adb
+async function executeMovil(
+  appRoute,
+  parameter,
+  strategyId,
+  testId,
+  executionId
+) {
+  console.log('***** Executing Movil Random *****');
   const s3 = new AWS.S3();
   const app = path.posix.basename(appRoute);
   const params = {
@@ -222,41 +268,35 @@ async function executeMovil(appRoute, parameter, executionId) {
     fs.writeFileSync(path.join(__dirname, '../adb', app), data.Body);
     console.log(app + ' has been created!');
     const devices = await client.listDevices();
+    console.log(devices);
     await client.install(devices[0].id, path.join(__dirname, '../adb', app));
-    var pathTest = path.join(
-      'C:',
-      'Users',
-      'Daniela',
-      'AppData',
-      'Local',
-      'Android',
-      'Sdk',
-      'platform-tools'
-    );
-    shell.cd(pathTest);
-    await shell.exec(' ' + parameter + ' > ' + app + '_log.txt');
-    const log = fs.readFileSync(path.join(pathTest, app + '_log.txt'));
-    s3.upload(
-      {
-        Bucket: 'miso-4208-grupo3/results',
-        Key: app + '_log.txt',
-        Body: log
-      },
-      async (err, data) => {
-        if (err) {
-          return err;
-        }
-        console.log('File uploaded successfully ' + data.Location);
-        await persist({
-          id_ejecucion: executionId,
-          ruta_archivo: data.Location
-        });
-        await updateExecution(executionId, 'ejecutado');
+    shell.cd(process.env.SDK);
+    shell.exec(' ' + parameter + ' > ' + app + '_log.txt');
+    const log = fs.readFileSync(path.join(process.env.SDK, app + '_log.txt'));
+    let paramsU = {
+      Bucket:
+        'miso-4208-grupo3/results/' +
+        strategyId +
+        '/' +
+        testId +
+        '/' +
+        executionId,
+      Key: app + '_log.txt',
+      Body: log
+    };
+    s3.upload(paramsU, async (err, data) => {
+      if (err) {
+        return err;
       }
-    );
+      console.log('File uploaded successfully ' + data.Location);
+      await persist({
+        id_ejecucion: executionId,
+        ruta_archivo: path.dirname(data.Location)
+      });
+      await updateExecution(executionId, 'ejecutado');
+    });
   });
 }
-
 //persist results
 async function persist(fields) {
   await Result.create(fields, { raw: true });
