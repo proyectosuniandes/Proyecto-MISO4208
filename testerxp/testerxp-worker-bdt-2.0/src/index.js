@@ -58,9 +58,9 @@ const task = cron.schedule('* * * * *', () => {
         ReceiptHandle: data.Messages[0].ReceiptHandle
       };
       const strategyTest = await getStrategyTest(
-        message.estrategia_ID,
-        message.prueba_ID,
-        message.aplicacion_ID
+        message.id_estrategia,
+        message.id_prueba,
+        message.id_app
       );
       deleteMessage(deleteParams);
       if (!strategyTest) {
@@ -77,7 +77,7 @@ const task = cron.schedule('* * * * *', () => {
           }
           if (strategyTest.tipo_app === 'web') {
             await executeWeb(
-              message.script,
+              message.ruta_script,
               headless,
               strategyTest.id_ejecucion
             );
@@ -94,7 +94,7 @@ const task = cron.schedule('* * * * *', () => {
 async function getStrategyTest(strategyId, testId, appId) {
   try {
     const record = await sequelize.query(
-      'select ep.id_ejecucion, e.estado, a.tipo_app, p.modo_prueba from estrategia_prueba ep, ejecucion e, app a, prueba p where ep.id_estrategia = $strategyId and ep.id_prueba = $testId and ep.id_ejecucion =e.id_ejecucion and a.id_app = $appId',
+      'select e.estado, p.modo_prueba, a.tipo_app from ejecucion e, prueba p, app a where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId',
       {
         bind: {
           strategyId: strategyId,
