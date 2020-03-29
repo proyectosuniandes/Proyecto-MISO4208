@@ -1,5 +1,4 @@
 const express = require("express");
-var env = require('node-env-file');
 
 var AWS = require("aws-sdk");
 var queueURL = "https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo";
