@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS resultado;
-DROP TABLE IF EXISTS estrategia_prueba;
 DROP TABLE IF EXISTS ejecucion;
+DROP TABLE IF EXISTS estrategia_prueba;
 DROP TABLE IF EXISTS estrategia;
 DROP TABLE IF EXISTS script;
 DROP TABLE IF EXISTS parametro;
@@ -64,27 +64,30 @@ CREATE TABLE IF NOT EXISTS script (
 );
 
 CREATE TABLE IF NOT EXISTS estrategia(
-  id_estrategia SERIAL PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS ejecucion(
-  id_ejecucion SERIAL PRIMARY KEY,
-  estado estado_ejecucion
+  id_estrategia SERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  estado estado_ejecucion NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS estrategia_prueba(
   id_estrategia INTEGER NOT NULL,
   id_prueba INTEGER NOT NULL,
-  id_ejecucion INTEGER NOT NULL,
   PRIMARY KEY (id_estrategia,id_prueba),
   CONSTRAINT id_estrategia_fkey FOREIGN KEY (id_estrategia)
     REFERENCES estrategia (id_estrategia) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT id_prueba_fkey FOREIGN KEY (id_prueba)
     REFERENCES prueba (id_prueba) MATCH SIMPLE
-    ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT id_ejecucion_fkey FOREIGN KEY (id_ejecucion)
-    REFERENCES ejecucion (id_ejecucion) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS ejecucion(
+  id_ejecucion SERIAL PRIMARY KEY,
+  id_estrategia INTEGER NOT NULL,
+  id_prueba INTEGER NOT NULL,
+  estado estado_ejecucion NOT NULL,
+  CONSTRAINT id_estrategia_prueba_fkey FOREIGN KEY (id_estrategia,id_prueba)
+    REFERENCES estrategia_prueba (id_estrategia,id_prueba) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 

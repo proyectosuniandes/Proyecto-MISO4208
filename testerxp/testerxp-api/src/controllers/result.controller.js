@@ -147,7 +147,7 @@ async function uploadFile(filePath, fileName, fields, persist) {
   const s3 = new AWS.S3();
   //Get items
   const record = await sequelize.query(
-    'select id_estrategia, id_prueba from estrategia_prueba where id_ejecucion=$executionId',
+    'select e.id_estrategia, e.id_prueba from ejecucion e where e.id_ejecucion=$executionId',
     {
       bind: {
         executionId: fields.id_ejecucion
