@@ -1,5 +1,5 @@
 const express = require("express");
-
+var env = require('node-env-file');
 
 var AWS = require("aws-sdk");
 var queueURL = "https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo";
@@ -34,18 +34,15 @@ function main() {
       console.log(messageprueba);
       var exec1 = JSON.parse(messageprueba);
       console.log(exec1);
-      switch (exec1.TipoPruebas) {
-        case 'e2e':
+      switch (exec1.tipo_prueba) {
+        case 'E2E':
           sqsURL='https://sqs.us-east-1.amazonaws.com/973067341356/e2e.fifo';
           break;
-        case 'random':
+        case 'RANDOM':
           sqsURL='https://sqs.us-east-1.amazonaws.com/973067341356/random.fifo';
           break;
-        case 'bdt':
+        case 'BDT':
           sqsURL='https://sqs.us-east-1.amazonaws.com/973067341356/bdt.fifo';
-          break;
-        case 'vrt':
-          sqsURL='https://sqs.us-east-1.amazonaws.com/973067341356/vrt.fifo';
           break;
         default:
           console.log('NO EJECUCION');
@@ -58,8 +55,8 @@ function main() {
       var sendParams = {
         MessageAttributes: data.Messages.MessageAttributes,
         MessageBody: data.Messages[0].Body,
-        MessageDeduplicationId: "1",  // Required for FIFO queues
-        MessageGroupId: "1",  // Required for FIFO queues
+        MessageDeduplicationId: data.Messages[0].MessageId,  // Required for FIFO queues
+        MessageGroupId: data.Messages[0].MessageId,  // Required for FIFO queues
         QueueUrl: sqsURL        
       };
 
@@ -82,4 +79,4 @@ function main() {
   setTimeout(main, 1000,);
 };
 main();	
-app.listen("3128");
+app.listen("5000");
