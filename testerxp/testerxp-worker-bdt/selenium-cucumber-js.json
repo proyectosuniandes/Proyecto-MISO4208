@@ -4,5 +4,5 @@
     "sharedObjects": "./shared-objects",
     "reports": "./reports",
     "browser": "firefox",
-    "timeout": 10000
+    "timeout": 30000
 }
