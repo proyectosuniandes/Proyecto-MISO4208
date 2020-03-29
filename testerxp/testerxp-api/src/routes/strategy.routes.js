@@ -12,4 +12,7 @@ module.exports = app => {
 
   //Retrieve all Strategies
   app.get('/strategies', Strategies.findAll);
+
+  //Execute a Strategy
+  app.get('/strategies/execute/:strategyId', Strategies.execute);
 };

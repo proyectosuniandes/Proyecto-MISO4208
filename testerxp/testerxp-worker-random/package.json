@@ -4,7 +4,7 @@
   "description": "worker random proyecto pruebas automatizadas",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/"
+    "dev": "nodemon --ignore cypress/* src/"
   },
   "author": "Grupo3",
   "license": "MIT",
