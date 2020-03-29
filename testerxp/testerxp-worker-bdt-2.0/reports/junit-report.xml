@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-    <testsuite name="login-into-losestudiantes;login-successful" tests="5" failures="0" skipped="0">
+    <testsuite name="login-into-mantis;login-successful" tests="5" failures="0" skipped="0">
         <properties>
-            <property name="URI" value="C:/Users/NicX/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature">
+            <property name="URI" value="C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature">
             </property>
         </properties>
-        <testcase name="Given I go to losestudiantes home screen" classname="login-into-losestudiantes;login-successful" time="0.002804501">
+        <testcase name="Given I go to Mantis home screen" classname="login-into-mantis;login-successful" time="0.000773601">
         </testcase>
-        <testcase name="When I open the login screen" classname="login-into-losestudiantes;login-successful" time="0.0004722">
+        <testcase name="When I fill username" classname="login-into-mantis;login-successful" time="0.001444">
         </testcase>
-        <testcase name="And I fill a right email and password" classname="login-into-losestudiantes;login-successful" time="0.0021424">
+        <testcase name="And I fill password" classname="login-into-mantis;login-successful" time="0.000382999">
         </testcase>
-        <testcase name="And I try to login" classname="login-into-losestudiantes;login-successful" time="0.0008066">
+        <testcase name="And I try to login" classname="login-into-mantis;login-successful" time="0.000387701">
         </testcase>
-        <testcase name="Then I already logged" classname="login-into-losestudiantes;login-successful" time="0.0001877">
+        <testcase name="Then I already logged" classname="login-into-mantis;login-successful" time="0.001295">
         </testcase>
     </testsuite>
 </testsuites>

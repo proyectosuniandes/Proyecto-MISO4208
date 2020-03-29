@@ -1,9 +1,9 @@
 [
   {
-    "description": "    As an user I want to authenticate myself within losestudiantes website in order to rate teachers",
+    "description": "    As an user I want to authenticate myself within Mantis website",
     "elements": [
       {
-        "id": "login-into-losestudiantes;login-successful",
+        "id": "login-into-mantis;login-successful",
         "keyword": "Scenario",
         "line": 4,
         "name": "Login successful",
@@ -11,40 +11,40 @@
           {
             "arguments": [],
             "keyword": "Given ",
-            "name": "I go to losestudiantes home screen",
+            "name": "I go to Mantis home screen",
             "result": {
               "status": "passed",
-              "duration": 2804501
+              "duration": 773601
             },
             "line": 5,
             "match": {
-              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:2"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:2"
             }
           },
           {
             "arguments": [],
             "keyword": "When ",
-            "name": "I open the login screen",
+            "name": "I fill username",
             "result": {
               "status": "passed",
-              "duration": 472200
+              "duration": 1444000
             },
             "line": 6,
             "match": {
-              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:9"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:6"
             }
           },
           {
             "arguments": [],
             "keyword": "And ",
-            "name": "I fill a right email and password",
+            "name": "I fill password",
             "result": {
               "status": "passed",
-              "duration": 2142400
+              "duration": 382999
             },
             "line": 7,
             "match": {
-              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:13"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:11"
             }
           },
           {
@@ -53,11 +53,11 @@
             "name": "I try to login",
             "result": {
               "status": "passed",
-              "duration": 806600
+              "duration": 387701
             },
             "line": 8,
             "match": {
-              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:19"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:15"
             }
           },
           {
@@ -66,11 +66,11 @@
             "name": "I already logged",
             "result": {
               "status": "passed",
-              "duration": 187700
+              "duration": 1295000
             },
             "line": 9,
             "match": {
-              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:24"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:19"
             }
           },
           {
@@ -78,11 +78,11 @@
             "keyword": "After ",
             "result": {
               "status": "passed",
-              "duration": 8529709000
+              "duration": 5388728399
             },
             "hidden": true,
             "match": {
-              "location": "C:\\Users\\NicX\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\node_modules\\selenium-cucumber-js\\runtime\\world.js:250"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\node_modules\\selenium-cucumber-js\\runtime\\world.js:250"
             }
           }
         ],
@@ -90,11 +90,11 @@
         "type": "scenario"
       }
     ],
-    "id": "login-into-losestudiantes",
+    "id": "login-into-mantis",
     "keyword": "Feature",
     "line": 1,
-    "name": "Login into losestudiantes",
+    "name": "Login into Mantis",
     "tags": [],
-    "uri": "C:/Users/NicX/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature"
+    "uri": "C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature"
   }
 ]

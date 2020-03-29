@@ -1,10 +1,7 @@
 {
-  "reporter": "mochawesome",
+  "reporter": "junit",
   "reporterOptions": {
-      "reportDir": "../cypress/results",
-      "overwrite": false,
-      "html": true,
-      "json": false,
-      "timestamp": "mmddyyyy_HHMMss"
-   }
+    "mochaFile": "results/my-test-output-[hash].xml"
+  },
+  "chromeWebSecurity": false
 }

@@ -127,6 +127,10 @@ async function updateExecution(executionId, estado) {
   );
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 //execute test
 async function executeWeb(rutaScript, mode, executionId) {
   const script = path.posix.basename(rutaScript);
@@ -135,6 +139,7 @@ async function executeWeb(rutaScript, mode, executionId) {
   downloadFile(script, '.feature', 'features');
   console.log('Scripts "' + script + '" downloaded!');
 
+  await sleep(2000);
   console.log('Running Cucumber...');
   var pathTest = 'node ./node_modules/selenium-cucumber-js/index.js';
   if (shell.exec(pathTest).code !== 0) {
