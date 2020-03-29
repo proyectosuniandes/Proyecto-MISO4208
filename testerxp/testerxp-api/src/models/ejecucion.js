@@ -1,6 +1,5 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const estrategiaPrueba = require('./estrategiaPrueba');
 const resultado = require('./resultado');
 
 const ejecucion = sequelize.define(
@@ -10,6 +9,12 @@ const ejecucion = sequelize.define(
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
+    },
+    id_estrategia: {
+      type: Sequelize.INTEGER
+    },
+    id_prueba: {
+      type: Sequelize.INTEGER
     },
     estado: {
       type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente')
@@ -22,10 +27,6 @@ const ejecucion = sequelize.define(
 );
 
 ejecucion.hasMany(resultado, {
-  foreignKey: 'id_ejecucion',
-  sourceKey: 'id_ejecucion'
-});
-ejecucion.belongsTo(estrategiaPrueba, {
   foreignKey: 'id_ejecucion',
   sourceKey: 'id_ejecucion'
 });

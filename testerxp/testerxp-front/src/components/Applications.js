@@ -31,8 +31,8 @@ export const ApplicationEdit = props => (
             <TextInput disabled source="id"/>
             <TextInput source="nombre"/>
             <SelectInput label="Tipo Aplicación" source="tipo_app" choices={[
-                {id: '1', name: 'Web'},
-                {id: '2', name: 'Móvil'},]}/>
+                {id: '2', name: 'Web'},
+                {id: '1', name: 'Móvil'},]}/>
         </SimpleForm>
     </Edit>
 );
@@ -43,8 +43,8 @@ export const ApplicationCreate = props => (
         <SimpleForm>
             <TextInput source="nombre"/>
             <SelectInput label="Tipo Aplicación" source="tipo_app" choices={[
-                {id: '1', name: 'Web'},
-                {id: '2', name: 'Móvil'},]}/>
+                {id: '2', name: 'Web'},
+                {id: '1', name: 'Móvil'},]}/>
         </SimpleForm>
     </Create>
 );

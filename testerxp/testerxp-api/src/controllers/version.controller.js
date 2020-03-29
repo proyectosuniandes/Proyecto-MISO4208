@@ -10,21 +10,28 @@ exports.create = async (req, res) => {
   console.log('***** Create Version *****');
   try {
     const form = formidable({ multiples: true });
-    form.parse(req, (err, fields, files) => {
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         res.status(500).json({ message: 'File not parsed' });
       }
-      uploadFile(
-        files.ruta_app.path,
-        files.ruta_app.name,
-        fields,
-        async fields => {
-          const record = await Version.create(fields, {
-            raw: true
-          });
-          res.status(201).json(record);
-        }
-      );
+      if (Object.keys(files).length > 0) {
+        uploadFile(
+          files.ruta_app.path,
+          files.ruta_app.name,
+          fields,
+          async fields => {
+            const record = await Version.create(fields, {
+              raw: true
+            });
+            res.status(201).json(record);
+          }
+        );
+      } else {
+        const record = await Version.create(fields, {
+          raw: true
+        });
+        res.status(201).json(record);
+      }
     });
   } catch (e) {
     console.log(e);
