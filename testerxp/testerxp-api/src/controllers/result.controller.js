@@ -1,5 +1,7 @@
 const Result = require('../models/resultado');
 const Execution = require('../models/ejecucion');
+const sequelize = require('../database/database');
+const { QueryTypes } = require('sequelize');
 const formidable = require('formidable');
 const AWS = require('aws-sdk');
 const fs = require('fs');
@@ -143,11 +145,28 @@ exports.findAll = async (req, res) => {
 
 async function uploadFile(filePath, fileName, fields, persist) {
   const s3 = new AWS.S3();
+  //Get items
+  const record = await sequelize.query(
+    'select id_estrategia, id_prueba from estrategia_prueba where id_ejecucion=$executionId',
+    {
+      bind: {
+        executionId: fields.id_ejecucion
+      },
+      type: QueryTypes.SELECT,
+      raw: true
+    }
+  );
   //Read content from file
   const fileContent = fs.readFileSync(filePath);
   //Setting up S3 upload parameters
   const params = {
-    Bucket: 'miso-4208-grupo3/file',
+    Bucket:
+      'miso-4208-grupo3/results/' +
+      record[0].id_estrategia +
+      '/' +
+      record[0].id_prueba +
+      '/' +
+      fields.id_ejecucion,
     Key: fileName,
     Body: fileContent
   };
@@ -157,25 +176,38 @@ async function uploadFile(filePath, fileName, fields, persist) {
       return err;
     }
     console.log('File uploaded successfully ' + data.Location);
-    fields.ruta_archivo = data.Location;
+    fields.ruta_archivo = path.dirname(data.Location);
     persist(fields);
   });
 }
 
 function deleteFile(rutaResult, next) {
   const s3 = new AWS.S3();
-  const oldFile = path.posix.basename(rutaResult);
-  // Setting up S3 delete parameters
-  const paramsD = {
-    Bucket: 'miso-4208-grupo3/file',
-    Key: oldFile
+  const split = rutaResult.split('.com/');
+  const bucket = 'miso-4208-grupo3';
+  const prefix = split[1];
+  // Setting up S3 list parameters
+  const paramsL = {
+    Bucket: bucket,
+    Prefix: prefix
   };
-  // Deleting files to the bucket
-  s3.deleteObject(paramsD, async function(err, data) {
+  // Listing files
+  s3.listObjects(paramsL, (err, data) => {
     if (err) {
       throw err;
     }
-    console.log('File deleted successfully. ' + data);
-    next();
+    // Setting up S3 delete parameters
+    let paramsD = { Bucket: bucket, Delete: { Objects: [] } };
+    data.Contents.forEach(d => {
+      paramsD.Delete.Objects.push({ Key: d.Key });
+    });
+    // Deleting files to the bucket
+    s3.deleteObjects(paramsD, async function(err, data) {
+      if (err) {
+        throw err;
+      }
+      console.log('Bucket deleted successfully. ' + data);
+      next();
+    });
   });
 }
