@@ -4,7 +4,7 @@ import {createMuiTheme} from '@material-ui/core/styles';
 // A custom theme for this app
 const theme = createMuiTheme({
     sidebar: {
-        width: 240, // The default value is 240
+        width: 260, // The default value is 240
         closedWidth: 55, // The default value is 55
     },
     palette: {
