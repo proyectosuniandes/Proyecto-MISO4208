@@ -1,9 +1,11 @@
 const Parameter = require('../models/parametro');
-const Test = require('../models/prueba');
+const Test = require('../models/Prueba');
+const util = require('util');
 
 //Create and Save a new Parameter
 exports.create = async (req, res) => {
   console.log('***** Create Parameter *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */))
   try {
     const record = await Parameter.create(req.body, {
       raw: true
@@ -18,6 +20,7 @@ exports.create = async (req, res) => {
 //Update a Parameter identified by the parameterId in the request
 exports.update = async (req, res) => {
   console.log('***** Update Parameter *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const record = await Parameter.findByPk(req.params.parameterId, {
       raw: true
@@ -38,6 +41,7 @@ exports.update = async (req, res) => {
 //Delete a Parameter identified by the parameterId in the request
 exports.delete = async (req, res) => {
   console.log('***** Delete Parameter *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */))
   try {
     await Parameter.destroy({
       where: { id_parametro: req.params.parameterId }
@@ -52,6 +56,7 @@ exports.delete = async (req, res) => {
 //Retrieve a Parameter identified by the parameterId in the request
 exports.findOne = async (req, res) => {
   console.log('***** FindOne Parameter *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */))
   try {
     const record = await Parameter.findByPk(req.params.parameterId, {
       include: Test,

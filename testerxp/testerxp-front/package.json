@@ -10,6 +10,10 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.1",
     "@testing-library/user-event": "^7.2.1",
+    "accordion": "^3.0.2",
+    "classnames": "^2.2.6",
+    "primeicons": "^2.0.0",
+    "primereact": "^4.1.2",
     "prop-types": "^15.7.2",
     "ra-data-json-server": "^3.2.3",
     "ra-data-simple-rest": "^3.2.2",
@@ -17,7 +21,8 @@
     "react-admin": "^3.2.3",
     "react-dom": "^16.13.0",
     "react-router-redux": "^4.0.8",
-    "react-scripts": "3.4.0"
+    "react-scripts": "3.4.0",
+    "react-transition-group": "^4.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -39,5 +44,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {}
 }
