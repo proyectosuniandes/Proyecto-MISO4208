@@ -57,8 +57,9 @@ const task = cron.schedule('* * * * *', () => {
         QueueUrl: queueURL,
         ReceiptHandle: data.Messages[0].ReceiptHandle
       };
+
       const strategyTest = await getStrategyTest(
-        message.id_estrategia,
+        message.id_ejecucion,
         message.id_prueba,
         message.id_app
       );
@@ -68,21 +69,12 @@ const task = cron.schedule('* * * * *', () => {
       } else {
         console.log(strategyTest);
         if (strategyTest.estado === 'registrado') {
-          await updateExecution(strategyTest.id_ejecucion, 'pendiente');
-          let headless;
-          if (strategyTest.modo_prueba === 'headless') {
-            headless = true;
-          } else {
-            headless = false;
-          }
+          await updateExecution(message.id_ejecucion, 'pendiente');
           if (strategyTest.tipo_app === 'web') {
             await executeWeb(
               message.ruta_script,
-              headless,
-              strategyTest.id_ejecucion
+              strategyTest
             );
-          } else {
-
           }
         }
       }
@@ -91,13 +83,13 @@ const task = cron.schedule('* * * * *', () => {
 });
 
 //Find strategyTest given strategyId and testId
-async function getStrategyTest(strategyId, testId, appId) {
+async function getStrategyTest(executionId, testId, appId) {
   try {
     const record = await sequelize.query(
-      'select e.estado, p.modo_prueba, a.tipo_app from ejecucion e, prueba p, app a where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId',
+      'select e.id_ejecucion, e.estado, p.modo_prueba, a.tipo_app from ejecucion e, prueba p, app a where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId',
       {
         bind: {
-          strategyId: strategyId,
+          executionId: executionId,
           testId: testId,
           appId: appId
         },
@@ -132,7 +124,7 @@ function sleep(ms) {
 }
 
 //execute test
-async function executeWeb(rutaScript, mode, executionId) {
+async function executeWeb(rutaScript, strategyTest) {
   const script = path.posix.basename(rutaScript);
 
   downloadFile(script, '.js', 'step-definitions');
@@ -141,13 +133,22 @@ async function executeWeb(rutaScript, mode, executionId) {
 
   await sleep(2000);
   console.log('Running Cucumber...');
-  var pathTest = 'node ./node_modules/selenium-cucumber-js/index.js';
+  let pathTest;
+  if (strategyTest.modo_prueba === 'headless')
+  {
+    pathTest = 'node ./node_modules/selenium-cucumber-js/index.js -k none';
+  }
+  if (strategyTest.modo_prueba === 'headful')
+  {
+    pathTest = 'node ./node_modules/selenium-cucumber-js/index.js';
+  }
   if (shell.exec(pathTest).code !== 0) {
     shell.exit(1);
     console.log('Cucumber failed. ' + err);
   }
   else {
     console.log('Cucumber complete. ');
+    await updateExecution(strategyTest.id_ejecucion, 'ejecutado');
   }
 
   //Uploading report to the bucket
@@ -166,7 +167,7 @@ async function executeWeb(rutaScript, mode, executionId) {
         return err;
       }
       console.log('File uploaded successfully ' + data.Location);
-      await persist({ id_ejecucion: executionId, ruta_archivo: data.Location });
+      await persist({ id_ejecucion: strategyTest.id_ejecucion, ruta_archivo: data.Location });
     }
   );
 }
