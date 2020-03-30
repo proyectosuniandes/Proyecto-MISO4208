@@ -63,7 +63,7 @@ const task = cron.schedule('* * * * *', () => {
         message.id_prueba,
         message.id_app
       );
-      //deleteMessage(deleteParams);
+      deleteMessage(deleteParams);
       if (!strategyTest) {
         console.log('estrategiaPrueba not found');
       } else {
