@@ -14,11 +14,11 @@
             "name": "I go to Mantis home screen",
             "result": {
               "status": "passed",
-              "duration": 773601
+              "duration": 897301
             },
             "line": 5,
             "match": {
-              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:2"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:2"
             }
           },
           {
@@ -27,11 +27,11 @@
             "name": "I fill username",
             "result": {
               "status": "passed",
-              "duration": 1444000
+              "duration": 2630099
             },
             "line": 6,
             "match": {
-              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:6"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:6"
             }
           },
           {
@@ -40,11 +40,11 @@
             "name": "I fill password",
             "result": {
               "status": "passed",
-              "duration": 382999
+              "duration": 588700
             },
             "line": 7,
             "match": {
-              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:11"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:11"
             }
           },
           {
@@ -53,11 +53,11 @@
             "name": "I try to login",
             "result": {
               "status": "passed",
-              "duration": 387701
+              "duration": 556800
             },
             "line": 8,
             "match": {
-              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:15"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:15"
             }
           },
           {
@@ -66,11 +66,11 @@
             "name": "I already logged",
             "result": {
               "status": "passed",
-              "duration": 1295000
+              "duration": 1329800
             },
             "line": 9,
             "match": {
-              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\step-definitions\\login.js:19"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\step-definitions\\login.js:19"
             }
           },
           {
@@ -78,11 +78,11 @@
             "keyword": "After ",
             "result": {
               "status": "passed",
-              "duration": 5388728399
+              "duration": 7771146100
             },
             "hidden": true,
             "match": {
-              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt-2.0\\node_modules\\selenium-cucumber-js\\runtime\\world.js:250"
+              "location": "C:\\Users\\Esteb\\Documents\\GitHub\\Proyecto-MISO4208\\testerxp\\testerxp-worker-bdt\\node_modules\\selenium-cucumber-js\\runtime\\world.js:250"
             }
           }
         ],
@@ -95,6 +95,6 @@
     "line": 1,
     "name": "Login into Mantis",
     "tags": [],
-    "uri": "C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature"
+    "uri": "C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt/features/login.feature"
   }
 ]
