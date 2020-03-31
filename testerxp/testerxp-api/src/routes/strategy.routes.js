@@ -1,13 +1,16 @@
 module.exports = app => {
   const Strategies = require('../controllers/strategy.controller.js');
 
-  //Create a new Parameter
+  //Create a new Strategy
   app.post('/strategies', Strategies.create);
 
-  //Delete a Parameter with ParameterId
+  //Update a Strategy with StrategyId
+  app.put('/strategies/:strategyId', Strategies.update);
+
+  //Delete a Strategy with StrategyId
   app.delete('/strategies/:strategyId', Strategies.delete);
 
-  //Retrieve a sigle Parameter with ParameterId
+  //Retrieve a sigle Strategy with StrategyId
   app.get('/strategies/:strategyId', Strategies.findOne);
 
   //Retrieve all Strategies

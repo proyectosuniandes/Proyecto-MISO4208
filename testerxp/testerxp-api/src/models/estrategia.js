@@ -9,6 +9,12 @@ const estrategia = sequelize.define(
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
+    },
+    nombre: {
+      type: Sequelize.TEXT
+    },
+    estado: {
+      type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente')
     }
   },
   {
