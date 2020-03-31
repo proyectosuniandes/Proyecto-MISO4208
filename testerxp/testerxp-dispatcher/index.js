@@ -1,4 +1,5 @@
 const express = require("express");
+const cron = require('node-cron');
 
 var AWS = require("aws-sdk");
 var queueURL = "https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo";
@@ -22,7 +23,9 @@ var params = {
 
 var app = express();
 
-function main() {
+app.set('port', process.env.PORT || 8080);
+
+const task = cron.schedule('* * * * *', () => {
   console.log("checking queue for messages...");
   sqs.receiveMessage(params, function(err, data) {
     if (err) {
@@ -37,7 +40,7 @@ function main() {
         case 'E2E':
           sqsURL='https://sqs.us-east-1.amazonaws.com/973067341356/e2e.fifo';
           break;
-        case 'RANDOM':
+        case 'random':
           sqsURL='https://sqs.us-east-1.amazonaws.com/973067341356/random.fifo';
           break;
         case 'BDT':
@@ -75,7 +78,9 @@ function main() {
       });
     }
   });
-  setTimeout(main, 1000,);
-};
-main();	
-app.listen("5000");
+});
+//Starting the server
+task.start();
+app.listen(app.get('port'), () => {
+  console.log('server on port', app.get('port'));
+});
