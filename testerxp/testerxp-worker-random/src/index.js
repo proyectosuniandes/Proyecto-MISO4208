@@ -72,10 +72,10 @@ const task = cron.schedule('* * * * *', () => {
           let headless, headful;
           if (strategyTest.modo_prueba === 'headless') {
             headless = true;
-            headful=false;
+            headful = false;
           } else {
             headless = false;
-            headful=true;
+            headful = true;
           }
           if (strategyTest.tipo_app === 'web') {
             await executeWeb(
@@ -139,7 +139,14 @@ async function updateExecution(executionId, estado) {
 }
 
 //execute random script with cypress
-async function executeWeb(rutaScript, headless,headful, strategyId, testId, executionId) {
+async function executeWeb(
+  rutaScript,
+  headless,
+  headful,
+  strategyId,
+  testId,
+  executionId
+) {
   console.log('***** Executing Web Random *****');
   const s3 = new AWS.S3();
   const split = rutaScript.split('.com/');
@@ -171,10 +178,15 @@ async function executeWeb(rutaScript, headless,headful, strategyId, testId, exec
           data.Body.toString()
         );
         console.log(d.Key + ' has been created!');
-        await cypress.run({
+        const a = await cypress.run({
           headless: headless,
-          headed:headful,
+          headed: headful,
           spec: path.join(__dirname, '../cypress/integration', d.Key),
+          screenshotsFolder: path.join(
+            __dirname,
+            '../cypress/screenshots',
+            prefix
+          ),
           chromeWebSecurity: false,
           reporter: 'mochawesome',
           reporterOptions: {
@@ -186,8 +198,35 @@ async function executeWeb(rutaScript, headless,headful, strategyId, testId, exec
             quiet: true
           }
         });
+        let paramsU = {
+          Bucket:
+            'miso-4208-grupo3/results/' +
+            strategyId +
+            '/' +
+            testId +
+            '/' +
+            executionId
+        };
         let nameScript = d.Key.split('/');
         nameScript = nameScript[nameScript.length - 1];
+        if (a.runs[0].screenshots.length > 0) {
+          const screenshot = fs.readFileSync(a.runs[0].screenshots[0].path);
+          paramsU.Key = nameScript + '.png';
+          paramsU.Body = screenshot;
+          s3.upload(paramsU, async (err, data) => {
+            if (err) {
+              return err;
+            }
+            console.log('File uploaded successfully ' + data.Location);
+            fs.unlinkSync(a.runs[0].screenshots[0].path);
+            await persist({
+              id_ejecucion: executionId,
+              ruta_archivo: data.Location
+            });
+            await updateExecution(executionId, 'ejecutado');
+          });
+        }
+        fs.unlinkSync(path.join(__dirname, '../cypress/integration', d.Key));
         const video = fs.readFileSync(
           path.join(__dirname, '../cypress/videos', d.Key + '.mp4')
         );
@@ -199,26 +238,19 @@ async function executeWeb(rutaScript, headless,headful, strategyId, testId, exec
           )
         );
         //Uploading video to the bucket
-        let paramsU = {
-          Bucket:
-            'miso-4208-grupo3/results/' +
-            strategyId +
-            '/' +
-            testId +
-            '/' +
-            executionId,
-          Key: nameScript + '.mp4',
-          Body: video
-        };
+        paramsU.Key = nameScript + '.mp4';
+        paramsU.Body = video;
         s3.upload(paramsU, async (err, data) => {
           if (err) {
             return err;
           }
           console.log('File uploaded successfully ' + data.Location);
-          fs.unlinkSync(path.join(__dirname, '../cypress/videos', d.Key + '.mp4'));
+          fs.unlinkSync(
+            path.join(__dirname, '../cypress/videos', d.Key + '.mp4')
+          );
           await persist({
             id_ejecucion: executionId,
-            ruta_archivo: path.dirname(data.Location)
+            ruta_archivo: data.Location
           });
           await updateExecution(executionId, 'ejecutado');
         });
@@ -230,14 +262,16 @@ async function executeWeb(rutaScript, headless,headful, strategyId, testId, exec
             return err;
           }
           console.log('File uploaded successfully ' + data.Location);
-          fs.unlinkSync(path.join(
-            __dirname,
-            '../cypress/results',
-            d.Key.split('.')[0] + '.json'
-          ));
+          fs.unlinkSync(
+            path.join(
+              __dirname,
+              '../cypress/results',
+              d.Key.split('.')[0] + '.json'
+            )
+          );
           await persist({
             id_ejecucion: executionId,
-            ruta_archivo: path.dirname(data.Location)
+            ruta_archivo: data.Location
           });
         });
       });
@@ -268,11 +302,11 @@ async function executeMovil(
     fs.writeFileSync(path.join(__dirname, '../adb', app), data.Body);
     console.log(app + ' has been created!');
     const devices = await client.listDevices();
-    console.log(devices);
     await client.install(devices[0].id, path.join(__dirname, '../adb', app));
     shell.cd(process.env.SDK);
-    shell.exec(' ' + parameter + ' > ' + app + '_log.txt');
-    const log = fs.readFileSync(path.join(process.env.SDK, app + '_log.txt'));
+    shell.exec(parameter + ' > /home/ubuntu/adbResult' + app + '_log.txt');
+    fs.unlinkSync(path.join(__dirname, '../adb', app));
+    const log = fs.readFileSync('/home/ubuntu/adbResult' + app + '_log.txt');
     let paramsU = {
       Bucket:
         'miso-4208-grupo3/results/' +
@@ -289,14 +323,16 @@ async function executeMovil(
         return err;
       }
       console.log('File uploaded successfully ' + data.Location);
+      fs.unlinkSync('/home/ubuntu/adbResult' + app + '_log.txt');
       await persist({
         id_ejecucion: executionId,
-        ruta_archivo: path.dirname(data.Location)
+        ruta_archivo: data.Location
       });
       await updateExecution(executionId, 'ejecutado');
     });
   });
 }
+
 //persist results
 async function persist(fields) {
   await Result.create(fields, { raw: true });
