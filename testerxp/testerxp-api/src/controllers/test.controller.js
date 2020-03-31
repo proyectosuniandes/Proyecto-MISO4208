@@ -1,9 +1,10 @@
-const Test = require('../models/prueba');
-const Version = require('../models/version');
+const Test = require('../models/Prueba');
+const Version = require('../models/Version');
 
 //Create and Save a new Test
 exports.create = async (req, res) => {
   console.log('***** Create Test *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const record = await Test.create(req.body, {
       raw: true
@@ -18,6 +19,7 @@ exports.create = async (req, res) => {
 //Update a Test identified by the testId in the request
 exports.update = async (req, res) => {
   console.log('***** Update Test *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const record = await Test.findByPk(req.params.testId, {
       raw: true
@@ -38,6 +40,7 @@ exports.update = async (req, res) => {
 //Delete a Test identified by the testId in the request
 exports.delete = async (req, res) => {
   console.log('***** Delete Test *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     await Test.destroy({
       where: { id_prueba: req.params.testId }
@@ -52,6 +55,7 @@ exports.delete = async (req, res) => {
 //Retrieve a Test identified by the testId in the request
 exports.findOne = async (req, res) => {
   console.log('***** FindOne Test *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const record = await Test.findByPk(req.params.testId, {
       include: Version,
@@ -70,6 +74,7 @@ exports.findOne = async (req, res) => {
 // Retrieve all Tests from the database.
 exports.findAll = async (req, res) => {
   console.log('***** FindAll Tests *****');
+  console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const { range, sort, filter } = req.query;
     console.log(filter);

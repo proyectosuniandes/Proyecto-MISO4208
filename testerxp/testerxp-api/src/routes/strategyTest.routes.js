@@ -4,9 +4,6 @@ module.exports = app => {
   //Create a new StrategyTest
   app.post('/strategyTests', StrategyTests.create);
 
-  //Update a StrategyTest with StrategyTestId
-  app.put('/strategyTests/:strategyId/:testId', StrategyTests.update);
-
   //Delete a StrategyTest with StrategyTestId
   app.delete('/strategyTests/:strategyId/:testId', StrategyTests.delete);
 

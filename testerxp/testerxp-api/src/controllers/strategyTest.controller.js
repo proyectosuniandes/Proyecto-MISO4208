@@ -1,6 +1,6 @@
 const StrategyTest = require('../models/estrategiaPrueba');
 const Strategy = require('../models/estrategia');
-const Test = require('../models/prueba');
+const Test = require('../models/Prueba');
 
 //Create and Save a new StrategyTest
 exports.create = async (req, res) => {
@@ -13,34 +13,6 @@ exports.create = async (req, res) => {
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'StrategyTest not created' });
-  }
-};
-
-//Update a StrategyTest identified by the strategyId and the testId in the request
-exports.update = async (req, res) => {
-  console.log('***** Update StrategyTest *****');
-  try {
-    const record = await StrategyTest.findOne({
-      where: {
-        id_estrategia: req.params.strategyId,
-        id_prueba: req.params.testId
-      },
-
-      raw: true
-    });
-    if (!record) {
-      return res.status(404).json({ error: 'StrategyTest not found' });
-    }
-    await StrategyTest.update(req.body, {
-      where: {
-        id_estrategia: req.params.strategyId,
-        id_prueba: req.params.testId
-      }
-    });
-    res.status(200).json(req.body);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: 'Error updating StrategyTest' });
   }
 };
 
@@ -96,7 +68,7 @@ exports.findAll = async (req, res) => {
     const { range, sort, filter } = req.query;
     console.log(filter);
     const [from, to] = range ? JSON.parse(range) : [0, 100];
-    const parsedFilter = filter ? parseFilterVersion(filter) : {};
+    const parsedFilter = filter ? parseFilterStrategy(filter) : {};
     const { count, rows } = await StrategyTest.findAndCountAll({
       include: [
         { model: Test, as: 'prueba' },
@@ -112,13 +84,46 @@ exports.findAll = async (req, res) => {
     res.set('X-Total-Count', `${count}`);
 
     console.log(
-      rows.map(resource => ({ ...resource, id: resource.id_estrategia }))
+      rows.map(resource => ({ ...resource, id: resource.id_prueba }))
     );
     res.json(
-      rows.map(resource => ({ ...resource, id: resource.id_estrategia }))
+      rows.map(resource => ({ ...resource, id: resource.id_prueba }))
     );
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'error retrieving StrategyTests' });
   }
+};
+
+function parseFilterStrategy(filter) {
+
+  console.log("Filter --->" + filter);
+
+  if(JSON.parse(filter).hasOwnProperty('id')){
+    filter = filter.replace("id", "id_estrategia")
+  }
+
+  console.log("Replace Filter --->" + filter);
+  const filters = JSON.parse(filter);
+  return Object.keys(filters)
+      .map(key => {
+        if (
+            typeof filters[key] === 'string' &&
+            filters[key].indexOf('%') !== -1
+        ) {
+          return {
+            [key]: {[Op.like]: filters[key]},
+          }
+        }
+        return {
+          [key]: filters[key],
+        }
+      })
+      .reduce(
+          (whereAttributes, whereAttribute) => ({
+            ...whereAttributes,
+            ...whereAttribute,
+          }),
+          {}
+      )
 };
