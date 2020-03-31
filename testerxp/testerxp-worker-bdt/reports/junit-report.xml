@@ -2,18 +2,18 @@
 <testsuites>
     <testsuite name="login-into-mantis;login-successful" tests="5" failures="0" skipped="0">
         <properties>
-            <property name="URI" value="C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt-2.0/features/login.feature">
+            <property name="URI" value="C:/Users/Esteb/Documents/GitHub/Proyecto-MISO4208/testerxp/testerxp-worker-bdt/features/login.feature">
             </property>
         </properties>
-        <testcase name="Given I go to Mantis home screen" classname="login-into-mantis;login-successful" time="0.000773601">
+        <testcase name="Given I go to Mantis home screen" classname="login-into-mantis;login-successful" time="0.000897301">
         </testcase>
-        <testcase name="When I fill username" classname="login-into-mantis;login-successful" time="0.001444">
+        <testcase name="When I fill username" classname="login-into-mantis;login-successful" time="0.002630099">
         </testcase>
-        <testcase name="And I fill password" classname="login-into-mantis;login-successful" time="0.000382999">
+        <testcase name="And I fill password" classname="login-into-mantis;login-successful" time="0.0005887">
         </testcase>
-        <testcase name="And I try to login" classname="login-into-mantis;login-successful" time="0.000387701">
+        <testcase name="And I try to login" classname="login-into-mantis;login-successful" time="0.0005568">
         </testcase>
-        <testcase name="Then I already logged" classname="login-into-mantis;login-successful" time="0.001295">
+        <testcase name="Then I already logged" classname="login-into-mantis;login-successful" time="0.0013298">
         </testcase>
     </testsuite>
 </testsuites>

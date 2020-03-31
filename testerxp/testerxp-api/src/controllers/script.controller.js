@@ -1,5 +1,5 @@
 const Script = require('../models/script');
-const Test = require('../models/prueba');
+const Test = require('../models/Prueba');
 const formidable = require('formidable');
 const AWS = require('aws-sdk');
 const fs = require('fs');
