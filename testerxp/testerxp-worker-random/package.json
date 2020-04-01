@@ -1,10 +1,10 @@
 {
-  "name": "testerxp-worker-random-2.0",
-  "version": "2.0.0",
+  "name": "testerxp-worker-random",
+  "version": "1.0.0",
   "description": "worker random proyecto pruebas automatizadas",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --ignore cypress/* src/"
+    "dev": "nodemon --ignore cypress/integration/* --ignore cypress/results/* --ignore cypress/screenshots/* --ignore cypress/videos/* src/"
   },
   "author": "Grupo3",
   "license": "MIT",
