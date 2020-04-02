@@ -5,10 +5,10 @@ module.exports = app => {
   app.post('/strategyTests', StrategyTests.create);
 
   //Delete a StrategyTest with StrategyTestId
-  app.delete('/strategyTests/:strategyId/:testId', StrategyTests.delete);
+  app.delete('/strategyTests/:strategyId', StrategyTests.delete);
 
   //Retrieve a sigle StrategyTest with StrategyTestId
-  app.get('/strategyTests/:strategyId/:testId', StrategyTests.findOne);
+  app.get('/strategyTests/:strategyId', StrategyTests.findOne);
 
   //Retrieve all StrategyTests
   app.get('/strategyTests', StrategyTests.findAll);

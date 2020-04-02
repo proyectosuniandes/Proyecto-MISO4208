@@ -3,7 +3,7 @@ import {Datagrid, EditButton, List, ReferenceField, TextField} from "react-admin
 import UrlFieldCmp from "../components/UrlFieldCmp";
 
 const VersionList = (props) => (
-    <List {...props} title="Lista de Versiones" sort={{field: 'id_version', order: 'ASC'}}>
+    <List {...props} title="Lista de Versiones" sort={{field: 'id_app', order: 'ASC'}}>
         <Datagrid rowClick="edit">
             <TextField source="id"/>
             <ReferenceField source="id_app" reference="apps" label="Aplicación">
