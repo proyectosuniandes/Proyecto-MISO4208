@@ -1,5 +1,5 @@
 const Script = require('../models/script');
-const Test = require('../models/Prueba');
+const Test = require('../models/prueba');
 const formidable = require('formidable');
 const AWS = require('aws-sdk');
 const fs = require('fs');
@@ -14,9 +14,9 @@ exports.create = async (req, res) => {
       if (err) {
         res.status(500).json({ message: 'File not parsed' });
       }
-      uploadFile(files.scripts, fields, async fields => {
+      uploadFile(files.scripts, fields, async (fields) => {
         const record = await Script.create(fields, {
-          raw: true
+          raw: true,
         });
         res.status(201).json(record);
       });
@@ -34,14 +34,14 @@ exports.update = async (req, res) => {
     const form = formidable({ multiples: true });
     form.parse(req, async (err, fields, files) => {
       const record = await Script.findByPk(req.params.scriptId, {
-        raw: true
+        raw: true,
       });
       if (!record) {
         return res.status(404).json({ error: 'Script not found' });
       }
-      const persist = async fields => {
+      const persist = async (fields) => {
         await Script.update(fields, {
-          where: { id_script: req.params.scriptId }
+          where: { id_script: req.params.scriptId },
         });
         res.status(200).json(fields);
       };
@@ -65,14 +65,14 @@ exports.delete = async (req, res) => {
   console.log('***** Delete Script *****');
   try {
     const record = await Script.findByPk(req.params.scriptId, {
-      raw: true
+      raw: true,
     });
     if (!record) {
       return res.status(404).json({ error: 'Script not found' });
     }
     deleteFile(record.ruta_script, async () => {
       await Script.destroy({
-        where: { id_script: req.params.scriptId }
+        where: { id_script: req.params.scriptId },
       });
       res.json({ id_script: req.params.scriptId });
     });
@@ -88,7 +88,7 @@ exports.findOne = async (req, res) => {
   try {
     const record = await Script.findByPk(req.params.scriptId, {
       include: Test,
-      raw: true
+      raw: true,
     });
     if (!record) {
       return res.status(404).json({ error: 'Script not found' });
@@ -114,15 +114,15 @@ exports.findAll = async (req, res) => {
       limit: to - from + 1,
       order: [sort ? JSON.parse(sort) : ['id_script', 'ASC']],
       where: parsedFilter,
-      raw: true
+      raw: true,
     });
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
 
     console.log(
-      rows.map(resource => ({ ...resource, id: resource.id_script }))
+      rows.map((resource) => ({ ...resource, id: resource.id_script }))
     );
-    res.json(rows.map(resource => ({ ...resource, id: resource.id_script })));
+    res.json(rows.map((resource) => ({ ...resource, id: resource.id_script })));
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'error retrieving Scripts' });
@@ -136,7 +136,7 @@ async function uploadFile(scripts, fields, persist) {
   const s3 = new AWS.S3();
   //Setting up S3 upload parameters
   let params = {
-    Bucket: 'miso-4208-grupo3/script/' + fields.id_prueba
+    Bucket: 'miso-4208-grupo3/script/' + fields.id_prueba,
   };
   //Read content from file
   for (let i = 0; i < scripts.length; i++) {
@@ -166,7 +166,7 @@ function deleteFile(rutaScript, next) {
   // Setting up S3 list parameters
   const paramsL = {
     Bucket: bucket,
-    Prefix: prefix
+    Prefix: prefix,
   };
   s3.listObjects(paramsL, (err, data) => {
     if (err) {
@@ -174,7 +174,7 @@ function deleteFile(rutaScript, next) {
     }
     // Setting up S3 delete parameters
     let paramsD = { Bucket: bucket, Delete: { Objects: [] } };
-    data.Contents.forEach(d => {
+    data.Contents.forEach((d) => {
       paramsD.Delete.Objects.push({ Key: d.Key });
     });
     // Deleting files to the bucket

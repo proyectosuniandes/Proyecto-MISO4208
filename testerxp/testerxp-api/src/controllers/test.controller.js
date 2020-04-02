@@ -1,5 +1,5 @@
-const Test = require('../models/Prueba');
-const Version = require('../models/Version');
+const Test = require('../models/prueba');
+const Version = require('../models/version');
 
 //Create and Save a new Test
 exports.create = async (req, res) => {
@@ -7,7 +7,7 @@ exports.create = async (req, res) => {
   console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const record = await Test.create(req.body, {
-      raw: true
+      raw: true,
     });
     res.status(201).json(record);
   } catch (e) {
@@ -22,13 +22,13 @@ exports.update = async (req, res) => {
   console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     const record = await Test.findByPk(req.params.testId, {
-      raw: true
+      raw: true,
     });
     if (!record) {
       return res.status(404).json({ error: 'Test not found' });
     }
     await Test.update(req.body, {
-      where: { id_prueba: req.params.testId }
+      where: { id_prueba: req.params.testId },
     });
     res.status(200).json(req.body);
   } catch (e) {
@@ -43,7 +43,7 @@ exports.delete = async (req, res) => {
   console.log(util.inspect(req.body, false, null, true /*enable colors */));
   try {
     await Test.destroy({
-      where: { id_prueba: req.params.testId }
+      where: { id_prueba: req.params.testId },
     });
     res.json({ id_prueba: req.params.testId });
   } catch (e) {
@@ -59,7 +59,7 @@ exports.findOne = async (req, res) => {
   try {
     const record = await Test.findByPk(req.params.testId, {
       include: Version,
-      raw: true
+      raw: true,
     });
     if (!record) {
       return res.status(404).json({ error: 'Test not found' });
@@ -86,15 +86,15 @@ exports.findAll = async (req, res) => {
       limit: to - from + 1,
       order: [sort ? JSON.parse(sort) : ['id_prueba', 'ASC']],
       where: parsedFilter,
-      raw: true
+      raw: true,
     });
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
 
     console.log(
-      rows.map(resource => ({ ...resource, id: resource.id_prueba }))
+      rows.map((resource) => ({ ...resource, id: resource.id_prueba }))
     );
-    res.json(rows.map(resource => ({ ...resource, id: resource.id_prueba })));
+    res.json(rows.map((resource) => ({ ...resource, id: resource.id_prueba })));
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'error retrieving Tests' });

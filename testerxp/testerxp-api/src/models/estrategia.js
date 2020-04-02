@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
 const estrategiaPrueba = require('./estrategiaPrueba');
 const dispositivos = require('./dispositivos');
-const navegadores = './navegadores';
+const navegadores = require('./navegadores');
 
 const estrategia = sequelize.define(
   'estrategia',
