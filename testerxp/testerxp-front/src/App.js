@@ -10,7 +10,7 @@ import Layout from './layout/Layout';
 import theme from './layout/Theme';
 import NotFound from './layout/NotFound';
 
-import  Dashboard  from './dashboard/Dashboard';
+import Dashboard from './dashboard/Dashboard';
 import applications from './applications';
 import versions from './versions';
 import strategies from './strategies';
@@ -21,7 +21,7 @@ const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
 
 
 const App = () => (
-    <Admin dashboard={Dashboard}
+    <Admin dashboard={Dashboard} locale="es"
            dataProvider={dataProvider}
            i18nProvider={i18nProvider}
            theme={theme}

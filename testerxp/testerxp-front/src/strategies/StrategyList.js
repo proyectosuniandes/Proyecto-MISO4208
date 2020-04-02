@@ -1,15 +1,9 @@
 import React from "react";
-import {
-    Datagrid,
-    EditButton,
-    List,
-    ReferenceField,
-    TextField,
-    ReferenceManyField,
-    SingleFieldList,
-    ChipField,
-    ReferenceFieldController
-} from "react-admin";
+import {ChipField, Datagrid, EditButton, List, ReferenceManyField, SingleFieldList, TextField} from "react-admin";
+
+import NestedFieldApp from '../components/data/NestedFieldApp.js'
+import NestedFieldVersion from '../components/data/NestedFieldVersion.js'
+
 import ExecuteButton from '../components/buttons/ExecuteStrategyButton.js';
 
 const StrategyList = (props) => (
@@ -17,9 +11,10 @@ const StrategyList = (props) => (
         <Datagrid rowClick="edit">
 
             <TextField source="id"/>
+
             <TextField source="nombre" label="Nombre Estrategia"/>
 
-            <ReferenceManyField label="Tipo de Prueba"
+           <ReferenceManyField label="Tipo de Prueba"
                                 reference="strategyTests"
                                 target="id_estrategia"
                                 sort={{field: 'id_prueba', order: 'ASC'}}>
@@ -28,67 +23,11 @@ const StrategyList = (props) => (
                 </SingleFieldList>
             </ReferenceManyField>
 
+            <NestedFieldApp label= "Aplicación"/>
 
-            <ReferenceFieldController label="Aplicación" reference="strategyTests" source="id_estrategia"
-                                      link={false}>
-                {({referenceRecord, ...props}) => (
-                    <ReferenceField basePath="/apps" resource="apps" reference="apps" source="prueba.id_app"
-                                    record={referenceRecord || {}} link={false}>
-                        <TextField source="nombre"/>
-                    </ReferenceField>
-                )}
-            </ReferenceFieldController>
+            <NestedFieldVersion label="Versión"/>
 
-            <ReferenceFieldController label="Tipo Aplicación" reference="strategyTests" source="id_estrategia"
-                                      link={false}>
-                {({referenceRecord, ...props}) => (
-                    <ReferenceField basePath="/apps" resource="apps" reference="apps" source="prueba.id_app"
-                                    record={referenceRecord || {}} link={false}>
-                        <TextField source="tipo_app"/>
-                    </ReferenceField>
-                )}
-            </ReferenceFieldController>
-
-
-            <ReferenceFieldController label="Versión" reference="strategyTests" source="id_estrategia" link={false}>
-                {({referenceRecord, ...props}) => (
-                    <ReferenceField basePath="/versions" resource="versions" reference="versions"
-                                    source="prueba.id_version" record={referenceRecord || {}} link={false}>
-                        <TextField source="descripcion"/>
-                    </ReferenceField>
-                )}
-            </ReferenceFieldController>
-
-           {/* <ReferenceFieldController label="Aplicación" reference="strategyTests" source="id_estrategia"
-                                      linkType={false}>
-                {({referenceRecord, ...props}) => (
-                    <ReferenceField basePath="/apps" resource="apps" reference="apps" source="prueba.id_app"
-                                    record={referenceRecord || {}} link={false}>
-                        <TextField source="nombre"/>
-                    </ReferenceField>
-                )}
-            </ReferenceFieldController>
-
-            <ReferenceFieldController label="Tipo Aplicación" reference="strategyTests" source="id_estrategia"
-                                      linkType={false}>
-                {({referenceRecord, ...props}) => (
-                    <ReferenceField basePath="/apps" resource="apps" reference="apps" source="prueba.id_app"
-                                    record={referenceRecord || {}} link={false}>
-                        <TextField source="tipo_app"/>
-                    </ReferenceField>
-                )}
-            </ReferenceFieldController>
-
-            <ReferenceFieldController label="Versión" reference="strategyTests" source="id_estrategia" link={false}>
-                {({referenceRecord, ...props}) => (
-                    <ReferenceField basePath="/versions" resource="versions" reference="versions"
-                                    source="prueba.id_version" record={referenceRecord || {}} link={false}>
-                        <TextField source="descripcion"/>
-                    </ReferenceField>
-                )}
-            </ReferenceFieldController>
-*/}
-            <EditButton label="Editar"/>
+            {/*<EditButton label="Editar"/>*/}
             <ExecuteButton/>
         </Datagrid>
     </List>

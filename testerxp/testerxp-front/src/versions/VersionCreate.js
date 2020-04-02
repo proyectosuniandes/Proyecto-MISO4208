@@ -38,12 +38,12 @@ const VersionCreate = (props: any) => {
                 </ReferenceInput>
 
 
-                <FormDataConsumer formClassName={classes.der} subscription={{ values: true }}>
-                    {({formData, // The whole form data
-                          scopedFormData, // The data for this item of the ArrayInput
-                          getSource, // A function to get the valid source inside an ArrayInput
-                          ...rest}) => formData['id_app'] &&
-                        <TextInput source="tipo_app" {...rest}/>
+                <FormDataConsumer formClassName={classes.der}>
+                    {({formData, ...rest}) => formData['id_app'] &&
+                        <ReferenceInput label="Tipo" source="id_app" reference="apps" {...rest}
+                                        sort={{field: 'id_app', order: 'ASC'}}>
+                            <SelectInput optionText="tipo_app" disabled/>
+                        </ReferenceInput>
                     }
                 </FormDataConsumer>
 

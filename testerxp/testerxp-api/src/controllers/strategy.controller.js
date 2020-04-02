@@ -10,6 +10,8 @@ AWS.config.update({region: 'us-east-1'});
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
     console.log('***** Create Strategy *****');
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
     try {
         const record = await Strategy.create(req.body, {
             raw: true
