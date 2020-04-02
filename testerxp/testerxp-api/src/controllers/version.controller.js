@@ -5,43 +5,38 @@ const AWS = require('aws-sdk');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
+
 //Create and Save a new Version
 exports.create = async (req, res) => {
     console.log('***** Create Version *****');
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
+
+
     try {
-        const form = formidable({multiples: true});
-        form.parse(req, async (err, fields, files) => {
-            if (err) {
-                res.status(500).json({message: 'File not parsed'});
-            }
-            if (Object.keys(files).length > 0) {
-                uploadFile(
-                    files.ruta_app.path,
-                    files.ruta_app.name,
-                    fields,
-                    async fields => {
-                        const record = await Version.create(fields, {
-                            raw: true
-                        });
-                        res.status(201).json(record);
-                    }
-                );
-            } else {
-                const record = await Version.create(fields, {
-                    raw: true
-                });
-                res.status(201).json(record);
-            }
-        });
+
+        if (!req.files || Object.keys(req.files).length === 0) {
+            const record = await Version.create(req.body, {
+                raw: true
+            });
+
+            res.status(201).json(record);
+        } else {
+
+
+        }
+
     } catch (e) {
         console.log(e);
         res.status(500).json({message: 'Version not created'});
     }
 };
 
-//Update a Version identified by the versionId and appId in the request
+
 //Update a Version identified by the versionId and appId in the request
 exports.update = async (req, res) => {
+
     console.log('***** Update Version *** ');
     console.log('req.body :' + util.inspect(req.body, false, null, true /*enable colors */));
     console.log('req.params :' + util.inspect(req.params, false, null, true /*enable colors */));
@@ -100,49 +95,50 @@ exports.update = async (req, res) => {
     }
 };
 
-
 //Delete a Version identified by the versionId and appId in the request
 exports.delete = async (req, res) => {
     console.log('***** Delete Version *****');
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
     try {
         const record = await Version.findOne({
             where: {
-                id_version: req.params.versionId,
-                id_app: req.params.appId
+                id_version: req.params.versionId
             },
             raw: true
         });
+
         if (!record) {
-            return res.status(404).json({error: 'Version not found'});
+            return res.status(404).json({error: 'Version No Encontrada'});
         }
-        deleteFile(record.ruta_app, async () => {
-            await Version.destroy({
-                where: {
-                    id_version: req.params.versionId,
-                    id_app: req.params.appId
-                }
-            });
-            res.json({id_version: req.params.versionId});
+        console.log(record);
+        await Version.destroy({
+            where: {
+                id_version: req.params.versionId
+            }
         });
+        res.json({id_version: req.params.versionId});
+
     } catch (e) {
         console.log(e);
-        res.status(500).json({message: 'Error deleting Version'});
+        res.status(500).json({message: 'Error Borrando Version'});
     }
 };
 
 //Retrieve a Version identified by the versionId and versionId in the request
 exports.findOne = async (req, res) => {
     console.log('***** FindOne Version *****');
-    console.log(util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
     try {
-        const record = await Version.findByPk(req.params.versionId, {
+        let record = await Version.findByPk(req.params.versionId, {
             include: App,
             raw: true
         });
         if (!record) {
             return res.status(404).json({error: 'Version not found'});
         }
-        console.log(record);
+
         res.status(200).json(record);
     } catch (e) {
         console.log(e);
@@ -153,7 +149,8 @@ exports.findOne = async (req, res) => {
 // Retrieve all Versions from the database.
 exports.findAll = async (req, res) => {
     console.log('**** FindAll Versions **** ');
-    console.log(util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
     try {
         const {range, sort, filter} = req.query;
         console.log(filter);
@@ -220,9 +217,16 @@ function deleteFile(rutaVersion, next) {
 }
 
 function parseFilterVersion(filter) {
-    console.log("Application Filter --->" + filter.replace("id", "id_app"));
 
-    const filters = JSON.parse(filter.replace("id", "id_app"));
+    console.log("Filter ---> " + filter);
+    if (JSON.parse(filter).hasOwnProperty('id')) {
+        filter = filter.replace("id", "id_version")
+    }
+    console.log("Replace Filter ---> " + filter);
+
+    //.replace("id", "id_app")
+
+    const filters = JSON.parse(filter);
 
     return Object.keys(filters)
         .map(key => {
