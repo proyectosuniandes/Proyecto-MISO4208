@@ -8,18 +8,18 @@ const app = sequelize.define(
     id_app: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     nombre: {
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
     },
     tipo_app: {
-      type: Sequelize.ENUM('movil', 'web')
-    }
+      type: Sequelize.ENUM('movil', 'web'),
+    },
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 

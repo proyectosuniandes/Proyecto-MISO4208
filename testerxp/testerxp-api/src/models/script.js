@@ -7,18 +7,18 @@ const script = sequelize.define(
     id_script: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     id_prueba: {
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
     },
     ruta_script: {
-      type: Sequelize.TEXT
-    }
+      type: Sequelize.TEXT,
+    },
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 

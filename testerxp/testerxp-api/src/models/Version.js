@@ -8,22 +8,22 @@ const version = sequelize.define(
     id_version: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     id_app: {
       type: Sequelize.INTEGER,
-      primaryKey: true
+      primaryKey: true,
     },
     descripcion: {
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
     },
     ruta_app: {
-      type: Sequelize.TEXT
-    }
+      type: Sequelize.TEXT,
+    },
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 
@@ -31,11 +31,19 @@ version.hasMany(prueba, { foreignKey: 'id_version', sourceKey: 'id_version' });
 version.hasMany(prueba, { foreignKey: 'id_app', sourceKey: 'id_app' });
 prueba.belongsTo(version, {
   foreignKey: 'id_version',
-  sourceKey: 'id_version'
+  sourceKey: 'id_version',
 });
 prueba.belongsTo(version, {
-  foreignKey: 'id_version',
-  sourceKey: 'id_version'
+  foreignKey: 'id_app',
+  sourceKey: 'id_app',
+});
+prueba.belongsTo(version, {
+  foreignKey: 'ref_version',
+  sourceKey: 'id_version',
+});
+prueba.belongsTo(version, {
+  foreignKey: 'ref_app',
+  sourceKey: 'id_app',
 });
 
 module.exports = version;

@@ -8,31 +8,31 @@ const ejecucion = sequelize.define(
     id_ejecucion: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     id_estrategia: {
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
     },
     id_prueba: {
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
     },
     estado: {
-      type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente')
-    }
+      type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente'),
+    },
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 
 ejecucion.hasMany(resultado, {
   foreignKey: 'id_ejecucion',
-  sourceKey: 'id_ejecucion'
+  sourceKey: 'id_ejecucion',
 });
 resultado.belongsTo(ejecucion, {
   foreignKey: 'id_ejecucion',
-  sourceKey: 'id_ejecucion'
+  sourceKey: 'id_ejecucion',
 });
 
 module.exports = ejecucion;
