@@ -10,6 +10,7 @@ const sequelize = require('../database/database');
 const { QueryTypes } = require('sequelize');
 const Execution = require('../models/ejecucion');
 const AWS = require('aws-sdk');
+AWS.config.update({ region: 'us-east-1' });
 
 // Retrieve all Strategies from the database.
 exports.findAll = async (req, res) => {
@@ -115,6 +116,30 @@ exports.create = async (req, res) => {
     }
   });
 };
+
+//Delete a Strategy with StrategyId
+exports.delete = async (req, res) => {
+  console.log('***** Create Strategy *****');
+  try {
+    const record = await Strategy.findByPk(req.params.strategyId, {
+      raw: true,
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Strategy not found' });
+    }
+    await Strategy.update(
+      { estado: 'cancelado' },
+      {
+        where: { id_estrategia: req.params.strategyId },
+      }
+    );
+    res.status(200).json(req.params.strategyId);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error updating Execution' });
+  }
+};
+
 //Execute a Strategy
 exports.execute = async (req, res) => {
   console.log('*****Execute Strategy *****');
