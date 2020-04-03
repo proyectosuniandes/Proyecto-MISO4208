@@ -17,7 +17,7 @@ const ejecucion = sequelize.define(
       type: Sequelize.INTEGER,
     },
     estado: {
-      type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente'),
+      type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente', 'cancelado'),
     },
   },
   {

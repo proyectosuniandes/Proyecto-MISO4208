@@ -55,6 +55,7 @@ require('./routes/app.routes.js')(app);
 require('./routes/version.routes.js')(app);
 require('./routes/strategy.routes.js')(app);
 require('./routes/strategyTest.routes.js')(app);
+require('./routes/execution.routes.js')(app);
 
 // define a simple route
 app.get('/', (req, res) => {
