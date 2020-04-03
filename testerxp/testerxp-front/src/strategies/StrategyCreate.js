@@ -247,7 +247,7 @@ const StrategyCreate = (props: any) => {
 
 
                     <FormDataConsumer>
-                        {formDataProps => formDataProps.id_app && (
+                        {formDataProps => (
                             <Card style={{width: '100%'}}>
                                 <TabPruebas {...formDataProps} />
                             </Card>
