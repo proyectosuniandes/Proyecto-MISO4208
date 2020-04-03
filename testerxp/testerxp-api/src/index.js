@@ -7,6 +7,21 @@ dotenv.config();
 
 //Initializations
 const app = express();
+
+var bodyParser = require('body-parser');
+
+
+
+app.use(bodyParser.urlencoded({
+  limit: '5mb',
+  parameterLimit: 100000,
+  extended: false
+}));
+
+app.use(bodyParser.json({
+  limit: '5mb'
+}));
+
 var cors = require('cors');
 app.use(cors());
 

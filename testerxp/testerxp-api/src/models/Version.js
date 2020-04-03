@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
-const prueba = require('./prueba');
+const prueba = require('./Prueba');
 
 const version = sequelize.define(
   'version',

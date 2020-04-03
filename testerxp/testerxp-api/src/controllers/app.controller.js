@@ -1,8 +1,12 @@
-const App = require('../models/app');
+const App = require('../models/App');
+const util = require('util');
 
 // Retrieve all Apps from the database.
 exports.findAll = async (req, res) => {
   console.log('***** FindAll Apps *****');
+  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
   try {
     const { range, sort, filter } = req.query;
     const [from, to] = range ? JSON.parse(range) : [0, 100];
@@ -44,6 +48,9 @@ exports.findOne = async (req, res) => {
 //Create and Save a new App
 exports.create = async (req, res) => {
   console.log('***** Create App *****');
+  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
   try {
     const record = await App.create(req.body, {
       raw: true,
@@ -60,6 +67,9 @@ exports.update = async (req, res) => {
   console.log(req.body);
   console.log(req.params);
   console.log('***** Update App *****');
+  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
   try {
     const record = await App.findByPk(req.params.appId, {
       raw: true,

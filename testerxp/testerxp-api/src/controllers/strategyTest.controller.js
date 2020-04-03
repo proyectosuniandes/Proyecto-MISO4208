@@ -1,5 +1,5 @@
 const StrategyTest = require('../models/estrategiaPrueba');
-const Test = require('../models/prueba');
+const Test = require('../models/Prueba');
 const Strategy = require('../models/estrategia');
 
 //Create and Save a new StrategyTest
