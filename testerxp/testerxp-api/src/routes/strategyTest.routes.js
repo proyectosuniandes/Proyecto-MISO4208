@@ -5,5 +5,5 @@ module.exports = (app) => {
   app.get('/strategyTests', StrategyTests.findAll);
 
   //Retrieve a sigle StrategyTest with StrategyTestId
-  app.get('/strategyTests/:strategyId/:testId', StrategyTests.findOne);
+  app.get('/strategyTests/:strategyId', StrategyTests.findOne);
 };

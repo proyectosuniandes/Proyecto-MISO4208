@@ -38,7 +38,6 @@ exports.findOne = async (req, res) => {
     const record = await Version.findOne({
       where: {
         id_version: req.params.versionId,
-        id_app: req.params.appId,
       },
       include: App,
       raw: true,
@@ -96,7 +95,6 @@ exports.update = async (req, res) => {
       const record = await Version.findOne({
         where: {
           id_version: req.params.versionId,
-          id_app: req.params.appId,
         },
         raw: true,
       });
@@ -107,7 +105,6 @@ exports.update = async (req, res) => {
         await Version.update(fields, {
           where: {
             id_version: req.params.versionId,
-            id_app: req.params.appId,
           },
         });
         res.status(200).json(fields);
@@ -134,7 +131,6 @@ exports.delete = async (req, res) => {
     const record = await Version.findOne({
       where: {
         id_version: req.params.versionId,
-        id_app: req.params.appId,
       },
       raw: true,
     });
@@ -145,7 +141,6 @@ exports.delete = async (req, res) => {
       await Version.destroy({
         where: {
           id_version: req.params.versionId,
-          id_app: req.params.appId,
         },
       });
       res.json({ id_version: req.params.versionId });
