@@ -1,19 +1,22 @@
 const { Sequelize } = require('sequelize');
 const sequelize = require('../database/database');
 
-const parametro = sequelize.define(
-  'parametro',
+const navegadores = sequelize.define(
+  'navegadores',
   {
-    id_parametro: {
+    id_navegador: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    id_prueba: {
+    id_estrategia: {
       type: Sequelize.INTEGER,
     },
-    param: {
-      type: Sequelize.TEXT,
+    navegador: {
+      type: Sequelize.ENUM('chrome', 'firefox'),
+    },
+    version: {
+      type: Sequelize.INTEGER,
     },
   },
   {
@@ -22,4 +25,4 @@ const parametro = sequelize.define(
   }
 );
 
-module.exports = parametro;
+module.exports = navegadores;

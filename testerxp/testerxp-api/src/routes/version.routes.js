@@ -1,4 +1,4 @@
-module.exports = app => {
+module.exports = (app) => {
   const Versions = require('../controllers/version.controller.js');
 
   //Create a new Parameter
@@ -8,11 +8,9 @@ module.exports = app => {
   app.put('/versions/:versionId', Versions.update);
 
   //Delete a Parameter with ParameterId
-  app.delete('/versions/:versionId/:appId', Versions.delete);
+  app.delete('/versions/:versionId', Versions.delete);
 
   //Retrieve a sigle Parameter with ParameterId
-  app.get('/versions/:versionId/:appId', Versions.findOne);
-
   app.get('/versions/:versionId', Versions.findOne);
 
   //Retrieve all Versions

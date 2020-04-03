@@ -3,7 +3,7 @@ import {Datagrid, EditButton, List, TextField} from "react-admin";
 
 
 const ApplicationList = (props) => (
-    <List {...props} title="Lista de Aplicaciones" sort={{field: 'id_app', order: 'ASC'}}>
+    <List {...props} title="Lista de Aplicaciones" sort={{field: 'nombre', order: 'ASC'}}>
         <Datagrid rowClick="edit">
             <TextField source="id"/>
             <TextField source="nombre" label="Aplicación"/>

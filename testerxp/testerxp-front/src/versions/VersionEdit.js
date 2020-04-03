@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Fragment} from "react";
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -7,7 +7,7 @@ import {
     Edit,
     FileField,
     FileInput,
-    FormDataConsumer,
+    FormDataConsumer, ReferenceInput, SelectInput,
     SimpleForm,
     TextInput
 } from "react-admin";
@@ -16,6 +16,8 @@ import {Box, Typography} from '@material-ui/core';
 
 import {makeStyles, Theme} from '@material-ui/core/styles';
 import {Styles} from '@material-ui/styles/withStyles';
+import {Card} from "primereact/card";
+import TypeAppCmp from "../components/data/TypeAppCmp";
 
 export const styles: Styles<Theme, any> = {
     izq: {display: 'inline-block'},
@@ -31,39 +33,69 @@ const VersionEdit = (props: any) => {
         <Edit {...props}>
             <SimpleForm>
 
-                <Typography variant="h6" gutterBottom>
-                    Aplicación
-                </Typography>
-                <Box mt="1em"/>
-                <TextInput disabled source="app.nombre" formClassName={classes.izq} label="Nombre"/>
-                <TextInput disabled source="app.tipo_app" label="Tipo" formClassName={classes.der}/>
-                <Box mt="1em"/>
-                <Typography variant="h6" gutterBottom>
-                    Versión
-                </Typography>
 
-                <Box mt="1em"/>
+                <Card style={{width: '100%'}}>
+                    <Typography variant="h6" gutterBottom> Aplicación <hr/></Typography>
+                    <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">
+                        <Box p={1} width="50%">
+                            <TextInput disabled source="app.nombre" label="Nombre" fullWidth/>
+                        </Box>
+                        <Box p={1} width="50%">
 
-                <TextInput disabled source="id_version" formClassName={classes.izq} label="ID"/>
-                <TextInput source="descripcion" label="Versión Aplicación" formClassName={classes.der}/>
+                            <TextInput disabled source="app.tipo_app" label="Tipo" fullWidth/>
 
+                        </Box>
 
-                <FormDataConsumer fullWidth>
-                    {({formData, ...rest}) => formData['app.tipo_app'] === 'web' &&
-                        <TextInput source="ruta_app" {...rest} label="Ruta Aplicación" fullWidth/>
-                    }
-                </FormDataConsumer>
+                    </Box>
+
+                </Card>
+
+                <br/>
+                <Card style={{width: '100%'}}>
+                    <Typography variant="h6" gutterBottom> Versión <hr/></Typography>
 
 
-                <Box mt="1em"/>
+                    <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">
+                        <Box p={1} width="50%">
+                            <TextInput disabled source="id_version" label="ID" fullWidth/>
+                        </Box>
+                        <Box p={1} width="50%">
+                            <TextInput source="descripcion" label="Versión Aplicación" fullWidth/>
+                        </Box>
+                    </Box>
 
-                <FormDataConsumer>
-                    {({formData, ...rest}) => formData['app.tipo_app'] === 'movil' &&
-                        <FileInput source="files" {...rest} label="Archivo Aplicación Móvil">
-                            <FileField source="ruta_app" title="Ruta"/>
-                        </FileInput>
-                    }
-                </FormDataConsumer>
+                    <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">
+                        <Box p={1} width="100%">
+
+                            <FormDataConsumer fullWidth>
+                                {({formData, ...rest}) => formData['app.tipo_app'] === 'web' && <Fragment>
+
+                                    <Typography variant="h6" gutterBottom> URL Web <hr/></Typography>
+                                    <TextInput source="ruta_app" {...rest} label="Ruta Aplicación" fullWidth/>
+                                </Fragment>
+
+                                }
+                            </FormDataConsumer>
+
+                            <FormDataConsumer>
+                                {({formData, ...rest}) => formData['app.tipo_app'] === 'movil' && <Fragment>
+                                    <Typography variant="h6" gutterBottom> Ruta APK <hr/></Typography>
+                                    <TextInput source="ruta_app" {...rest} label="Ruta Aplicación" fullWidth disabled/>
+                                    <hr/>
+                                    <br/>
+                                    <FileInput source="files" {...rest} label="Archivo Aplicación Móvil">
+                                        <FileField source="ruta_app" title="Ruta"/>
+                                    </FileInput>
+                                </Fragment>
+                                }
+                            </FormDataConsumer>
+
+                        </Box>
+
+                    </Box>
+
+
+                </Card>
 
 
             </SimpleForm>
