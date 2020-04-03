@@ -6,6 +6,13 @@ const path = require('path');
 const fs = require('fs');
 const cypress = require('cypress');
 const rm = require('rimraf');
+//const vrt = require('./manejador-vrt.js');
+
+var configVrt = [
+  { "before": "before1.png", "after": "after1.png", "result": "result1.png" },
+  { "before": "before2.png", "after": "after2.png", "result": "result2.png" },
+  { "before": "before3.png", "after": "after3.png", "result": "result3.png" }
+]
 
 //initializations
 const app = express();
@@ -61,7 +68,8 @@ const task = cron.schedule('* * * * *', () => {
       const strategyTest = await getStrategyTest(
         message.id_ejecucion,
         message.id_prueba,
-        message.id_app
+        message.id_app,
+        message.id_estrategia
       );
 
       var pathScirptRemove="./cypress/integration/*.spec.js";     
@@ -81,10 +89,14 @@ const task = cron.schedule('* * * * *', () => {
             headless = false;
             headful=true;
           }
+          let dispositivo = strategyTest.dispositivo;
+          let vrt = strategyTest.vrt;
           await executeWeb(
             message.ruta_script,
             headless,
             headful,
+            dispositivo,
+            vrt,
             message.id_estrategia,
             message.id_prueba,
             message.id_ejecucion
@@ -96,10 +108,10 @@ const task = cron.schedule('* * * * *', () => {
 });
 
 //Find strategyTest given strategyId and testId
-async function getStrategyTest(executionId, testId, appId) {
+async function getStrategyTest(executionId, testId, appId, strategyId) {
   try {
     const record = await sequelize.query(
-      'select e.estado, p.modo_prueba, a.tipo_app from ejecucion e, prueba p, app a where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId',
+      'select e.estado, p.modo_prueba, p.vrt, a.tipo_app, s.dispositivo from ejecucion e, prueba p, app a, estrategia s where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId and s.id_estrategia = $strategyId',
       {
         bind: {
           executionId: executionId,
@@ -133,7 +145,7 @@ async function updateExecution(executionId, estado) {
 }
 
 //execute random script with cypress
-async function executeWeb(rutaScript, headless,headful, strategyId, testId, executionId) {
+async function executeWeb(rutaScript, headless, headful, dispositivo, vrt, strategyId, testId, executionId) {
   console.log('***** Executing Web ****');
   const s3 = new AWS.S3();
   const split = rutaScript.split('.com/');
@@ -170,6 +182,7 @@ async function executeWeb(rutaScript, headless,headful, strategyId, testId, exec
         await cypress.run({
           headless: headless,
           headed:headful,
+          browser:dispositivo,
           spec: path.join(__dirname, '/cypress/integration', archivo[2]),
           chromeWebSecurity: false,
           reporter: 'mochawesome',
