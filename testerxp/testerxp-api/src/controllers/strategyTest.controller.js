@@ -53,7 +53,7 @@ exports.findAll = async (req, res) => {
 exports.findOne = async (req, res) => {
   console.log('***** FindOne StrategyTest *****');
   try {
-    const record = await StrategyTest.findOne({
+    const record = await StrategyTest.findAll({
       where: {
         id_estrategia: req.params.strategyId,
       },

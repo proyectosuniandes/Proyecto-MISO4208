@@ -7,7 +7,8 @@ describe('Mantisby login', function() {
         cy.get('.login-container').find('input[type="submit"]').click()
         cy.get('.dropdown-toggle').contains('administrator')
     })
-
+}),
+describe('Add Project', function() {
     it('Add Project succesfull', function() {
         cy.visit('http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/mantis/login_page.php')
         cy.get('.login-container').find('input[name="username"]').click().type("administrator")
@@ -29,11 +30,49 @@ describe('Mantisby login', function() {
         const id = uuid()
         const testname = 'Pruebas Automaticas ' + id
         cy.get('.form-container').find('input[name="name"]').click().type(testname)
+        cy.get('.form-container').find('select[name="status"]').select('release')
+        cy.get('.form-container').find('input[name="inherit_global"]').check()
+        cy.get('.form-container').find('select[name="view_state"]').select('private')
         cy.get('.form-container').find('textarea[name="description"]').click().type("Ejemplo pruebas Automaticas")
         cy.get('.form-container').find('input[type="submit"]').click()
-        cy.get('.table-responsive').contains('Pruebas Automaticas')
     })
-
+    it('Add Project others', function() {
+        cy.visit('http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/mantis/login_page.php')
+        cy.get('.login-container').find('input[name="username"]').click().type("administrator")
+        cy.get('.login-container').find('input[type="submit"]').click()
+        cy.get('.login-container').find('input[name="password"]').click().type("mantisbtprueba")
+        cy.get('.login-container').find('input[type="submit"]').click()
+        cy.get('.nav').contains('Manage')
+        .should('have.attr', 'href')
+        .then((href) => {
+            cy.visit('http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/'+href)
+        })
+        cy.get('.nav').contains('Manage Projects')
+        .should('have.attr', 'href')
+        .then((href) => {
+            cy.visit('http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/'+href)
+        })
+        cy.get('.form-inline').contains('Create New Project').click()
+        const uuid = () => Cypress._.random(0, 1e6)
+        const id = uuid()
+        const testname = 'Pruebas Automaticas ' + id
+        cy.get('.form-container').find('input[name="name"]').click().type(testname)
+        cy.get('.form-container').find('select[name="status"]').select('release')
+        cy.get('.form-container').find('input[name="inherit_global"]').check()
+        cy.get('.form-container').find('input[name="inherit_global"]').check()
+        cy.get('.form-container').find('select[name="view_state"]').select('private')
+        cy.get('.form-container').find('input[name="inherit_global"]').check()
+        cy.get('.form-container').find('input[name="inherit_global"]').check()
+        cy.get('.form-container').find('select[name="view_state"]').select('public')
+        cy.get('.form-container').find('select[name="status"]').select('stable')
+        cy.get('.form-container').find('select[name="status"]').select('obsolete')
+        cy.get('.form-container').find('select[name="view_state"]').select('private')
+        cy.get('.form-container').find('select[name="view_state"]').select('public')
+        cy.get('.form-container').find('textarea[name="description"]').click().type("Ejemplo pruebas Automaticas")
+        cy.get('.form-container').find('input[type="submit"]').click()
+    })
+}),
+describe('Create User', function() {
     it('Create User', function() {
         cy.visit('http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/mantis/login_page.php')
         cy.get('.login-container').find('input[name="username"]').click().type("administrator")
@@ -62,7 +101,8 @@ describe('Mantisby login', function() {
         cy.get('.form-container').find('input[type="submit"]').click()
         cy.get('.alert.alert-info').contains('Reset Password sends the confirmation URL via e-mail')
     })
-
+}),
+describe('Report Issue', function() {
     it('Report Issue', function() {
         cy.visit('http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/mantis/login_page.php')
         cy.get('.login-container').find('input[name="username"]').click().type("administrator")
