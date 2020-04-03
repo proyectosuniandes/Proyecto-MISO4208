@@ -1,5 +1,5 @@
 import React from 'react';
-import {Query, Loading, Error, TextField, Datagrid} from 'react-admin';
+import {Error, Loading, Query} from 'react-admin';
 
 
 const NestedFieldVersion = ({record}) => (

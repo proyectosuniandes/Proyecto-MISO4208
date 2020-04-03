@@ -20,6 +20,9 @@ const dataProvider = simpleRestProvider('http://localhost:8080');
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
 
 
+
+
+
 const App = () => (
     <Admin dashboard={Dashboard} locale="es"
            dataProvider={dataProvider}

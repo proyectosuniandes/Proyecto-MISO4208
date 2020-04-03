@@ -1,5 +1,5 @@
 import React from "react";
-import {ChipField, Datagrid, EditButton, List, ReferenceManyField, SingleFieldList, TextField} from "react-admin";
+import {ChipField, Datagrid, List, ReferenceManyField, SingleFieldList, TextField} from "react-admin";
 
 import NestedFieldApp from '../components/data/NestedFieldApp.js'
 import NestedFieldVersion from '../components/data/NestedFieldVersion.js'

@@ -12,6 +12,7 @@ exports.create = async (req, res) => {
     console.log('***** Create Strategy *****');
     console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
     console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+    console.log('req.header : ' + util.inspect(req.header, false, null, true /*enable colors */));
     try {
         const record = await Strategy.create(req.body, {
             raw: true
@@ -22,6 +23,9 @@ exports.create = async (req, res) => {
         res.status(500).json({message: 'Strategy not created'});
     }
 };
+
+
+
 
 //Update a Strategy identified by the strategyId in the request
 exports.update = async (req, res) => {

@@ -20,6 +20,7 @@
     "react": "^16.13.0",
     "react-admin": "^3.3.3",
     "react-dom": "^16.13.0",
+    "react-final-form": "^6.4.0",
     "react-router-redux": "^4.0.8",
     "react-scripts": "3.4.0",
     "react-transition-group": "^4.3.0"
