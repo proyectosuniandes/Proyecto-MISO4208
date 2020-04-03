@@ -275,9 +275,20 @@ const TabPruebas = ({formData, ...rest}) => {
 
                 {formData.pruebas
                 && formData.pruebas.includes('BDT') && <Tab label="BDT">
+
+                    {formData.tipo_app === 'web' &&
+                    <FileInput source="filesBDT" label="Script BDT" multiple="true">
+                        <FileField source="urlFile" title="nomFile"/>
+                    </FileInput>
+                    }
+
+                    {formData.tipo_app === 'movil' &&
                     <FileInput source="filesBDT" label="Script BDT">
                         <FileField source="urlFile" title="nomFile"/>
                     </FileInput>
+                    }
+
+
                 </Tab>}
 
                 {formData.pruebas
@@ -299,7 +310,7 @@ const TabPruebas = ({formData, ...rest}) => {
                             </Box>
 
                         </Fragment>}
-                        {formData.tipo_app === 'web' && <FileInput source="filesRANDOM" label="Script RANDOM" multiple="true">
+                        {formData.tipo_app === 'web' && <FileInput source="filesRANDOM" label="Script RANDOM">
                             <FileField source="urlFile" title="nomFile"/>
                         </FileInput>}
                     </Card>
