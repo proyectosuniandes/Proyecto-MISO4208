@@ -11,11 +11,9 @@ exports.create = async (idPrueba, files) => {
       await Script.create(fields, {
         raw: true,
       });
-      return true;
     });
   } catch (e) {
     console.log(e);
-    return null;
   }
 };
 

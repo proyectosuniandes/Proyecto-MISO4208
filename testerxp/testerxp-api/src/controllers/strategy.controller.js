@@ -17,20 +17,16 @@ exports.findAll = async (req, res) => {
   try {
     const { range, sort, filter } = req.query;
     const [from, to] = range ? JSON.parse(range) : [0, 100];
-    //const parsedFilter = filter ? parseFilterVersion(filter) : {};
+    const parsedFilter = filter ? parseFilterStrategy(filter) : {};
     const { count, rows } = await Strategy.findAndCountAll({
       offset: from,
       limit: to - from + 1,
       order: [sort ? JSON.parse(sort) : ['id_estrategia', 'ASC']],
-      //where: parsedFilter,
+      where: parsedFilter,
       raw: true,
     });
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
-
-    console.log(
-      rows.map((resource) => ({ ...resource, id: resource.id_estrategia }))
-    );
     res.json(
       rows.map((resource) => ({ ...resource, id: resource.id_estrategia }))
     );
@@ -65,11 +61,12 @@ exports.create = async (req, res) => {
           fields.chrome
         );
       }
-      JSON.parse(fields.pruebas).forEach(async (p) => {
+      fields.pruebas = JSON.parse(fields.pruebas);
+      for (let i = 0; i < fields.pruebas.length; i++) {
         let prueba = {
           id_version: fields.version_app,
           id_app: fields.id_app,
-          tipo_prueba: p,
+          tipo_prueba: fields.pruebas[i],
           modo_prueba: fields.modo,
           vrt: fields.vrt,
         };
@@ -83,9 +80,9 @@ exports.create = async (req, res) => {
           resPrueba.dataValues.id_prueba
         );
         if (fields.tipo_app === 'movil') {
-          if (p === 'E2E') {
+          if (fields.pruebas[i] === 'E2E') {
             Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
-          } else if (p === 'random') {
+          } else if (fields.pruebas[i] === 'random') {
             Parameter.create({
               id_prueba: resPrueba.dataValues.id_prueba,
               param:
@@ -96,19 +93,22 @@ exports.create = async (req, res) => {
                 ' ' +
                 fields.numEventos,
             });
-          } else if (p === 'BDT') {
+          } else if (fields.pruebas[i] === 'BDT') {
             Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
           }
         } else {
-          if (p === 'E2E') {
+          if (fields.pruebas[i] === 'E2E') {
             Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
-          } else if (p === 'random') {
+          } else if (fields.pruebas[i] === 'random') {
             Script.create(resPrueba.dataValues.id_prueba, files.filesRANDOM);
-          } else if (p === 'BDT') {
+          } else if (fields.pruebas[i] === 'BDT') {
             Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
           }
         }
-      });
+        if (i === fields.pruebas.length - 1) {
+          res.sendStatus(200);
+        }
+      }
     } catch (e) {
       console.log(e);
       res.status(500).json({ message: 'Strategy not created' });
@@ -199,3 +199,31 @@ exports.execute = async (req, res) => {
     res.status(500).json({ message: 'error executing Strategy' });
   }
 };
+
+function parseFilterStrategy(filter) {
+  console.log('Application Filter --->' + filter.replace('id', 'id_app'));
+
+  const filters = JSON.parse(filter.replace('id', 'id_app'));
+
+  return Object.keys(filters)
+    .map((key) => {
+      if (
+        typeof filters[key] === 'string' &&
+        filters[key].indexOf('%') !== -1
+      ) {
+        return {
+          [key]: { [Op.like]: filters[key] },
+        };
+      }
+      return {
+        [key]: filters[key],
+      };
+    })
+    .reduce(
+      (whereAttributes, whereAttribute) => ({
+        ...whereAttributes,
+        ...whereAttribute,
+      }),
+      {}
+    );
+}

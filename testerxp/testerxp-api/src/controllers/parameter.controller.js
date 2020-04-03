@@ -4,12 +4,10 @@ const Parameter = require('../models/parametro');
 exports.create = async (parameter) => {
   console.log('***** Create Parameter *****');
   try {
-    const record = await Parameter.create(parameter, {
+    await Parameter.create(parameter, {
       raw: true,
     });
-    return record;
   } catch (e) {
     console.log(e);
-    return null;
   }
 };
