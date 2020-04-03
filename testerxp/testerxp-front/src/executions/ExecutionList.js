@@ -4,7 +4,7 @@ import UrlFieldCmp from "../components/UrlFieldCmp";
 
 const ExecutionList = (props) => (
     <List {...props} title="Lista de Ejecuciones" >
-        <Datagrid rowClick="edit">
+        <Datagrid>
             <TextField source="id"/>
             <ReferenceField source="id_app" reference="apps" label="Aplicación">
                 <TextField source="nombre" />

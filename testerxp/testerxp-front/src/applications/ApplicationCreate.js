@@ -1,5 +1,5 @@
 import React from "react";
-import {Create, FormDataConsumer, ReferenceInput, SelectInput, SimpleForm, TextInput} from "react-admin";
+import {Create, SelectInput, SimpleForm, TextInput} from "react-admin";
 import {Box, Typography} from "@material-ui/core";
 import {Card} from 'primereact/card';
 
