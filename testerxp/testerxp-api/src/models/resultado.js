@@ -7,18 +7,18 @@ const resultado = sequelize.define(
     id_resultado: {
       type: Sequelize.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     id_ejecucion: {
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
     },
     ruta_archivo: {
-      type: Sequelize.TEXT
-    }
+      type: Sequelize.TEXT,
+    },
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 

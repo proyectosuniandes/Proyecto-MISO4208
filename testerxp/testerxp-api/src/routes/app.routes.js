@@ -1,5 +1,11 @@
-module.exports = app => {
+module.exports = (app) => {
   const Apps = require('../controllers/app.controller.js');
+
+  //Retrieve all Apps
+  app.get('/apps', Apps.findAll);
+
+  //Retrieve a sigle App with AppId
+  app.get('/apps/:appId', Apps.findOne);
 
   //Create a new App
   app.post('/apps', Apps.create);
@@ -9,10 +15,4 @@ module.exports = app => {
 
   //Delete a App with AppId
   app.delete('/apps/:appId', Apps.delete);
-
-  //Retrieve a sigle App with AppId
-  app.get('/apps/:appId', Apps.findOne);
-
-  //Retrieve all Apps
-  app.get('/apps', Apps.findAll);
 };
