@@ -225,9 +225,9 @@ const StrategyCreate = (props: any) => {
                             <Card style={{width: '100%'}}>
                                 <Typography variant="h6" gutterBottom>Tipos de Pruebas <hr/></Typography>
                                 <SelectArrayInput label="Pruebas" source="pruebas" fullWidth choices={[
-                                    {id: 'e2e', name: 'E2E'},
+                                    {id: 'E2E', name: 'E2E'},
                                     {id: 'random', name: 'RANDOM'},
-                                    {id: 'bdt', name: 'BDT'},
+                                    {id: 'BDT', name: 'BDT'},
 
                                 ]}/> </Card></Fragment>
                         }
@@ -239,7 +239,7 @@ const StrategyCreate = (props: any) => {
                                 <Typography variant="h6" gutterBottom>Tipos de Pruebas <hr/></Typography>
                                 <SelectArrayInput label="Pruebas" source="pruebas" fullWidth choices={[
                                     {id: 'random', name: 'RANDOM'},
-                                    {id: 'bdt', name: 'BDT'},
+                                    {id: 'BDT', name: 'BDT'},
 
                                 ]}/> </Card></Fragment>
                         }
@@ -267,14 +267,14 @@ const TabPruebas = ({formData, ...rest}) => {
         <Fragment>
             <TabbedShowLayout   {...rest}>
                 {formData.pruebas
-                && formData.pruebas.includes('e2e') && <Tab label="E2E">
+                && formData.pruebas.includes('E2E') && <Tab label="E2E">
                     <FileInput source="filesE2E" label="Script E2E">
                         <FileField source="urlFile" title="nomfile"/>
                     </FileInput>
                 </Tab>}
 
                 {formData.pruebas
-                && formData.pruebas.includes('bdt') && <Tab label="BDT">
+                && formData.pruebas.includes('BDT') && <Tab label="BDT">
                     <FileInput source="filesBDT" label="Script BDT">
                         <FileField source="urlFile" title="nomFile"/>
                     </FileInput>
@@ -299,7 +299,7 @@ const TabPruebas = ({formData, ...rest}) => {
                             </Box>
 
                         </Fragment>}
-                        {formData.tipo_app === 'web' && <FileInput source="filesRANDOM" label="Script RANDOM">
+                        {formData.tipo_app === 'web' && <FileInput source="filesRANDOM" label="Script RANDOM" multiple="true">
                             <FileField source="urlFile" title="nomFile"/>
                         </FileInput>}
                     </Card>

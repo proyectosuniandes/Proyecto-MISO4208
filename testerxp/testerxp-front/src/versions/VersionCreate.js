@@ -4,76 +4,86 @@ import {
     FileField,
     FileInput,
     FormDataConsumer,
-    SimpleForm,
     ReferenceInput,
     SelectInput,
+    SimpleForm,
     TextInput
 } from "react-admin";
 
-import {Box, Typography} from "@material-ui/core";
-import {Styles} from "@material-ui/styles/withStyles";
-import {makeStyles, Theme} from "@material-ui/core/styles";
 
-export const styles: Styles<Theme, any> = {
-    izq: {display: 'inline-block'},
-    der: {display: 'inline-block', marginLeft: 32},
-    ruta: {width: 800},
-};
-const useStyles = makeStyles(styles);
+import {Box, Typography} from "@material-ui/core";
+import {Card} from 'primereact/card';
+import TypeAppCmp from "../components/data/TypeAppCmp";
+
 
 const VersionCreate = (props: any) => {
-    const classes = useStyles();
+
     return (
 
         <Create {...props}>
             <SimpleForm>
-                <Typography variant="h6" gutterBottom>
-                    Aplicación
-                </Typography>
-                <Box mt="1em"/>
 
-                <ReferenceInput label="Nombre" source="id_app" reference="apps" formClassName={classes.izq}
-                                sort={{field: 'id_app', order: 'ASC'}}>
-                    <SelectInput optionText="nombre" />
-                </ReferenceInput>
-
-
-                <FormDataConsumer formClassName={classes.der}>
-                    {({formData, ...rest}) => formData['id_app'] &&
-                        <ReferenceInput label="Tipo" source="id_app" reference="apps" {...rest}
-                                        sort={{field: 'id_app', order: 'ASC'}}>
-                            <SelectInput optionText="tipo_app" disabled/>
-                        </ReferenceInput>
-                    }
-                </FormDataConsumer>
+                <Card style={{width: '100%'}}>
+                    <Typography variant="h6" gutterBottom> Aplicación <hr/></Typography>
+                    <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">
+                        <Box p={1} width="50%">
+                            <ReferenceInput label="Nombre" source="id_app" reference="apps"
+                                            sort={{field: 'id_app', order: 'ASC'}}>
+                                <SelectInput optionText="nombre" fullWidth/>
+                            </ReferenceInput>
+                        </Box>
+                        <Box p={1} width="50%">
 
 
-                <Box mt="1em"/>
-                <Typography variant="h6" gutterBottom>
-                    Versión
-                </Typography>
+                            <FormDataConsumer>
+                                {formDataProps => (
+                                    <TypeAppCmp {...formDataProps} />
+                                )}
+                            </FormDataConsumer>
 
-                <Box mt="1em"/>
+                        </Box>
 
-                <TextInput source="descripcion" label="Versión Aplicación"/>
+                    </Box>
+
+                </Card>
+
+                <br/>
+                <Card style={{width: '100%'}}>
+                    <Typography variant="h6" gutterBottom> Versión <hr/></Typography>
+
+                    <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">
+                        <Box p={1} width="50%">
+                            <TextInput source="descripcion" label="Versión Aplicación"/>
+                        </Box>
+                        <Box p={1} width="50%">
+
+                        </Box>
+
+                    </Box>
+
+                    <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">
+                        <Box p={1} width="100%">
+
+                            <FormDataConsumer fullWidth>
+                                {({formData, ...rest}) => formData.tipo_app === 'web' &&
+                                    <TextInput source="ruta_app" {...rest} label="Ruta Aplicación"/>
+                                }
+                            </FormDataConsumer>
+
+                            <FormDataConsumer>
+                                {({formData, ...rest}) =>  formData.tipo_app === 'movil' &&
+                                    <FileInput source="files" {...rest} label="Archivo Aplicación Móvil">
+                                        <FileField source="ruta_app" {...rest} title="Ruta"/>
+                                    </FileInput>
+                                }
+                            </FormDataConsumer>
+
+                        </Box>
+
+                    </Box>
 
 
-                <FormDataConsumer fullWidth>
-                    {({formData, ...rest}) => formData['id_app'] === 1 &&
-                        <TextInput source="ruta_app" {...rest} label="Ruta Aplicación"/>
-                    }
-                </FormDataConsumer>
-
-
-                <Box mt="1em"/>
-
-                <FormDataConsumer>
-                    {({formData, ...rest}) => formData['id_app'] !== 1 &&
-                        <FileInput source="files" {...rest} label="Archivo Aplicación Móvil">
-                            <FileField source="ruta_app" {...rest} title="Ruta"/>
-                        </FileInput>
-                    }
-                </FormDataConsumer>
+                </Card>
 
 
             </SimpleForm>

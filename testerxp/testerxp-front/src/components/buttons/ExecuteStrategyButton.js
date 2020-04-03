@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import Button from '@material-ui/core/Button'
 
 import {
-    showNotification
+    showNotification,useNotify, useRedirect,
 } from 'react-admin';
 import {push} from 'react-router-redux';
 
@@ -33,11 +33,19 @@ class ExecuteButton extends Component {
             .catch(function (err) {
                 console.error(err);
             });
+
+        const notify = useNotify();
+        const redirect = useRedirect();
+
+        redirect('/executions');
+        notify('Estategia Lanzada para su Ejecución');
+
     };
+
     render() {
-        return <Button  variant="outlined"
+        return <Button variant="outlined"
                        color="primary"
-                       size="small"onClick={this.handleClick}>Ejecutar</Button  >;
+                       size="small" onClick={this.handleClick}>Ejecutar</Button>;
     }
 }
 

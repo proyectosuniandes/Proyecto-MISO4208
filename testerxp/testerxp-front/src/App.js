@@ -19,10 +19,6 @@ import executions from './executions';
 const dataProvider = simpleRestProvider('http://localhost:8080');
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
 
-
-
-
-
 const App = () => (
     <Admin dashboard={Dashboard} locale="es"
            dataProvider={dataProvider}
@@ -30,13 +26,12 @@ const App = () => (
            theme={theme}
            layout={Layout}
            catchAll={NotFound}>
-        <Resource name="apps"  {...applications} options={{label: 'Aplicaciones'}}/>
+        <Resource name="apps"  {...applications} options={{label: 'Aplicaciones (AUT)'}}/>
         <Resource name="versions"  {...versions} options={{label: 'Versión de Aplicaciones'}}/>
         <Resource name="strategies" {...strategies} options={{label: 'Estrategias de Prueba'}}/>
         <Resource name="executions" {...executions} options={{label: 'Ejecución de Estrategias'}}/>
         <Resource name="strategyTests"/>
 
-        <Resource name="historicalTests"/>
     </Admin>
 );
 
