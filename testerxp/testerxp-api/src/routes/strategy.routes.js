@@ -6,4 +6,10 @@ module.exports = (app) => {
 
   //Create a new Strategy
   app.post('/strategies', Strategies.create);
+
+  //Delete a Strategy with StrategyId
+  app.delete('/strategies/:strategyId', Strategies.delete);
+
+  //Execute a Strategy
+  app.get('/strategies/execute/:strategyId', Strategies.execute);
 };
