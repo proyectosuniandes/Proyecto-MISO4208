@@ -36,20 +36,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Routes
-require('./routes/parameter.routes.js')(app);
-require('./routes/script.routes.js')(app);
-require('./routes/strategy.routes.js')(app);
-require('./routes/result.routes.js')(app);
-require('./routes/execution.routes.js')(app);
-require('./routes/strategyTest.routes.js')(app);
-require('./routes/test.routes.js')(app);
-require('./routes/version.routes.js')(app);
 require('./routes/app.routes.js')(app);
+require('./routes/version.routes.js')(app);
+require('./routes/strategy.routes.js')(app);
 
 // define a simple route
 app.get('/', (req, res) => {
   res.json({
-    'message': 'Welcome to TesterXP'
+    message: 'Welcome to TesterXP',
   });
 });
 
