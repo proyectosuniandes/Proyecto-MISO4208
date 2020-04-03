@@ -1,87 +1,15 @@
 const Strategy = require('../models/estrategia');
-<<<<<<< HEAD
 const formidable = require('formidable');
+const Devices = require('./devices.controller');
+const Browsers = require('./browsers.controller');
 const Test = require('./test.controller');
-=======
-const StrategyTest = require('../models/estrategiaPrueba');
+const StrategyTest = require('./strategyTest.controller');
+const Script = require('./script.controller');
+const Parameter = require('./parameter.controller');
 const sequelize = require('../database/database');
-const {QueryTypes} = require('sequelize');
+const { QueryTypes } = require('sequelize');
 const Execution = require('../models/ejecucion');
 const AWS = require('aws-sdk');
-const util = require('util');
-AWS.config.update({region: 'us-east-1'});
-
-//Create and Save a new Strategy
-exports.create = async (req, res) => {
-    console.log('***** Create Strategy *****');
-    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
-    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
-    console.log('req.header : ' + util.inspect(req.header, false, null, true /*enable colors */));
-    try {
-        const record = await Strategy.create(req.body, {
-            raw: true
-        });
-        res.status(201).json(record);
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({message: 'Strategy not created'});
-    }
-};
-
-
-
-
-//Update a Strategy identified by the strategyId in the request
-exports.update = async (req, res) => {
-    console.log('***** Update Strategy *****');
-    try {
-        const record = await Strategy.findByPk(req.params.strategyId, {
-            raw: true
-        });
-        if (!record) {
-            return res.status(404).json({error: 'Strategy not found'});
-        }
-        await Strategy.update(req.body, {
-            where: {id_estrategia: req.params.strategyId}
-        });
-        res.status(200).json(req.body);
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({message: 'Error updating Execution'});
-    }
-};
-
-//Delete a Strategy identified by the strategyId in the request
-exports.delete = async (req, res) => {
-    console.log('***** Delete Strategy *****');
-    try {
-        await Strategy.destroy({
-            where: {id_estrategia: req.params.strategyId}
-        });
-        res.json({id_estrategia: req.params.strategyId});
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({message: 'Error deleting Strategy'});
-    }
-};
-
-//Retrieve a Strategy identified by the strategyId in the request
-exports.findOne = async (req, res) => {
-    console.log('***** FindOne Strategy *****');
-    try {
-        const record = await Strategy.findByPk(req.params.strategyId, {
-            raw: true
-        });
-        if (!record) {
-            return res.status(404).json({error: 'Strategy not found'});
-        }
-        res.status(200).json(record);
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({message: 'Error retrieving Strategy'});
-    }
-};
->>>>>>> master
 
 // Retrieve all Strategies from the database.
 exports.findAll = async (req, res) => {
@@ -89,7 +17,7 @@ exports.findAll = async (req, res) => {
   try {
     const { range, sort, filter } = req.query;
     const [from, to] = range ? JSON.parse(range) : [0, 100];
-    const parsedFilter = filter; //? parseFilterVersion(filter) : {};
+    //const parsedFilter = filter ? parseFilterVersion(filter) : {};
     const { count, rows } = await Strategy.findAndCountAll({
       offset: from,
       limit: to - from + 1,
@@ -114,25 +42,160 @@ exports.findAll = async (req, res) => {
 
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
+  console.log('***** Create Strategy *****');
   const form = formidable({ multiples: true });
   form.parse(req, async (err, fields, files) => {
     if (err) {
       res.status(500).json({ message: 'File not parsed' });
     }
-    JSON.parse(fields.pruebas).forEach(async (p) => {
-      let prueba = {
-        id_version: fields.version_app,
-        id_app: fields.id_app,
-        tipo_prueba: p,
-        modo_prueba: fields.modo,
-        vrt: fields.vrt,
+    try {
+      const estrategia = {
+        nombre: fields.nom_estrategia,
+        estado: 'registrado',
       };
-      if (fields.vrt) {
-        prueba.ref_app = fields.id_app;
-        prueba.ref_version = fields.version_vrt;
+      const { dataValues } = await Strategy.create(estrategia, {
+        raw: true,
+      });
+      if (fields.tipo_app === 'movil') {
+        await Devices.create(dataValues.id_estrategia, fields.dispositivos);
+      } else {
+        await Browsers.create(
+          dataValues.id_estrategia,
+          fields.firefox,
+          fields.chrome
+        );
       }
-      const resPrueba = await Test.create(prueba);
-      console.log(resPrueba);
-    });
+      JSON.parse(fields.pruebas).forEach(async (p) => {
+        let prueba = {
+          id_version: fields.version_app,
+          id_app: fields.id_app,
+          tipo_prueba: p,
+          modo_prueba: fields.modo,
+          vrt: fields.vrt,
+        };
+        if (fields.vrt) {
+          prueba.ref_app = fields.id_app;
+          prueba.ref_version = fields.version_vrt;
+        }
+        const resPrueba = await Test.create(prueba);
+        await StrategyTest.create(
+          dataValues.id_estrategia,
+          resPrueba.dataValues.id_prueba
+        );
+        if (fields.tipo_app === 'movil') {
+          if (p === 'E2E') {
+            Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
+          } else if (p === 'random') {
+            Parameter.create({
+              id_prueba: resPrueba.dataValues.id_prueba,
+              param:
+                './adb shell monkey -p ' +
+                fields.paquete +
+                ' --pct-syskeys 0 -s ' +
+                fields.semillaRandom +
+                ' ' +
+                fields.numEventos,
+            });
+          } else if (p === 'BDT') {
+            Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
+          }
+        } else {
+          if (p === 'E2E') {
+            Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
+          } else if (p === 'random') {
+            Script.create(resPrueba.dataValues.id_prueba, files.filesRANDOM);
+          } else if (p === 'BDT') {
+            Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
+          }
+        }
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(500).json({ message: 'Strategy not created' });
+    }
   });
+};
+//Execute a Strategy
+exports.execute = async (req, res) => {
+  console.log('*****Execute Strategy *****');
+  try {
+    await Strategy.update(
+      { estado: 'pendiente' },
+      {
+        where: { id_estrategia: req.params.strategyId },
+      }
+    );
+    const record = await sequelize.query(
+      'select p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, (select p2.param from parametro p2 where ' +
+        'p2.id_prueba =p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba ' +
+        '=p.id_prueba ) as ruta_script from estrategia_prueba ep, prueba p, "version" v where ' +
+        'ep.id_estrategia=$strategyId and ep.id_prueba =p.id_prueba and p.id_version =v.id_version and ' +
+        'p.id_app =v.id_app',
+      {
+        bind: {
+          strategyId: req.params.strategyId,
+        },
+        type: QueryTypes.SELECT,
+        raw: true,
+      }
+    );
+    if (!record) {
+      res.status(404).json({ message: 'Strategy not found' });
+    }
+    const sqs = new AWS.SQS();
+    for (let i = 0; i < record.length; i++) {
+      const executions = await Execution.create(
+        {
+          id_estrategia: req.params.strategyId,
+          id_prueba: record[i].id_prueba,
+          estado: 'registrado',
+        },
+        {
+          raw: true,
+        }
+      );
+      const params = {
+        MessageBody: JSON.stringify({
+          id_estrategia: req.params.strategyId,
+          id_ejecucion: executions.dataValues.id_ejecucion,
+          id_prueba: record[i].id_prueba,
+          id_app: record[i].id_app,
+          ruta_app: record[i].ruta_app,
+          tipo_prueba: record[i].tipo_prueba,
+          parametro: record[i].parametro,
+          ruta_script: record[i].ruta_script,
+        }),
+        QueueUrl:
+          'https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo',
+        MessageGroupId:
+          req.params.strategyId +
+          '' +
+          executions.dataValues.id_ejecucion +
+          '' +
+          record[i].id_prueba +
+          '' +
+          record[i].id_app,
+        MessageDeduplicationId:
+          req.params.strategyId +
+          '' +
+          executions.dataValues.id_ejecucion +
+          '' +
+          record[i].id_prueba +
+          '' +
+          record[i].id_app,
+      };
+      await sqs.sendMessage(params, function(err, data) {
+        if (err) {
+          console.log('Error', err);
+        } else {
+          console.log('Success', data.MessageId);
+          if (i === record.length - 1) {
+            res.sendStatus(200);
+          }
+        }
+      });
+    }
+  } catch (e) {
+    res.status(500).json({ message: 'error executing Strategy' });
+  }
 };

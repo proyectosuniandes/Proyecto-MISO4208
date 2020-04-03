@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS resultado;
 DROP TABLE IF EXISTS ejecucion;
 DROP TABLE IF EXISTS estrategia_prueba;
-DROP TABLE IF EXISTS dispositivos;
 DROP TABLE IF EXISTS navegadores;
+DROP TABLE IF EXISTS dispositivos;
 DROP TABLE IF EXISTS estrategia;
 DROP TABLE IF EXISTS script;
 DROP TABLE IF EXISTS parametro;
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS estrategia(
 CREATE TABLE IF NOT EXISTS dispositivos(
   id_dispositivo SERIAL PRIMARY KEY,
   id_estrategia INTEGER NOT NULL,
-  dispositivo INTEGER NOT NULL,
+  dispositivo dispositivo NOT NULL,
   CONSTRAINT id_estrategia_fkey FOREIGN KEY(id_estrategia)
     REFERENCES estrategia (id_estrategia) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS dispositivos(
 CREATE TABLE IF NOT EXISTS navegadores(
   id_navegador SERIAL PRIMARY KEY,
   id_estrategia INTEGER NOT NULL,
-  navegador INTEGER NOT NULL,
+  navegador navegador NOT NULL,
   version  INTEGER NOT NULL,
   CONSTRAINT id_estrategia_fkey FOREIGN KEY(id_estrategia)
     REFERENCES estrategia (id_estrategia) MATCH SIMPLE
