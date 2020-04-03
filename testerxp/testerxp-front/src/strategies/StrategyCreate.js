@@ -11,10 +11,10 @@ import TypeAppCmp from '../components/data/TypeAppCmp'
 
 import {
     BooleanInput,
-    Create, Error,
+    Create,
     FileField,
     FileInput,
-    FormDataConsumer, Loading, Query,
+    FormDataConsumer,
     ReferenceInput,
     SelectArrayInput,
     SelectInput,
