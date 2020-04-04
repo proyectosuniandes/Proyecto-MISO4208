@@ -6,7 +6,7 @@ const dataProvider = simpleRestProvider('http://localhost:8080');
 const DataProvideUpload = {
         ...dataProvider,
         create: (resource, params) => {
-            if (resource === 'versions' || params.data.files) {
+            if (resource === 'versions' && params.data.files) {
 
                 console.log('resource :' + resource);
                 console.log('params : ' + util.inspect(params, false, null, true /*enable colors */));
