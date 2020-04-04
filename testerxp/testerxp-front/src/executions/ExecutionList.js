@@ -6,10 +6,10 @@ const ExecutionList = (props) => (
     <List {...props} title="Lista de Ejecuciones" >
         <Datagrid>
             <TextField source="id"/>
-            <ReferenceField source="id_app" reference="apps" label="Aplicación">
+            <ReferenceField source="id_app" reference="apps" label="Aplicación" >
                 <TextField source="nombre" />
             </ReferenceField>
-            <ReferenceField source="id_app" reference="apps" label="Tipo Aplicación">
+            <ReferenceField source="id_app" reference="apps" label="Tipo Aplicación" >
                 <TextField source="tipo_app" />
             </ReferenceField>
             <TextField source="descripcion" label="Versión"/>

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import simpleRestProvider from 'ra-data-simple-rest';
 
 import {Admin, Resource} from 'react-admin';
 
@@ -15,13 +14,15 @@ import applications from './applications';
 import versions from './versions';
 import strategies from './strategies';
 import executions from './executions';
+import DataProvideUpload from './DataProvideUpload'
 
-const dataProvider = simpleRestProvider('http://localhost:8080');
+
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, 'es');
 
 const App = () => (
+
     <Admin dashboard={Dashboard} locale="es"
-           dataProvider={dataProvider}
+           dataProvider={DataProvideUpload}
            i18nProvider={i18nProvider}
            theme={theme}
            layout={Layout}
@@ -34,6 +35,7 @@ const App = () => (
 
     </Admin>
 );
+
 
 
 export default App;

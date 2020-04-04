@@ -1,8 +1,6 @@
 const Version = require('../models/version');
 const App = require('../models/app');
-const formidable = require('formidable');
 const AWS = require('aws-sdk');
-const fs = require('fs');
 const path = require('path');
 
 // Retrieve all Versions from the database.
@@ -56,30 +54,30 @@ exports.findOne = async (req, res) => {
 exports.create = async (req, res) => {
   console.log('***** Create Version *****');
   try {
-    const form = formidable({ multiples: true });
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        res.status(500).json({ message: 'File not parsed' });
-      }
-      if (Object.keys(files).length > 0) {
-        uploadFile(
-          files.ruta_app.path,
-          files.ruta_app.name,
-          fields,
-          async (fields) => {
-            const record = await Version.create(fields, {
-              raw: true,
-            });
-            res.status(201).json(record);
-          }
-        );
-      } else {
-        const record = await Version.create(fields, {
-          raw: true,
-        });
-        res.status(201).json(record);
-      }
-    });
+    if (req.body.tipo_app === 'movil') {
+      //Read content from file
+      const file = new Buffer(req.body.files.base64File, 'base64');
+      uploadFile(
+        file,
+        req.body.files.name,
+        {
+          id_app: req.body.id_app,
+          descripcion: req.body.descripcion,
+        },
+        async (fields) => {
+          const record = await Version.create(fields, {
+            raw: true,
+          });
+          res.status(201).json(record);
+        }
+      );
+    } else {
+      delete req.body.tipo_app;
+      const record = await Version.create(req.body, {
+        raw: true,
+      });
+      res.status(201).json(record);
+    }
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'Version not created' });
@@ -90,34 +88,54 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   console.log('***** Update Version *****');
   try {
-    const form = formidable({ multiples: true });
-    form.parse(req, async (err, fields, files) => {
-      const record = await Version.findOne({
+    const record = await Version.findOne({
+      where: {
+        id_version: req.params.versionId,
+      },
+      raw: true,
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Version not found' });
+    }
+    const persist = async (fields) => {
+      await Version.update(fields, {
         where: {
           id_version: req.params.versionId,
         },
-        raw: true,
       });
-      if (!record) {
-        return res.status(404).json({ error: 'Version not found' });
-      }
-      const persist = async (fields) => {
-        await Version.update(fields, {
-          where: {
-            id_version: req.params.versionId,
-          },
-        });
-        res.status(200).json(fields);
-      };
-      if (Object.keys(files).length > 0) {
+      res.status(200).json(fields);
+    };
+    if (req.body.app.tipo_app === 'movil') {
+      if (req.body.files) {
+        const file = new Buffer(req.body.files.base64File, 'base64');
         const upload = () => {
-          uploadFile(files.ruta_app.path, files.ruta_app.name, fields, persist);
+          uploadFile(
+            file,
+            req.body.files.name,
+            {
+              id_app: req.body.id_app,
+              descripcion: req.body.descripcion,
+            },
+            persist
+          );
         };
         deleteFile(record.ruta_app, upload);
       } else {
-        persist(fields);
+        persist({
+          id_app: req.body.id_app,
+          descripcion: req.body.descripcion,
+        });
       }
-    });
+    } else {
+      delete req.body.id_version;
+      delete req.body.id_app;
+      delete req.body['app.id_app'];
+      delete req.body['app.nombre'];
+      delete req.body['app.tipo_app'];
+      delete req.body.id;
+      delete req.body.app;
+      persist(req.body);
+    }
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'Error updating Version' });
@@ -185,17 +203,14 @@ function parseFilterVersion(filter) {
     );
 }
 
-async function uploadFile(filePath, fileName, fields, persist) {
+async function uploadFile(file, fileName, fields, persist) {
   const s3 = new AWS.S3();
-  //Read content from file
-  const fileContent = fs.readFileSync(filePath);
   //Setting up S3 upload parameters
   const params = {
     Bucket: 'miso-4208-grupo3/app',
     Key: fileName,
-    Body: fileContent,
+    Body: file,
   };
-  //Uploading files to the bucket
   await s3.upload(params, async (err, data) => {
     if (err) {
       return err;

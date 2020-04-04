@@ -4,7 +4,8 @@ import {ChipField, Datagrid, List, ReferenceManyField, SingleFieldList, TextFiel
 import NestedFieldApp from '../components/data/NestedFieldApp.js'
 import NestedFieldVersion from '../components/data/NestedFieldVersion.js'
 
-import ExecuteButton from '../components/buttons/ExecuteStrategyButton.js';
+
+import ExecuteButton from '../components/buttons/ExecuteButton';
 
 const StrategyList = (props) => (
     <List {...props} title="Lista de Estrategias de Prueba" sort={{field: 'id_estrategia', order: 'ASC'}}>
@@ -23,11 +24,15 @@ const StrategyList = (props) => (
                 </SingleFieldList>
             </ReferenceManyField>
 
-            <NestedFieldApp label= "Aplicación"/>
 
-            <NestedFieldVersion label="Versión"/>
+
+
+          {/*<NestedFieldApp label= "Aplicación"/>*/}
+
+            {/*<NestedFieldVersion label="Versión"/>*/}
 
             {/*<EditButton label="Editar"/>*/}
+
             <ExecuteButton/>
         </Datagrid>
     </List>

@@ -1,18 +1,18 @@
 const Browsers = require('../models/navegadores');
 
 //Create and Save a new Device
-exports.create = async (strategyId, firefox, chrome) => {
-  console.log('***** Create Devices*****');
+exports.create = async (strategyId, electron, chrome) => {
+  console.log('***** Create Browsers*****');
   try {
-    JSON.parse(firefox).forEach((f) => {
+    electron.forEach((e) => {
       Browsers.create({
         id_estrategia: strategyId,
-        navegador: 'firefox',
-        version: f,
+        navegador: 'electron',
+        version: e,
       });
     });
 
-    JSON.parse(chrome).forEach((c) => {
+    chrome.forEach((c) => {
       Browsers.create({
         id_estrategia: strategyId,
         navegador: 'chrome',

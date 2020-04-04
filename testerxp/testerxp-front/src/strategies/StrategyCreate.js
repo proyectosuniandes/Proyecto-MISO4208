@@ -158,13 +158,11 @@ const StrategyCreate = (props: any) => {
                             <Card style={{width: '100%'}}>
                                 <Typography variant="h6" gutterBottom>Matriz de Navegadores <hr/></Typography>
                                 <SelectArrayInput label="Versiones Firefox" source="firefox" fullWidth choices={[
-                                    {id: '67', name: '67'},
-                                    {id: '68', name: '68'},
+                                    {id: '72.0.2', name: '72.0.2'},
                                 ]}/>
 
                                 <SelectArrayInput label="Versiones Google Chrome " source="chrome" fullWidth choices={[
-                                    {id: '80', name: '80'},
-                                    {id: '81', name: '81'},
+                                    {id: '80.0.3987.116', name: '80.0.3987.116'},
                                 ]}/>
                             </Card>
 
@@ -294,8 +292,6 @@ const TabPruebas = ({formData, ...rest}) => {
                 {formData.pruebas
                 && formData.pruebas.includes('random') && <Tab label="RANDOM">
                     <Card style={{width: '100%'}}>
-
-
                         {formData.tipo_app === 'movil' && <Fragment>
                             <Typography variant="h6" gutterBottom>Parámetros <hr/></Typography>
                             <Box display="flex" justifyContent="center" m={1} p={1}
@@ -306,7 +302,12 @@ const TabPruebas = ({formData, ...rest}) => {
                                 <Box p={1} width="50%">
                                     <TextInput source="numEventos" label="Número de Eventos" fullWidth/>
                                 </Box>
-
+                            </Box>
+                            <Box display="flex" justifyContent="center" m={1} p={1}
+                                 bgcolor="background.paper">
+                                <Box p={1} width="100%">
+                                    <TextInput source="paquetes" label="Paquete" fullWidth/>
+                                </Box>
                             </Box>
 
                         </Fragment>}
