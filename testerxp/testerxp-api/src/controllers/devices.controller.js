@@ -4,7 +4,8 @@ const Devices = require('../models/dispositivos');
 exports.create = async (strategyId, devices) => {
   console.log('***** Create Devices*****');
   try {
-    JSON.parse(devices).forEach((d) => {
+    devices.forEach((d) => {
+      console.log(d);
       Devices.create({
         id_estrategia: strategyId,
         dispositivo: d,

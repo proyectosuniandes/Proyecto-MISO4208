@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+var bodyParser = require('body-parser');
 
 //Environment Variables
 const dotenv = require('dotenv');
@@ -26,6 +27,20 @@ app.use(function(req, res, next) {
 
   next();
 });
+
+app.use(
+  bodyParser.urlencoded({
+    limit: '20mb',
+    parameterLimit: 100000,
+    extended: false,
+  })
+);
+
+app.use(
+  bodyParser.json({
+    limit: '20mb',
+  })
+);
 
 //settings
 app.set('port', process.env.PORT || 8080);

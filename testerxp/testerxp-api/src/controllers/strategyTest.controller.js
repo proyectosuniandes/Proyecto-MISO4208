@@ -40,6 +40,9 @@ exports.findAll = async (req, res) => {
     });
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
+    console.log(
+      rows.map((resource) => ({ ...resource, id: resource.id_estrategia }))
+    );
     res.json(
       rows.map((resource) => ({ ...resource, id: resource.id_estrategia }))
     );
