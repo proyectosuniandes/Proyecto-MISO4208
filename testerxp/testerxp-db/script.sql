@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS navegadores(
   id_navegador SERIAL PRIMARY KEY,
   id_estrategia INTEGER NOT NULL,
   navegador navegador NOT NULL,
-  version  INTEGER NOT NULL,
+  version TEXT NOT NULL,
   CONSTRAINT id_estrategia_fkey FOREIGN KEY(id_estrategia)
     REFERENCES estrategia (id_estrategia) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION

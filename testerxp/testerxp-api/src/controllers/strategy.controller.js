@@ -1,5 +1,4 @@
 const Strategy = require('../models/estrategia');
-const formidable = require('formidable');
 const Devices = require('./devices.controller');
 const Browsers = require('./browsers.controller');
 const Test = require('./test.controller');
@@ -40,81 +39,125 @@ exports.findAll = async (req, res) => {
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
   console.log('***** Create Strategy *****');
-  const form = formidable({ multiples: true });
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      res.status(500).json({ message: 'File not parsed' });
+  console.log(req.body);
+  try {
+    const estrategia = {
+      nombre: req.body.nom_estrategia,
+      estado: 'registrado',
+    };
+    const { dataValues } = await Strategy.create(estrategia, {
+      raw: true,
+    });
+    if (req.body.tipo_app === 'movil') {
+      await Devices.create(dataValues.id_estrategia, req.body.dispositivos);
+    } else {
+      await Browsers.create(
+        dataValues.id_estrategia,
+        req.body.electron,
+        req.body.chrome
+      );
     }
-    try {
-      const estrategia = {
-        nombre: fields.nom_estrategia,
-        estado: 'registrado',
+    for (let i = 0; i < req.body.pruebas.length; i++) {
+      let prueba = {
+        id_version: req.body.version_app,
+        id_app: req.body.id_app,
+        tipo_prueba: req.body.pruebas[i],
+        modo_prueba: req.body.modo,
+        vrt: req.body.vrt,
       };
-      const { dataValues } = await Strategy.create(estrategia, {
-        raw: true,
-      });
-      if (fields.tipo_app === 'movil') {
-        await Devices.create(dataValues.id_estrategia, fields.dispositivos);
+      if (req.body.vrt) {
+        prueba.ref_app = req.body.id_app;
+        prueba.ref_version = req.body.version_vrt;
+      }
+      const resPrueba = await Test.create(prueba);
+      await StrategyTest.create(
+        dataValues.id_estrategia,
+        resPrueba.dataValues.id_prueba
+      );
+      if (req.body.tipo_app === 'movil') {
+        console.log('movil');
+        if (req.body.pruebas[i] === 'E2E') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === req.body.pruebas[i]) {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        } else if (req.body.pruebas[i] === 'random') {
+          Parameter.create({
+            id_prueba: resPrueba.dataValues.id_prueba,
+            param:
+              './adb shell monkey -p ' +
+              req.body.paquetes +
+              ' --pct-syskeys 0 -s ' +
+              req.body.semillaRandom +
+              ' ' +
+              req.body.numEventos,
+          });
+        } else if (req.body.pruebas[i] === 'BDT') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === req.body.pruebas[i]) {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        }
       } else {
-        await Browsers.create(
-          dataValues.id_estrategia,
-          fields.firefox,
-          fields.chrome
-        );
-      }
-      fields.pruebas = JSON.parse(fields.pruebas);
-      for (let i = 0; i < fields.pruebas.length; i++) {
-        let prueba = {
-          id_version: fields.version_app,
-          id_app: fields.id_app,
-          tipo_prueba: fields.pruebas[i],
-          modo_prueba: fields.modo,
-          vrt: fields.vrt,
-        };
-        if (fields.vrt) {
-          prueba.ref_app = fields.id_app;
-          prueba.ref_version = fields.version_vrt;
-        }
-        const resPrueba = await Test.create(prueba);
-        await StrategyTest.create(
-          dataValues.id_estrategia,
-          resPrueba.dataValues.id_prueba
-        );
-        if (fields.tipo_app === 'movil') {
-          if (fields.pruebas[i] === 'E2E') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
-          } else if (fields.pruebas[i] === 'random') {
-            Parameter.create({
-              id_prueba: resPrueba.dataValues.id_prueba,
-              param:
-                './adb shell monkey -p ' +
-                fields.paquete +
-                ' --pct-syskeys 0 -s ' +
-                fields.semillaRandom +
-                ' ' +
-                fields.numEventos,
-            });
-          } else if (fields.pruebas[i] === 'BDT') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
-          }
-        } else {
-          if (fields.pruebas[i] === 'E2E') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
-          } else if (fields.pruebas[i] === 'random') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesRANDOM);
-          } else if (fields.pruebas[i] === 'BDT') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
-          }
-        }
-        if (i === fields.pruebas.length - 1) {
-          res.sendStatus(200);
+        if (req.body.pruebas[i] === 'E2E') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === req.body.pruebas[i]) {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        } else if (req.body.pruebas[i] === 'random') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === 'RANDOM') {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        } else if (req.body.pruebas[i] === 'BDT') {
+          req.body.files.forEach((files) => {
+            if (files[0] !== undefined) {
+              if (files[0].prueba === req.body.pruebas[i]) {
+                let baseFiles = [];
+                let fileNames = [];
+                files.forEach((f) => {
+                  baseFiles.push(f.base64File);
+                  fileNames.push(f.name);
+                });
+                Script.create(
+                  resPrueba.dataValues.id_prueba,
+                  baseFiles,
+                  fileNames
+                );
+              }
+            }
+          });
         }
       }
-    } catch (e) {
-      console.log(e);
-      res.status(500).json({ message: 'Strategy not created' });
+      if (i === req.body.pruebas.length - 1) {
+        console.log('llega al final');
+        res.status(200).json(dataValues);
+      }
     }
-  });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Strategy not created' });
+  }
 };
 
 //Delete a Strategy with StrategyId

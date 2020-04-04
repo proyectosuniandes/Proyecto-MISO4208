@@ -16,7 +16,7 @@ const navegadores = sequelize.define(
       type: Sequelize.ENUM('chrome', 'electron'),
     },
     version: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.TEXT,
     },
   },
   {
