@@ -39,7 +39,6 @@ exports.findAll = async (req, res) => {
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
   console.log('***** Create Strategy *****');
-  console.log(req.body);
   try {
     const estrategia = {
       nombre: req.body.nom_estrategia,
@@ -75,7 +74,6 @@ exports.create = async (req, res) => {
         resPrueba.dataValues.id_prueba
       );
       if (req.body.tipo_app === 'movil') {
-        console.log('movil');
         if (req.body.pruebas[i] === 'E2E') {
           req.body.files.forEach((f) => {
             if (f.prueba === req.body.pruebas[i]) {
@@ -150,7 +148,6 @@ exports.create = async (req, res) => {
         }
       }
       if (i === req.body.pruebas.length - 1) {
-        console.log('llega al final');
         res.status(200).json(dataValues);
       }
     }
