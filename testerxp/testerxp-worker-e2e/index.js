@@ -72,37 +72,64 @@ const task = cron.schedule('* * * * *', () => {
         message.id_estrategia
       );
 
-      var pathScirptRemove="./cypress/integration/*.spec.js";     
-			// delete all existing report files
-      removeFiles(pathScirptRemove);
+      var pathScreenRemove="./cypress/screenshots/*.*";     
+      removeFiles(pathScreenRemove);
       
       if (!strategyTest) {
         console.log('estrategiaPrueba not found');
       } else {
-        if (strategyTest.estado === 'registrado') {
-          await updateExecution(message.id_ejecucion, 'pendiente');
-          let headless, headful;
-          if (strategyTest.modo_prueba === 'headless') {
-            headless = true;
-            headful=false;
-          } else {
-            headless = false;
-            headful=true;
+        strategyTest.forEach( async (record) => {
+          if (record.estado === 'registrado') {
+            await updateExecution(message.id_ejecucion, 'pendiente');
+            let headless, headful;
+            if (record.modo_prueba === 'headless') {
+              headless = true;
+              headful=false;
+            } else {
+              headless = false;
+              headful=true;
+            }
+            let navegador = record.navegador;
+            
+            if (navegador === 'firefox'){
+              navegador = 'electron';
+            }
+            
+            let vrt = record.vrt;
+            
+            var ruta_vrt;
+            
+            if (vrt) {
+              const vrtTest = await getVrt(
+                message.id_prueba,
+                message.id_app
+              );
+              if (!vrtTest) {
+                console.log('app VRT not found');
+              } else{
+                ruta_vrt = vrtTest.ruta_app;
+              }
+            }
+            
+            await executeWeb(
+              message.ruta_script,
+              headless,
+              headful,
+              navegador,
+              vrt,
+              message.ruta_app,
+              ruta_vrt,
+              message.id_estrategia,
+              message.id_prueba,
+              message.id_ejecucion
+            );
           }
-          let dispositivo = strategyTest.dispositivo;
-          let vrt = strategyTest.vrt;
-          await executeWeb(
-            message.ruta_script,
-            headless,
-            headful,
-            dispositivo,
-            vrt,
-            message.id_estrategia,
-            message.id_prueba,
-            message.id_ejecucion
-          );
-        }
+
+        })
+        
       }
+      var pathScirptRemove="./cypress/integration/" + message.id_ejecucion + "*.spec.js";
+      removeFiles(pathScirptRemove);  
     }
   });
 });
@@ -111,10 +138,35 @@ const task = cron.schedule('* * * * *', () => {
 async function getStrategyTest(executionId, testId, appId, strategyId) {
   try {
     const record = await sequelize.query(
-      'select e.estado, p.modo_prueba, p.vrt, a.tipo_app, s.dispositivo from ejecucion e, prueba p, app a, estrategia s where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId and s.id_estrategia = $strategyId',
+      'select e.estado, p.modo_prueba, p.vrt, a.tipo_app, n.navegador from ejecucion e, prueba p, app a, navegadores n where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId and n.id_estrategia = $strategyId',
       {
         bind: {
           executionId: executionId,
+          testId: testId,
+          appId: appId,
+          strategyId: strategyId
+        },
+        type: QueryTypes.SELECT,
+        raw: true
+      }
+    );
+    if (!record) {
+      return null;
+    }
+    return record;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+
+//Find vrt given strategyId and testId
+async function getVrt(executionId, testId, appId, strategyId) {
+  try {
+    const record = await sequelize.query(
+      'select v.ruta_app from prueba p, version v where v.id_app = p.ref_app and v.id_version = p.ref_version and p.id_prueba =$testId and a.id_app = $appId',
+      {
+        bind: {
           testId: testId,
           appId: appId
         },
@@ -125,7 +177,7 @@ async function getStrategyTest(executionId, testId, appId, strategyId) {
     if (!record) {
       return null;
     }
-    return record[0];
+    return record;
   } catch (e) {
     console.log(e);
     return null;
@@ -145,7 +197,7 @@ async function updateExecution(executionId, estado) {
 }
 
 //execute random script with cypress
-async function executeWeb(rutaScript, headless, headful, dispositivo, vrt, strategyId, testId, executionId) {
+async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp, rutaVrt, strategyId, testId, executionId) {
   console.log('***** Executing Web ****');
   const s3 = new AWS.S3();
   const split = rutaScript.split('.com/');
@@ -157,6 +209,7 @@ async function executeWeb(rutaScript, headless, headful, dispositivo, vrt, strat
   };
 
   s3.listObjects(paramsL, (err, data) => {
+    
     if (err) {
       throw err;
     }
@@ -174,78 +227,88 @@ async function executeWeb(rutaScript, headless, headful, dispositivo, vrt, strat
         //   recursive: true
         // });
         var archivo = d.Key.split('/');
-        fs.writeFileSync(          
-          path.join(__dirname, '/cypress/integration', archivo[2]),
-          data.Body.toString()
-        );
-        console.log(archivo[2] + ' has been created!');
-        await cypress.run({
-          headless: headless,
-          headed:headful,
-          browser:dispositivo,
-          spec: path.join(__dirname, '/cypress/integration', archivo[2]),
-          chromeWebSecurity: false,
-          reporter: 'mochawesome',
-          reporterOptions: {
-            reportFilename: archivo[2],
-            reportDir: path.join(__dirname, '/cypress/results'),
-            //overwrite: false,
-            html: false,
-            json: true,
-            quiet: true
-          }
-        });
-        let nameScript = d.Key.split('/');
-        nameScript = nameScript[nameScript.length - 1];
-        const video = fs.readFileSync(
-          path.join(__dirname, '/cypress/videos', archivo[2] + '.mp4')
-        );
-        console.log(archivo[2].split('.js'));
-        const report = fs.readFileSync(
-          path.join(__dirname, '/cypress/results', archivo[2].split('.js')[0] + '.json')
-        );
-        //Uploading video to the bucket
-        let paramsU = {
-          Bucket:
-            'miso-4208-grupo3/results/' +
-            strategyId +
-            '/' +
-            testId +
-            '/' +
-            executionId,
-          Key: nameScript + '.mp4',
-          Body: video
-        };
-        s3.upload(paramsU, async (err, data) => {
-          if (err) {
-            return err;
-          }
-          console.log('File uploaded successfully ' + data.Location);
-          fs.unlinkSync(path.join(__dirname, '/cypress/videos', archivo[2] + '.mp4'));
-          await persist({
-            id_ejecucion: executionId,
-            ruta_archivo: path.dirname(data.Location)
+        
+        if (archivo[2] != ''){
+          fs.writeFileSync(          
+            path.join(__dirname, '/cypress/integration', executionId+navegador+archivo[2]),
+            data.Body.toString()
+          );
+          console.log(executionId+navegador+archivo[2] + ' has been created!');
+          
+          await cypress.run({
+            headless: headless,
+            headed:headful,
+            browser:navegador,
+            spec: path.join(__dirname, '/cypress/integration', executionId+navegador+archivo[2]),
+            chromeWebSecurity: false,
+            config: {
+              baseUrl: rutaApp,
+              video: true,
+            },
+            reporter: 'mochawesome',
+            reporterOptions: {
+              reportFilename: executionId+navegador+archivo[2],
+              reportDir: path.join(__dirname, '/cypress/results'),
+              //overwrite: false,
+              html: false,
+              json: true,
+              quiet: true
+            }
           });
-          await updateExecution(executionId, 'ejecutado');
-        });
-        paramsU.Key = nameScript.split('.js')[0] + '.json';
-        paramsU.Body = report;
-        //Uploading json to the bucket
-        s3.upload(paramsU, async (err, data) => {
-          if (err) {
-            return err;
-          }
-          console.log('File uploaded successfully ' + data.Location);
-          fs.unlinkSync(path.join(
-            __dirname,
-            '/cypress/results',
-            archivo[2].split('.js')[0] + '.json'
-          ));
-          await persist({
-            id_ejecucion: executionId,
-            ruta_archivo: path.dirname(data.Location)
+          let nameScript = d.Key.split('/');
+          nameScript = nameScript[nameScript.length - 1];
+          
+          const video = fs.readFileSync(
+            path.join(__dirname, '/cypress/videos', executionId+navegador+archivo[2] + '.mp4')
+          );
+          
+          const report = fs.readFileSync(
+            path.join(__dirname, '/cypress/results', executionId+navegador+archivo[2].split('.js')[0] + '.json')
+          );
+          //Uploading video to the bucket
+          let paramsU = {
+            Bucket:
+              'miso-4208-grupo3/results/' +
+              strategyId +
+              '/' +
+              testId +
+              '/' +
+              executionId,
+            Key: executionId+navegador + nameScript + '.mp4',
+            Body: video
+          };
+          s3.upload(paramsU, async (err, data) => {
+            if (err) {
+              return err;
+            }
+            console.log('File uploaded successfully ' + data.Location);
+            fs.unlinkSync(path.join(__dirname, '/cypress/videos', executionId+navegador+archivo[2] + '.mp4'));
+            await persist({
+              id_ejecucion: executionId,
+              ruta_archivo: path.dirname(data.Location)
+            });
+            await updateExecution(executionId, 'ejecutado');
+            
           });
-        });
+          paramsU.Key = executionId+navegador + nameScript.split('.js')[0] + '.json';
+          paramsU.Body = report;
+          //Uploading json to the bucket
+          s3.upload(paramsU, async (err, data) => {
+            if (err) {
+              return err;
+            }
+            console.log('File uploaded successfully ' + data.Location);
+            fs.unlinkSync(path.join(
+              __dirname,
+              '/cypress/results',
+              executionId+navegador + archivo[2].split('.js')[0] + '.json'
+            ));
+            await persist({
+              id_ejecucion: executionId,
+              ruta_archivo: path.dirname(data.Location)
+            });
+          });
+        }
       });
     });
   });
