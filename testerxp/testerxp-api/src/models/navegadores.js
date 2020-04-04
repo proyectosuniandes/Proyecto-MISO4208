@@ -13,7 +13,7 @@ const navegadores = sequelize.define(
       type: Sequelize.INTEGER,
     },
     navegador: {
-      type: Sequelize.ENUM('chrome', 'firefox'),
+      type: Sequelize.ENUM('chrome', 'electron'),
     },
     version: {
       type: Sequelize.INTEGER,
