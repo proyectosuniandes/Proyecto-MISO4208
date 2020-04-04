@@ -7,26 +7,11 @@ dotenv.config();
 
 //Initializations
 const app = express();
-
-var bodyParser = require('body-parser');
-
-
-
-app.use(bodyParser.urlencoded({
-  limit: '5mb',
-  parameterLimit: 100000,
-  extended: false
-}));
-
-app.use(bodyParser.json({
-  limit: '5mb'
-}));
-
 var cors = require('cors');
 app.use(cors());
 
 app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // update to match the domain you will make the request from
+  //res.header('Access-Control-Allow-Origin', 'http://ec2-3-95-244-7.compute-1.amazonaws.com/#/'); // update to match the domain you will make the request from
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
