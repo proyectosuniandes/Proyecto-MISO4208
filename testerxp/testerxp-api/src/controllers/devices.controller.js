@@ -5,7 +5,6 @@ exports.create = async (strategyId, devices) => {
   console.log('***** Create Devices*****');
   try {
     devices.forEach((d) => {
-      console.log(d);
       Devices.create({
         id_estrategia: strategyId,
         dispositivo: d,
