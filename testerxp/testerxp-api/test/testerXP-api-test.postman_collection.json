@@ -1,0 +1,1104 @@
+{
+	"info": {
+		"_postman_id": "e8294a1c-7650-4334-bd47-cbd29fc2fd58",
+		"name": "testerXP-api-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "App",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nombre\": \"test\",\n\t\"tipo_app\": \"movil\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/apps",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nombre\": \"appTest-edited\",\n\t\"tipo_app\": \"web\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/apps/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apps",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/apps/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apps",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/apps/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apps",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/apps",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apps"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Version",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id_app",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "descripcion",
+									"value": "1.7.112",
+									"type": "text"
+								},
+								{
+									"key": "ruta_app",
+									"type": "file",
+									"src": "/C:/Users/Daniela/Downloads/loop-1.7.11 - Copy.apk"
+								},
+								{
+									"key": "ruta_app",
+									"value": "http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com/mantis/login_page.php",
+									"type": "text",
+									"disabled": true
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/versions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"versions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "descripcion",
+									"value": "1.1.1",
+									"type": "text"
+								},
+								{
+									"key": "ruta_app",
+									"type": "file",
+									"src": "/C:/Users/Daniela/Downloads/administrator.doc"
+								},
+								{
+									"key": "ruta_app",
+									"value": "url edited",
+									"type": "text",
+									"disabled": true
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/versions/4/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"versions",
+								"4",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/versions/4/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"versions",
+								"4",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/versions/2/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"versions",
+								"2",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/versions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"versions"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Test",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_version\": \"3\",\n\t\"id_app\": \"3\",\n\t\"tipo_prueba\": \"E2E\",\n\t\"modo_prueba\": \"headless\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_version\": \"2\",\n\t\"id_app\": \"2\",\n\t\"tipo_prueba\": \"VRT\",\n\t\"modo_prueba\": \"headful\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tests/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tests",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/tests/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tests",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/tests/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tests",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/tests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tests"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Parameter",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_prueba\": \"1\",\n\t\"param\": \"adb shell monkey -p es.usc.citius.servando.calendula -v 10000\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/parameters",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"parameters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_prueba\": \"3\",\n\t\"param\": \"test-param-updated\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/parameters/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"parameters",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/parameters/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"parameters",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/parameters/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"parameters",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/parameters",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"parameters"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Script",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id_prueba",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "scripts",
+									"type": "file",
+									"src": [
+										"/C:/Users/Daniela/Downloads/scriptMantis.js",
+										"/C:/Users/Daniela/Downloads/administrator.doc"
+									]
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/scripts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"scripts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id_prueba",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "scripts",
+									"type": "file",
+									"src": [
+										"/C:/Users/Daniela/OneDrive/Documentos/Comparación Ejecución de Pruebas.docx",
+										"/C:/Users/Daniela/OneDrive/Documentos/Sprint 3.docx"
+									]
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/scripts/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"scripts",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/scripts/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"scripts",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/scripts/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"scripts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/scripts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"scripts"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "StrategyTest",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_estrategia\": \"2\",\n\t\"id_prueba\": \"3\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/strategyTests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategyTests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategyTests/2/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategyTests",
+								"2",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategyTests/1/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategyTests",
+								"1",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategyTests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategyTests"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Strategy",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nombre\": \"estrategia 3\",\n\t\"estado\": \"registrado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/strategies",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"nombre\": \"estrategia-edited\",\n\t\"estado\": \"ejecutado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/strategies/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategies",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategies/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategies",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategies/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategies",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategies",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "execute",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/strategies/execute/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"strategies",
+								"execute",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Execution",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_estrategia\": \"1\",\n\t\"id_prueba\":\"1\",\n\t\"estado\": \"registrado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/executions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"executions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id_estrategia\": \"1\",\n\t\"id_prueba\":\"2\",\n\t\"estado\": \"ejecutado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/executions/15",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"executions",
+								"15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/executions/15",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"executions",
+								"15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/executions/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"executions",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/executions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"executions"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Result",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id_ejecucion",
+									"value": "14",
+									"type": "text"
+								},
+								{
+									"key": "ruta_archivo",
+									"type": "file",
+									"src": "/C:/Users/Daniela/OneDrive/Documentos/Tu.doc"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/results",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"results"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id_ejecucion",
+									"value": "21",
+									"type": "text"
+								},
+								{
+									"key": "ruta_archivo",
+									"type": "file",
+									"src": "/C:/Users/Daniela/Downloads/administrator.doc"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/results/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"results",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/results/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"results",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/results/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"results",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/results",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"results"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

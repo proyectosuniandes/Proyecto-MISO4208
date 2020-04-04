@@ -11,7 +11,6 @@ const { QueryTypes } = require('sequelize');
 const Execution = require('../models/ejecucion');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-1' });
-const util = require('util');
 
 // Retrieve all Strategies from the database.
 exports.findAll = async (req, res) => {
@@ -41,8 +40,6 @@ exports.findAll = async (req, res) => {
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
   console.log('***** Create Strategy *****');
-  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
-  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
   const form = formidable({ multiples: true });
   form.parse(req, async (err, fields, files) => {
     if (err) {
