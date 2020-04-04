@@ -63,10 +63,9 @@ exports.create = async (req, res) => {
 
         //-- sube el archivo
         if (req.body.files) {
-            var fs = require("fs");
             var scriptBuffer = Buffer.from(req.body.files.base64File, 'base64');
             //fs.writeFileSync("imagen.jpg", scriptBuffer);
-            scriptName = req.body.files.name;
+            var scriptName = req.body.files.name;
             req.body.ruta_app =  uploadFile(scriptName, scriptBuffer);
         }
 

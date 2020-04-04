@@ -41,7 +41,7 @@ exports.findAll = async (req, res) => {
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
     res.json(
-      rows.map((resource) => ({ ...resource, id: resource.id_estrategia }))
+      rows.map((resource) => ({ ...resource, id: resource.id_prueba }))
     );
   } catch (e) {
     console.log(e);

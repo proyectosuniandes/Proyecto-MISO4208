@@ -4,12 +4,13 @@ import {connect} from 'react-redux';
 import Button from '@material-ui/core/Button'
 
 import {
-    showNotification,useNotify, useRedirect,
+    showNotification, useNotify, useRedirect,
 } from 'react-admin';
 import {push} from 'react-router-redux';
 
 
 const util = require('util');
+
 
 class ExecuteButton extends Component {
     handleClick = () => {
@@ -20,6 +21,10 @@ class ExecuteButton extends Component {
 
         const urlRest = `http://localhost:8080/strategies/execute/` + record.id_estrategia;
         console.log(urlRest);
+        const notify = useNotify();
+        const redirect = useRedirect();
+        redirect('/executions');
+        notify('Estategia Lanzada para su Ejecución');
 
         fetch(urlRest, {
             method: 'GET'
@@ -33,13 +38,6 @@ class ExecuteButton extends Component {
             .catch(function (err) {
                 console.error(err);
             });
-
-        const notify = useNotify();
-        const redirect = useRedirect();
-
-        redirect('/executions');
-        notify('Estategia Lanzada para su Ejecución');
-
     };
 
     render() {
