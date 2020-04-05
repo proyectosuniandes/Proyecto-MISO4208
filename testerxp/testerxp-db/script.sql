@@ -118,6 +118,8 @@ CREATE TABLE IF NOT EXISTS ejecucion(
   id_estrategia INTEGER NOT NULL,
   id_prueba INTEGER NOT NULL,
   estado estado_ejecucion NOT NULL,
+  fecha_inicio TIMESTAMP NOT NULL,
+  fecha_fin TIMESTAMP NOT NULL,
   CONSTRAINT id_estrategia_prueba_fkey FOREIGN KEY (id_estrategia,id_prueba)
     REFERENCES estrategia_prueba (id_estrategia,id_prueba) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -127,6 +129,7 @@ CREATE TABLE IF NOT EXISTS RESULTADO(
   id_resultado SERIAL PRIMARY KEY,
   id_ejecucion INTEGER NOT NULL,
   ruta_archivo TEXT NOT NULL,
+  fecha TIMESTAMP NOT NULL,
   CONSTRAINT id_ejecucion_fkey FOREIGN KEY (id_ejecucion)
     REFERENCES ejecucion (id_ejecucion) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
