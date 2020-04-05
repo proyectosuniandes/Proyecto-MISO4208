@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS ejecucion(
   id_prueba INTEGER NOT NULL,
   estado estado_ejecucion NOT NULL,
   fecha_inicio TIMESTAMP NOT NULL,
-  fecha_fin TIMESTAMP NOT NULL,
+  fecha_fin TIMESTAMP,
   CONSTRAINT id_estrategia_prueba_fkey FOREIGN KEY (id_estrategia,id_prueba)
     REFERENCES estrategia_prueba (id_estrategia,id_prueba) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
