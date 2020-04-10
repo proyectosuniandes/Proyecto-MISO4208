@@ -9,20 +9,20 @@
   "author": "Grupo3",
   "license": "MIT",
   "devDependencies": {
-    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-prettier": "^6.10.1",
     "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "prettier": "^2.0.4"
   },
   "dependencies": {
     "adbkit": "^2.11.1",
-    "aws-sdk": "^2.642.0",
-    "cypress": "^4.2.0",
+    "aws-sdk": "^2.654.0",
+    "cypress": "^4.3.0",
     "express": "^4.17.1",
     "mocha": "^7.1.1",
     "mochawesome": "^5.0.0",
     "node-cron": "^2.0.3",
-    "pg": "^7.18.2",
-    "sequelize": "^5.21.5",
+    "pg": "^8.0.0",
+    "sequelize": "^5.21.6",
     "shelljs": "^0.8.3"
   }
 }
