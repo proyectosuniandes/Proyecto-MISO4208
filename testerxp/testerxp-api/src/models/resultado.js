@@ -15,6 +15,9 @@ const resultado = sequelize.define(
     ruta_archivo: {
       type: Sequelize.TEXT,
     },
+    fecha: {
+      type: Sequelize.DATE,
+    },
   },
   {
     timestamps: false,

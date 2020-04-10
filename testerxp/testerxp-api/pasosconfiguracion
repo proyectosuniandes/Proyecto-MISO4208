@@ -1,0 +1,16 @@
+#Configuracion back
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+nvm install node
+npm install
+npm install pm2
+
+#Configuraciion Front
+sudo yum install -y httpd
+sudo service httpd start
+sudo chkconfig httpd on
+sudo groupadd www
+sudo usermod -a -G www ec2-user
+#salir y volver a entrar al servidor
+sudo chown -R root:www /var/www
+sudo chmod 2775 /var/www
+find /var/www -type f -exec sudo chmod 0664 {} +

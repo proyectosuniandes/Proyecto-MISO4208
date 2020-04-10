@@ -16,3 +16,21 @@ exports.create = async (strategyId, devices) => {
     return null;
   }
 };
+
+// Retrieve all Devices from the database.
+exports.findAll = async (filter) => {
+  console.log('***** FindAll Devices *****');
+  try {
+    const devices = await Devices.findAll({
+      where: filter,
+      raw: true,
+    });
+    if (devices.length) {
+      return devices;
+    }
+    return null;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
