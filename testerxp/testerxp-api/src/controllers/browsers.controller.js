@@ -25,3 +25,20 @@ exports.create = async (strategyId, electron, chrome) => {
     return null;
   }
 };
+// Retrieve all Browsers from the database.
+exports.findAll = async (filter) => {
+  console.log('***** FindAll Browsers *****');
+  try {
+    const browsers = await Browsers.findAll({
+      where: filter,
+      raw: true,
+    });
+    if (browsers.length) {
+      return browsers;
+    }
+    return null;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};

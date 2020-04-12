@@ -62,10 +62,10 @@ exports.create = async (req, res) => {
         id_app: req.body.id_app,
         tipo_prueba: req.body.pruebas[i],
         modo_prueba: req.body.modo,
-        vrt: req.body.vrt,
+        vrt: false,
       };
       if (req.body.vrt) {
-        prueba.ref_app = req.body.id_app;
+        (prueba.vrt = true), (prueba.ref_app = req.body.id_app);
         prueba.ref_version = req.body.version_vrt;
       }
       const resPrueba = await Test.create(prueba);
@@ -88,7 +88,7 @@ exports.create = async (req, res) => {
           Parameter.create({
             id_prueba: resPrueba.dataValues.id_prueba,
             param:
-              './adb shell monkey -p ' +
+              '-p ' +
               req.body.paquetes +
               ' --pct-syskeys 0 -s ' +
               req.body.semillaRandom +
@@ -190,12 +190,9 @@ exports.execute = async (req, res) => {
         where: { id_estrategia: req.params.strategyId },
       }
     );
+
     const record = await sequelize.query(
-      'select p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, (select p2.param from parametro p2 where ' +
-        'p2.id_prueba =p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba ' +
-        '=p.id_prueba ) as ruta_script from estrategia_prueba ep, prueba p, "version" v where ' +
-        'ep.id_estrategia=$strategyId and ep.id_prueba =p.id_prueba and p.id_version =v.id_version and ' +
-        'p.id_app =v.id_app',
+      'select p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, p.vrt, (select p2.param from parametro p2 where p2.id_prueba=p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba=p.id_prueba) as ruta_script, (select v2.ruta_app from version v2 where p.ref_version =v2.id_version and p.ref_app =v2.id_app ) as ruta_app_vrt from estrategia_prueba ep, prueba p, version v where ep.id_estrategia=$strategyId and ep.id_prueba =p.id_prueba and p.id_version =v.id_version and p.id_app =v.id_app',
       {
         bind: {
           strategyId: req.params.strategyId,
@@ -207,6 +204,12 @@ exports.execute = async (req, res) => {
     if (!record) {
       res.status(404).json({ message: 'Strategy not found' });
     }
+    const dispositivos = await Devices.findAll({
+      id_estrategia: req.params.strategyId,
+    });
+    const navegadores = await Browsers.findAll({
+      id_estrategia: req.params.strategyId,
+    });
     const sqs = new AWS.SQS();
     for (let i = 0; i < record.length; i++) {
       const executions = await Execution.create(
@@ -214,6 +217,7 @@ exports.execute = async (req, res) => {
           id_estrategia: req.params.strategyId,
           id_prueba: record[i].id_prueba,
           estado: 'registrado',
+          fecha_inicio: new Date(),
         },
         {
           raw: true,
@@ -229,6 +233,18 @@ exports.execute = async (req, res) => {
           tipo_prueba: record[i].tipo_prueba,
           parametro: record[i].parametro,
           ruta_script: record[i].ruta_script,
+          vrt: record[i].vrt,
+          ruta_app_vrt: record[i].ruta_app_vrt,
+          dispositivos: dispositivos
+            ? dispositivos.map((d) => {
+                return { uuid: d.dispositivo };
+              })
+            : null,
+          navegadores: navegadores
+            ? navegadores.map((n) => {
+                return { tipo: n.navegador, version: n.version };
+              })
+            : null,
         }),
         QueueUrl:
           'https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo',
@@ -261,6 +277,7 @@ exports.execute = async (req, res) => {
       });
     }
   } catch (e) {
+    console.log(e);
     res.status(500).json({ message: 'error executing Strategy' });
   }
 };
