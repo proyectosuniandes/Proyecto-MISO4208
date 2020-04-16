@@ -25,7 +25,7 @@ var app = express();
 
 app.set('port', process.env.PORT || 8080);
 
-const task = cron.schedule('* * * * *', () => {
+const task = cron.schedule('*/10 * * * * *', () => {
   console.log("checking queue for messages...");
   sqs.receiveMessage(params, function(err, data) {
     if (err) {

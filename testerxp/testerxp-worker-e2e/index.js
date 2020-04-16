@@ -40,7 +40,7 @@ const Execution = require('./models/ejecucion');
 const Result = require('./models/resultado');
 
 //Initialize cron
-const task = cron.schedule('* * * * *', () => {
+const task = cron.schedule('*/10 * * * * *', () => {
   console.log('***** Initializing Cron *****');
   const sqs = new AWS.SQS();
   //Delete message from queue
@@ -74,55 +74,63 @@ const task = cron.schedule('* * * * *', () => {
 
       var pathScreenRemove="./cypress/screenshots/*.*";     
       removeFiles(pathScreenRemove);
+      const estado = strategyTest[0].estado;
       
       if (!strategyTest) {
         console.log('estrategiaPrueba not found');
       } else {
-        strategyTest.forEach( async (record) => {
-          if (record.estado === 'registrado') {
+        
+        message.navegadores.forEach( async (record) => {
+          
+          if (estado === 'registrado') {
             await updateExecution(message.id_ejecucion, 'pendiente');
             let headless, headful;
-            if (record.modo_prueba === 'headless') {
+            if (strategyTest[0].modo_prueba === 'headless') {
               headless = true;
               headful=false;
             } else {
               headless = false;
               headful=true;
             }
-            let navegador = record.navegador;
             
-            if (navegador === 'firefox'){
-              navegador = 'electron';
-            }
-            
-            let vrt = record.vrt;
-            
-            var ruta_vrt;
-            
-            if (vrt) {
-              const vrtTest = await getVrt(
-                message.id_prueba,
-                message.id_app
-              );
-              if (!vrtTest) {
-                console.log('app VRT not found');
-              } else{
-                ruta_vrt = vrtTest.ruta_app;
-              }
-            }
-            
+            let navegador = record.tipo;
+
+            const versionApp = await getidapp(
+              message.id_app,
+              message.ruta_app
+            );
+
             await executeWeb(
               message.ruta_script,
               headless,
               headful,
               navegador,
-              vrt,
+              message.vrt,
               message.ruta_app,
-              ruta_vrt,
+              versionApp[0].id_version,
               message.id_estrategia,
               message.id_prueba,
               message.id_ejecucion
             );
+
+            if (message.vrt){
+              const versionVrt= await getidapp(
+                message.id_app,
+                message.ruta_app_vrt
+              );
+              await executeWeb(
+                message.ruta_script,
+                headless,
+                headful,
+                navegador,
+                message.vrt,
+                message.ruta_app_vrt,
+                versionVrt[0].id_version,
+                message.id_estrategia,
+                message.id_prueba,
+                message.id_ejecucion
+              );
+            }
           }
 
         })
@@ -138,7 +146,7 @@ const task = cron.schedule('* * * * *', () => {
 async function getStrategyTest(executionId, testId, appId, strategyId) {
   try {
     const record = await sequelize.query(
-      'select e.estado, p.modo_prueba, p.vrt, a.tipo_app, n.navegador from ejecucion e, prueba p, app a, navegadores n where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId and n.id_estrategia = $strategyId',
+      'select e.estado, p.modo_prueba, a.tipo_app from ejecucion e, prueba p, app a where e.id_ejecucion=$executionId and p.id_prueba = $testId and a.id_app = $appId',
       {
         bind: {
           executionId: executionId,
@@ -160,15 +168,15 @@ async function getStrategyTest(executionId, testId, appId, strategyId) {
   }
 }
 
-//Find vrt given strategyId and testId
-async function getVrt(executionId, testId, appId, strategyId) {
+//Find idApp
+async function getidapp(appId, ruta) {
   try {
     const record = await sequelize.query(
-      'select v.ruta_app from prueba p, version v where v.id_app = p.ref_app and v.id_version = p.ref_version and p.id_prueba =$testId and a.id_app = $appId',
+      'select v.id_version from version v where v.id_app=$appId and v.ruta_app= $ruta',
       {
         bind: {
-          testId: testId,
-          appId: appId
+          appId: appId,
+          ruta: ruta
         },
         type: QueryTypes.SELECT,
         raw: true
@@ -186,18 +194,22 @@ async function getVrt(executionId, testId, appId, strategyId) {
 
 //Update execution given executionId
 async function updateExecution(executionId, estado) {
+  let fecha_fin = null;
+  if (estado === 'ejecutado') {
+    fecha_fin = new Date();
+  }
   await Execution.update(
-    { estado: estado },
+    { estado, fecha_fin },
     {
       where: {
-        id_ejecucion: executionId
-      }
+        id_ejecucion: executionId,
+      },
     }
   );
 }
 
 //execute random script with cypress
-async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp, rutaVrt, strategyId, testId, executionId) {
+async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp, versionApp, strategyId, testId, executionId) {
   console.log('***** Executing Web ****');
   const s3 = new AWS.S3();
   const split = rutaScript.split('.com/');
@@ -230,24 +242,23 @@ async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp
         
         if (archivo[2] != ''){
           fs.writeFileSync(          
-            path.join(__dirname, '/cypress/integration', executionId+navegador+archivo[2]),
+            path.join(__dirname, '/cypress/integration', executionId+''+versionApp+navegador+archivo[2]),
             data.Body.toString()
           );
-          console.log(executionId+navegador+archivo[2] + ' has been created!');
+          console.log(executionId+''+versionApp+navegador+archivo[2] + ' has been created!');
           
           await cypress.run({
             headless: headless,
             headed:headful,
             browser:navegador,
-            spec: path.join(__dirname, '/cypress/integration', executionId+navegador+archivo[2]),
+            spec: path.join(__dirname, '/cypress/integration', executionId+''+versionApp+navegador+archivo[2]),
             chromeWebSecurity: false,
             config: {
-              baseUrl: rutaApp,
-              video: true,
+              baseUrl: rutaApp
             },
             reporter: 'mochawesome',
             reporterOptions: {
-              reportFilename: executionId+navegador+archivo[2],
+              reportFilename: executionId+''+versionApp+navegador+archivo[2],
               reportDir: path.join(__dirname, '/cypress/results'),
               //overwrite: false,
               html: false,
@@ -255,15 +266,20 @@ async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp
               quiet: true
             }
           });
+
           let nameScript = d.Key.split('/');
           nameScript = nameScript[nameScript.length - 1];
           
           const video = fs.readFileSync(
-            path.join(__dirname, '/cypress/videos', executionId+navegador+archivo[2] + '.mp4')
+            path.join(__dirname, '/cypress/videos', executionId+''+versionApp+navegador+archivo[2] + '.mp4')
           );
           
           const report = fs.readFileSync(
-            path.join(__dirname, '/cypress/results', executionId+navegador+archivo[2].split('.js')[0] + '.json')
+            path.join(__dirname, '/cypress/results', executionId+''+versionApp+navegador+archivo[2].split('.js')[0] + '.json')
+          );
+
+          const screenshot = fs.readFileSync(
+            path.join(__dirname, '/cypress/screenshots/', executionId+''+versionApp+navegador+archivo[2])
           );
           //Uploading video to the bucket
           let paramsU = {
@@ -274,7 +290,7 @@ async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp
               testId +
               '/' +
               executionId,
-            Key: executionId+navegador + nameScript + '.mp4',
+            Key: executionId+''+versionApp+navegador + nameScript + '.mp4',
             Body: video
           };
           s3.upload(paramsU, async (err, data) => {
@@ -282,15 +298,12 @@ async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp
               return err;
             }
             console.log('File uploaded successfully ' + data.Location);
-            fs.unlinkSync(path.join(__dirname, '/cypress/videos', executionId+navegador+archivo[2] + '.mp4'));
-            await persist({
-              id_ejecucion: executionId,
-              ruta_archivo: path.dirname(data.Location)
-            });
+            fs.unlinkSync(path.join(__dirname, '/cypress/videos', executionId+''+versionApp+navegador+archivo[2] + '.mp4'));
+
             await updateExecution(executionId, 'ejecutado');
             
           });
-          paramsU.Key = executionId+navegador + nameScript.split('.js')[0] + '.json';
+          paramsU.Key = executionId+''+versionApp+navegador + nameScript.split('.js')[0] + '.json';
           paramsU.Body = report;
           //Uploading json to the bucket
           s3.upload(paramsU, async (err, data) => {
@@ -301,12 +314,16 @@ async function executeWeb(rutaScript, headless, headful, navegador, vrt, rutaApp
             fs.unlinkSync(path.join(
               __dirname,
               '/cypress/results',
-              executionId+navegador + archivo[2].split('.js')[0] + '.json'
+              executionId+''+versionApp+navegador + archivo[2].split('.js')[0] + '.json'
             ));
-            await persist({
-              id_ejecucion: executionId,
-              ruta_archivo: path.dirname(data.Location)
-            });
+            
+          });
+
+          
+          await persist({
+            id_ejecucion: executionId,
+            ruta_archivo: path.dirname(data.Location),
+            fecha: new Date()
           });
         }
       });
