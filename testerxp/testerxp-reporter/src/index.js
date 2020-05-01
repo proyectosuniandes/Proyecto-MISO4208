@@ -29,6 +29,7 @@ var base_imagen;
 var base_video;
 var base_json;
 var base_html;
+var base_txt;
 
 //Temp Variables
 var html_reporte;
@@ -37,6 +38,7 @@ var html_imagen;
 var html_video;
 var html_json;
 var html_html;
+var html_txt;
 
 //Initialize cron
 const task = cron.schedule('* * * * *', () => {
@@ -46,35 +48,103 @@ const task = cron.schedule('* * * * *', () => {
 
 async function ejecutarProceso() {
   loadBases();
-  html_reporte = '';
-  html_ejecucion = '';
-  html_imagen = '';
-  html_video = '';
-  html_json = '';
-  html_html = '';
 
-  await buildHtml(1, 1, 1);
+  var lst_pendiente = await obtenerPendientes();
 
-  var show_imagen = !html_imagen ? 'd-none' : '';
-  var show_video = !html_video ? 'd-none' : '';
-  var show_json = !html_json ? 'd-none' : '';
-  var show_html = !html_html ? 'd-none' : '';
-
-  var tmp_ejecucion = base_ejecucion;
-  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_IMAGEN]', html_imagen);
-  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_VIDEO]', html_video);
-  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_JSON]', html_json);
-  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_HTML]', html_html);
-  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_IMAGEN]', show_imagen);
-  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_VIDEO]', show_video);
-  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_JSON]', show_json);
-  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_HTML]', show_html);
-  var tmp_reporte = base_reporte.replace('[CONTENT]', tmp_ejecucion);
-
-  fs.writeFile(path.resolve(__dirname, '../tmp/report.html'), tmp_reporte, function (err) {
-    if (err) return console.log(err);
-    console.log('Report has been created!');
+  var lst_result = [];
+  lst_pendiente.forEach(function (entry) {
+    var lst_estrategia = lst_result.find(x => x.id_estrategia == entry.id_estrategia);
+    if (!lst_estrategia) {
+      var lst_ejecucion = [];
+      lst_ejecucion.push({
+        id_ejecucion: entry.id_ejecucion
+      });
+      var lst_prueba = [];
+      lst_prueba.push({
+        id_prueba: entry.id_prueba,
+        tipo_prueba: entry.tipo_prueba,
+        lst_ejecucion: lst_ejecucion
+      });
+      lst_result.push({
+        id_estrategia: entry.id_estrategia,
+        lst_prueba: lst_prueba
+      });
+    } else {
+      var lst_prueba = lst_estrategia.lst_prueba.find(x => x.id_prueba == entry.id_prueba);
+      if (!lst_prueba) {
+        var lst_ejecucion = [];
+        lst_ejecucion.push({
+          id_ejecucion: entry.id_ejecucion
+        });
+        lst_estrategia.lst_prueba.push({
+          id_prueba: entry.id_prueba,
+          tipo_prueba: entry.tipo_prueba,
+          lst_ejecucion: lst_ejecucion
+        });
+      }
+      else {
+        var lst_ejecucion = lst_prueba.lst_ejecucion.find(x => x.id_ejecucion == entry.id_ejecucion);
+        if (!lst_ejecucion) {
+          lst_prueba.lst_ejecucion.push({
+            id_ejecucion: entry.id_ejecucion
+          });
+        }
+      }
+    }
   });
+
+  //console.log(lst_result[0].lst_prueba[0].lst_ejecucion)
+
+  for (let es = 0; es < lst_result.length; es++) {
+    var obj_estrategia = lst_result[es];
+    var tmp_reporte = base_reporte;
+    for (let pr = 0; pr < obj_estrategia.lst_prueba.length; pr++) {
+      var obj_prueba = obj_estrategia.lst_prueba[pr];
+      var tmp_ejecucion = '';
+      for (let ej = 0; ej < obj_prueba.lst_ejecucion.length; ej++) {
+        var obj_ejecucion = obj_prueba.lst_ejecucion[ej];
+
+        await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion);
+
+        var show_imagen = !html_imagen ? 'd-none' : '';
+        var show_video = !html_video ? 'd-none' : '';
+        var show_json = !html_json ? 'd-none' : '';
+        var show_html = !html_html ? 'd-none' : '';
+        var show_txt = !html_txt ? 'd-none' : '';
+
+        tmp_ejecucion += base_ejecucion;
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_IMAGEN]', html_imagen);
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_VIDEO]', html_video);
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_JSON]', html_json);
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_HTML]', html_html);
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_TXT]', html_txt);
+        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_IMAGEN]', show_imagen);
+        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_VIDEO]', show_video);
+        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_JSON]', show_json);
+        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_HTML]', show_html);
+        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_TXT]', show_txt);
+        tmp_ejecucion = tmp_ejecucion.replace('[ID_EJECUCION]', obj_ejecucion.id_ejecucion);
+      }
+
+      var content_prueba = '';
+      if (obj_prueba.tipo_prueba.toLowerCase() == 'random') content_prueba = '[CONTENT_RANDOM]';
+      if (obj_prueba.tipo_prueba.toLowerCase() == 'e2e') content_prueba = '[CONTENT_E2E]';
+      if (obj_prueba.tipo_prueba.toLowerCase() == 'bdt') content_prueba = '[CONTENT_BDT]';
+
+      tmp_reporte = tmp_reporte.replace(content_prueba, tmp_ejecucion);
+    }
+
+    var sin_ejecucion = 'No hay ejecuciones para este tipo de prueba.';
+    tmp_reporte = tmp_reporte.replace('[CONTENT_RANDOM]', sin_ejecucion);
+    tmp_reporte = tmp_reporte.replace('[CONTENT_E2E]', sin_ejecucion);
+    tmp_reporte = tmp_reporte.replace('[CONTENT_BDT]', sin_ejecucion);
+
+    fs.writeFile(path.resolve(__dirname, `../tmp/report_${obj_estrategia.id_estrategia}.html`), tmp_reporte, function (err) {
+      if (err) return console.log(err);
+      console.log('Report has been created!');
+    });
+  }
+
   /*var result = await obtenerEjecutados();
   console.log(result);
   result.forEach(async item => {
@@ -91,6 +161,15 @@ async function ejecutarProceso() {
 
 async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
   return new Promise((resolve, reject) => {
+
+    html_reporte = '';
+    html_ejecucion = '';
+    html_imagen = '';
+    html_video = '';
+    html_json = '';
+    html_html = '';
+    html_txt = '';
+
     const s3 = new AWS.S3();
     const params = {
       Bucket: 'miso-4208-grupo3',
@@ -98,12 +177,12 @@ async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
     };
     s3.listObjectsV2(params, function (err, data) {
       if (err) console.log(err, err.stack);
-      console.log(data);
+      //console.log(data);
       data.Contents.forEach(file => {
         const url = s3.getSignedUrl('getObject', {
           Bucket: data.Name,
           Key: file.Key,
-          Expires: 0
+          Expires: 604800
         });
 
         var ext = path.extname(file.Key).toLowerCase();
@@ -114,6 +193,11 @@ async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
         if (ext === '.mp4') {
           var object = base_video.replace('[URL_VIDEO]', url);
           html_video += object;
+        }
+        if (ext === '.txt') {
+          var text = request('GET', url);
+          var object = base_txt.replace('[URL_TXT]', text.getBody('utf8'));
+          html_txt += object;
         }
         if (ext === '.json') {
           var text = request('GET', url);
@@ -141,10 +225,10 @@ async function deleteTempFiles() {
   });
 }
 
-async function obtenerEjecutados() {
+async function obtenerPendientes() {
   try {
     const record = await sequelize.query(
-      "select e.id_ejecucion, e.id_estrategia, e.id_prueba, e.estado, e.id_prueba, p.tipo_prueba, a.tipo_app from ejecucion e inner join prueba p on e.id_prueba = p.id_prueba inner join app a on p.id_app = a.id_app  where estado = 'ejecutado' AND e.id_ejecucion = 4",
+      "SELECT es.id_estrategia, p.id_prueba, ej.id_ejecucion, p.tipo_prueba FROM estrategia_prueba ep INNER JOIN estrategia es ON es.id_estrategia = ep.id_estrategia AND es.estado = 'pendiente' INNER JOIN prueba p ON p.id_prueba = ep.id_prueba INNER JOIN ejecucion ej ON ej.id_estrategia = ep.id_estrategia AND ej.id_prueba = ep.id_prueba WHERE (SELECT COUNT(1) FROM ejecucion ej1 WHERE ej1.id_estrategia = es.id_estrategia AND ej1.id_prueba = p.id_prueba) = (SELECT COUNT(1) FROM ejecucion ej2 WHERE ej2.id_estrategia = es.id_estrategia AND ej2.id_prueba = p.id_prueba and ej2.estado = 'ejecutado');",
       {
         type: QueryTypes.SELECT,
         raw: true
@@ -158,44 +242,6 @@ async function obtenerEjecutados() {
     console.log(e);
     return null;
   }
-}
-
-async function downloadFiles(idEjecucion) {
-  return new Promise((resolve, reject) => {
-    const s3 = new AWS.S3();
-    const LOparams = {
-      Bucket: 'miso-4208-grupo3',
-      Prefix: 'results/' + idEjecucion + '/'
-    };
-
-    s3.listObjectsV2(LOparams, function (LOerr, LOdata) {
-      if (LOerr) console.log(LOerr, LOerr.stack);
-
-      console.log(LOdata);
-      var length = LOdata.Contents.length;
-      LOdata.Contents.forEach(file => {
-        var GOparams = {
-          Bucket: LOparams.Bucket,
-          Key: file.Key
-        };
-        s3.getObject(GOparams, function (GOerr, GOdata) {
-          if (GOerr) console.log(GOerr, GOerr.stack);
-
-          var filename = path.basename(file.Key);
-          var ext = path.extname(file.Key);
-          if (ext) {
-            fs.writeFileSync(path.join(__dirname, '../tmp/', filename), GOdata.Body.toString());
-            console.log(filename + ' has been created!');
-
-            length--;
-            if (length === 1) {
-              resolve('OK');
-            }
-          }
-        });
-      });
-    });
-  });
 }
 
 async function uploadReport(idEjecucion, report) {
@@ -241,6 +287,7 @@ function loadBases() {
   base_video = fs.readFileSync(path.resolve(__dirname, '../templates/base_video.html')).toString('utf8');
   base_json = fs.readFileSync(path.resolve(__dirname, '../templates/base_json.html')).toString('utf8');
   base_html = fs.readFileSync(path.resolve(__dirname, '../templates/base_html.html')).toString('utf8');
+  base_txt = fs.readFileSync(path.resolve(__dirname, '../templates/base_txt.html')).toString('utf8');
 }
 
 //Starting the server
