@@ -10,7 +10,7 @@ const NestedFieldApp = ({record}) => (
             ) : result1.error ? (
                 <Error/>
             ) : (
-                <Query type="getOne" resource="apps" payload={{id: result1.data['prueba.id_app']}}>
+                <Query type="getOne" resource="apps" payload={{id: result1.data[0]['prueba.id_app']}}>
                     {result2 =>
                         result2.loading ? (
                             <Loading/>

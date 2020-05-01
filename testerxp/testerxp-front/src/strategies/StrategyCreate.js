@@ -9,6 +9,7 @@ import {Box, Typography} from "@material-ui/core";
 
 import TypeAppCmp from '../components/data/TypeAppCmp'
 
+
 import {
     BooleanInput,
     Create,
@@ -25,11 +26,12 @@ import {
 } from 'react-admin';
 
 const util = require('util');
+const redirect = (basePath, id, data) => `/strategies`;
 const StrategyCreate = (props: any) => {
 
     return (
         <Create {...props}>
-            <SimpleForm>
+            <SimpleForm redirect={redirect}>
 
 
                 <div style={{width: '100%'}}>
@@ -157,8 +159,8 @@ const StrategyCreate = (props: any) => {
                         {({formData, ...rest}) => formData.tipo_app === 'web' &&
                             <Card style={{width: '100%'}}>
                                 <Typography variant="h6" gutterBottom>Matriz de Navegadores <hr/></Typography>
-                                <SelectArrayInput label="Versiones Firefox" source="firefox" fullWidth choices={[
-                                    {id: '72.0.2', name: '72.0.2'},
+                                <SelectArrayInput label="Versiones Electron" source="electron" fullWidth choices={[
+                                    {id: '8.2.0', name: '8.2.0'},
                                 ]}/>
 
                                 <SelectArrayInput label="Versiones Google Chrome " source="chrome" fullWidth choices={[
@@ -184,7 +186,7 @@ const StrategyCreate = (props: any) => {
                                     },
                                     {
                                         id: 'b1e51193-4db8-43f7-b7cd-ae35eebb6bca',
-                                        name: 'Custom Phone - Android: 4.4.4 - SCREEN: 1536 x 2048 dpi 320'
+                                        name: 'Custom Phone - Android: 4.4.4 - SCREEN: 768 x 2048 dpi 320'
                                     },
 
                                     {

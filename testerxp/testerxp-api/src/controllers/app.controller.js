@@ -31,6 +31,8 @@ exports.findAll = async (req, res) => {
 
 exports.findOne = async (req, res) => {
   console.log('***** FindOne App *****');
+  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
   try {
     const record = await App.findByPk(req.params.appId, {
       raw: true,

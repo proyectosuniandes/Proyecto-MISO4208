@@ -9,6 +9,9 @@ const util = require('util');
 // Retrieve all Versions from the database.
 exports.findAll = async (req, res) => {
     console.log('**** FindAll Versions **** ');
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
     try {
         const {range, sort, filter} = req.query;
         const [from, to] = range ? JSON.parse(range) : [0, 100];
@@ -34,7 +37,10 @@ exports.findAll = async (req, res) => {
 
 //Retrieve a Version identified by the versionId and appId in the request
 exports.findOne = async (req, res) => {
-    console.log('***** FindOne Version *****');
+    console.log('***** FindOne Version *****')
+    console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+    console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
     try {
         const record = await Version.findOne({
             where: {

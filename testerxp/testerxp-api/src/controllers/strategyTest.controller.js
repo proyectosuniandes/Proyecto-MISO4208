@@ -1,7 +1,7 @@
 const StrategyTest = require('../models/estrategiaPrueba');
 const Test = require('../models/Prueba');
 const Strategy = require('../models/estrategia');
-
+const util = require('util');
 //Create and Save a new StrategyTest
 exports.create = async (strategy, test) => {
   console.log('***** Create StrategyTest *****');
@@ -40,6 +40,9 @@ exports.findAll = async (req, res) => {
     });
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
+    console.log(
+        rows.map(resource => ({ ...resource, id: resource.id_prueba }))
+    );
     res.json(
       rows.map((resource) => ({ ...resource, id: resource.id_prueba }))
     );
@@ -52,6 +55,9 @@ exports.findAll = async (req, res) => {
 //Retrieve a StrategyTest identified by the strategyId and the testId in the request
 exports.findOne = async (req, res) => {
   console.log('***** FindOne StrategyTest *****');
+  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
+  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
+
   try {
     const record = await StrategyTest.findAll({
       where: {
