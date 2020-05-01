@@ -1,5 +1,6 @@
 const express = require('express');
 const cron = require('node-cron');
+const request = require('sync-request');
 const AWS = require('aws-sdk');
 const { QueryTypes } = require('sequelize');
 const path = require('path');
@@ -21,6 +22,22 @@ const sequelize = require('./database/database');
 const Execution = require('./models/ejecucion');
 const Result = require('./models/resultado');
 
+//Bases
+var base_reporte;
+var base_ejecucion;
+var base_imagen;
+var base_video;
+var base_json;
+var base_html;
+
+//Temp Variables
+var html_reporte;
+var html_ejecucion;
+var html_imagen;
+var html_video;
+var html_json;
+var html_html;
+
 //Initialize cron
 const task = cron.schedule('* * * * *', () => {
   console.log('***** Initializing Cron *****');
@@ -28,7 +45,37 @@ const task = cron.schedule('* * * * *', () => {
 });
 
 async function ejecutarProceso() {
-  var result = await obtenerEjecutados();
+  loadBases();
+  html_reporte = '';
+  html_ejecucion = '';
+  html_imagen = '';
+  html_video = '';
+  html_json = '';
+  html_html = '';
+
+  await buildHtml(1, 1, 1);
+
+  var show_imagen = !html_imagen ? 'd-none' : '';
+  var show_video = !html_video ? 'd-none' : '';
+  var show_json = !html_json ? 'd-none' : '';
+  var show_html = !html_html ? 'd-none' : '';
+
+  var tmp_ejecucion = base_ejecucion;
+  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_IMAGEN]', html_imagen);
+  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_VIDEO]', html_video);
+  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_JSON]', html_json);
+  tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_HTML]', html_html);
+  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_IMAGEN]', show_imagen);
+  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_VIDEO]', show_video);
+  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_JSON]', show_json);
+  tmp_ejecucion = tmp_ejecucion.replace('[SHOW_HTML]', show_html);
+  var tmp_reporte = base_reporte.replace('[CONTENT]', tmp_ejecucion);
+
+  fs.writeFile(path.resolve(__dirname, '../tmp/report.html'), tmp_reporte, function (err) {
+    if (err) return console.log(err);
+    console.log('Report has been created!');
+  });
+  /*var result = await obtenerEjecutados();
   console.log(result);
   result.forEach(async item => {
     if (item.tipo_prueba === 'random' && item.tipo_app === 'movil') {
@@ -39,6 +86,48 @@ async function ejecutarProceso() {
       await uploadReport(item.id_ejecucion, report);
       deleteTempFiles();
     }
+  });*/
+}
+
+async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
+  return new Promise((resolve, reject) => {
+    const s3 = new AWS.S3();
+    const params = {
+      Bucket: 'miso-4208-grupo3',
+      Prefix: `results/${pIdEstrategia}/${pIdPrueba}/${pIdEjecucion}`
+    };
+    s3.listObjectsV2(params, function (err, data) {
+      if (err) console.log(err, err.stack);
+      console.log(data);
+      data.Contents.forEach(file => {
+        const url = s3.getSignedUrl('getObject', {
+          Bucket: data.Name,
+          Key: file.Key,
+          Expires: 0
+        });
+
+        var ext = path.extname(file.Key).toLowerCase();
+        if (ext === '.png') {
+          var object = base_imagen.replace('[URL_IMAGEN]', url);
+          html_imagen += object;
+        }
+        if (ext === '.mp4') {
+          var object = base_video.replace('[URL_VIDEO]', url);
+          html_video += object;
+        }
+        if (ext === '.json') {
+          var text = request('GET', url);
+          var object = base_json.replace('[URL_JSON]', text.getBody('utf8'));
+          html_json += object;
+        }
+        if (ext === '.html') {
+          var object = base_html.replace('[URL_HTML]', url);
+          html_html += object;
+        }
+      });
+
+      resolve('OK');
+    });
   });
 }
 
@@ -143,6 +232,15 @@ async function updateExecution(executionId, estado) {
 //Persist results
 async function persist(fields) {
   await Result.create(fields, { raw: true });
+}
+
+function loadBases() {
+  base_reporte = fs.readFileSync(path.resolve(__dirname, '../templates/base_reporte.html')).toString('utf8');
+  base_ejecucion = fs.readFileSync(path.resolve(__dirname, '../templates/base_ejecucion.html')).toString('utf8');
+  base_imagen = fs.readFileSync(path.resolve(__dirname, '../templates/base_imagen.html')).toString('utf8');
+  base_video = fs.readFileSync(path.resolve(__dirname, '../templates/base_video.html')).toString('utf8');
+  base_json = fs.readFileSync(path.resolve(__dirname, '../templates/base_json.html')).toString('utf8');
+  base_html = fs.readFileSync(path.resolve(__dirname, '../templates/base_html.html')).toString('utf8');
 }
 
 //Starting the server

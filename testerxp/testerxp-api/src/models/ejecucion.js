@@ -19,6 +19,12 @@ const ejecucion = sequelize.define(
     estado: {
       type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente', 'cancelado'),
     },
+    fecha_inicio: {
+      type: Sequelize.DATE,
+    },
+    fecha_fin: {
+      type: Sequelize.DATE,
+    },
   },
   {
     timestamps: false,

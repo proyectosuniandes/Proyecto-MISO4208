@@ -1,0 +1,36 @@
+{
+  "id_estrategia": 3,
+  "id_ejecucion": 3,
+  "id_prueba": 3,
+  "id_app": 1,
+  "ruta_app": "http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com",
+  "tipo_prueba": "E2E",
+  "parametro": null,
+  "ruta_script": "https://miso-4208-grupo3.s3.us-east-2.amazonaws.com/script/3",
+  "vrt": false,
+  "ruta_app_vrt": null,
+  "dispositivos": null,
+  "navegadores": [
+    { "tipo": "electron", "version": "8.2.0" },
+    { "tipo": "chrome", "version": "80.0.3987.116" }
+  ]
+}
+
+
+{
+  "id_estrategia": 3,
+  "id_ejecucion": 3,
+  "id_prueba": 3,
+  "id_app": 1,
+  "ruta_app": "http://lbmiso4208mantisbt2230-869d406e6bc0cec1.elb.us-east-1.amazonaws.com",
+  "tipo_prueba": "E2E",
+  "parametro": null,
+  "ruta_script": "https://miso-4208-grupo3.s3.us-east-2.amazonaws.com/script/3",
+  "vrt": true,
+  "ruta_app_vrt": "http://3.228.17.94",
+  "dispositivos": null,
+  "navegadores": [
+    { "tipo": "electron", "version": "8.2.0" },
+    { "tipo": "chrome", "version": "80.0.3987.116" }
+  ]
+}

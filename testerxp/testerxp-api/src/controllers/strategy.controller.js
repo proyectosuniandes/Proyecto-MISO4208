@@ -1,5 +1,4 @@
 const Strategy = require('../models/estrategia');
-const formidable = require('formidable');
 const Devices = require('./devices.controller');
 const Browsers = require('./browsers.controller');
 const Test = require('./test.controller');
@@ -11,7 +10,6 @@ const { QueryTypes } = require('sequelize');
 const Execution = require('../models/ejecucion');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-1' });
-const util = require('util');
 
 // Retrieve all Strategies from the database.
 exports.findAll = async (req, res) => {
@@ -46,83 +44,122 @@ exports.findAll = async (req, res) => {
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
   console.log('***** Create Strategy *****');
-  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
-  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
-  const form = formidable({ multiples: true });
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      res.status(500).json({ message: 'File not parsed' });
+  try {
+    const estrategia = {
+      nombre: req.body.nom_estrategia,
+      estado: 'registrado',
+    };
+    const { dataValues } = await Strategy.create(estrategia, {
+      raw: true,
+    });
+    if (req.body.tipo_app === 'movil') {
+      await Devices.create(dataValues.id_estrategia, req.body.dispositivos);
+    } else {
+      await Browsers.create(
+        dataValues.id_estrategia,
+        req.body.electron,
+        req.body.chrome
+      );
     }
-    try {
-      const estrategia = {
-        nombre: fields.nom_estrategia,
-        estado: 'registrado',
+    for (let i = 0; i < req.body.pruebas.length; i++) {
+      let prueba = {
+        id_version: req.body.version_app,
+        id_app: req.body.id_app,
+        tipo_prueba: req.body.pruebas[i],
+        modo_prueba: req.body.modo,
+        vrt: false,
       };
-      const { dataValues } = await Strategy.create(estrategia, {
-        raw: true,
-      });
-      if (fields.tipo_app === 'movil') {
-        await Devices.create(dataValues.id_estrategia, fields.dispositivos);
+      if (req.body.vrt) {
+        (prueba.vrt = true), (prueba.ref_app = req.body.id_app);
+        prueba.ref_version = req.body.version_vrt;
+      }
+      const resPrueba = await Test.create(prueba);
+      await StrategyTest.create(
+        dataValues.id_estrategia,
+        resPrueba.dataValues.id_prueba
+      );
+      if (req.body.tipo_app === 'movil') {
+        if (req.body.pruebas[i] === 'E2E') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === req.body.pruebas[i]) {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        } else if (req.body.pruebas[i] === 'random') {
+          Parameter.create({
+            id_prueba: resPrueba.dataValues.id_prueba,
+            param:
+              '-p ' +
+              req.body.paquetes +
+              ' --pct-syskeys 0 -s ' +
+              req.body.semillaRandom +
+              ' ' +
+              req.body.numEventos,
+          });
+        } else if (req.body.pruebas[i] === 'BDT') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === req.body.pruebas[i]) {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        }
       } else {
-        await Browsers.create(
-          dataValues.id_estrategia,
-          fields.firefox,
-          fields.chrome
-        );
-      }
-      fields.pruebas = JSON.parse(fields.pruebas);
-      for (let i = 0; i < fields.pruebas.length; i++) {
-        let prueba = {
-          id_version: fields.version_app,
-          id_app: fields.id_app,
-          tipo_prueba: fields.pruebas[i],
-          modo_prueba: fields.modo,
-          vrt: fields.vrt,
-        };
-        if (fields.vrt) {
-          prueba.ref_app = fields.id_app;
-          prueba.ref_version = fields.version_vrt;
-        }
-        const resPrueba = await Test.create(prueba);
-        await StrategyTest.create(
-          dataValues.id_estrategia,
-          resPrueba.dataValues.id_prueba
-        );
-        if (fields.tipo_app === 'movil') {
-          if (fields.pruebas[i] === 'E2E') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
-          } else if (fields.pruebas[i] === 'random') {
-            Parameter.create({
-              id_prueba: resPrueba.dataValues.id_prueba,
-              param:
-                './adb shell monkey -p ' +
-                fields.paquete +
-                ' --pct-syskeys 0 -s ' +
-                fields.semillaRandom +
-                ' ' +
-                fields.numEventos,
-            });
-          } else if (fields.pruebas[i] === 'BDT') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
-          }
-        } else {
-          if (fields.pruebas[i] === 'E2E') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesE2E);
-          } else if (fields.pruebas[i] === 'random') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesRANDOM);
-          } else if (fields.pruebas[i] === 'BDT') {
-            Script.create(resPrueba.dataValues.id_prueba, files.filesBDT);
-          }
-        }
-        if (i === fields.pruebas.length - 1) {
-          res.sendStatus(200);
+        if (req.body.pruebas[i] === 'E2E') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === req.body.pruebas[i]) {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        } else if (req.body.pruebas[i] === 'random') {
+          req.body.files.forEach((f) => {
+            if (f.prueba === 'RANDOM') {
+              Script.create(
+                resPrueba.dataValues.id_prueba,
+                f.base64File,
+                f.name
+              );
+            }
+          });
+        } else if (req.body.pruebas[i] === 'BDT') {
+          req.body.files.forEach((files) => {
+            if (files[0] !== undefined) {
+              if (files[0].prueba === req.body.pruebas[i]) {
+                let baseFiles = [];
+                let fileNames = [];
+                files.forEach((f) => {
+                  baseFiles.push(f.base64File);
+                  fileNames.push(f.name);
+                });
+                Script.create(
+                  resPrueba.dataValues.id_prueba,
+                  baseFiles,
+                  fileNames
+                );
+              }
+            }
+          });
         }
       }
-    } catch (e) {
-      console.log(e);
-      res.status(500).json({ message: 'Strategy not created' });
+      if (i === req.body.pruebas.length - 1) {
+        res.status(200).json(dataValues);
+      }
     }
-  });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Strategy not created' });
+  }
 };
 
 //Delete a Strategy with StrategyId
@@ -158,12 +195,9 @@ exports.execute = async (req, res) => {
         where: { id_estrategia: req.params.strategyId },
       }
     );
+
     const record = await sequelize.query(
-      'select p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, (select p2.param from parametro p2 where ' +
-        'p2.id_prueba =p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba ' +
-        '=p.id_prueba ) as ruta_script from estrategia_prueba ep, prueba p, "version" v where ' +
-        'ep.id_estrategia=$strategyId and ep.id_prueba =p.id_prueba and p.id_version =v.id_version and ' +
-        'p.id_app =v.id_app',
+      'select p.id_prueba, v.id_app, v.ruta_app, p.tipo_prueba, p.vrt, (select p2.param from parametro p2 where p2.id_prueba=p.id_prueba) as parametro, (select s.ruta_script from script s where s.id_prueba=p.id_prueba) as ruta_script, (select v2.ruta_app from version v2 where p.ref_version =v2.id_version and p.ref_app =v2.id_app ) as ruta_app_vrt from estrategia_prueba ep, prueba p, version v where ep.id_estrategia=$strategyId and ep.id_prueba =p.id_prueba and p.id_version =v.id_version and p.id_app =v.id_app',
       {
         bind: {
           strategyId: req.params.strategyId,
@@ -175,6 +209,12 @@ exports.execute = async (req, res) => {
     if (!record) {
       res.status(404).json({ message: 'Strategy not found' });
     }
+    const dispositivos = await Devices.findAll({
+      id_estrategia: req.params.strategyId,
+    });
+    const navegadores = await Browsers.findAll({
+      id_estrategia: req.params.strategyId,
+    });
     const sqs = new AWS.SQS();
     for (let i = 0; i < record.length; i++) {
       const executions = await Execution.create(
@@ -182,6 +222,7 @@ exports.execute = async (req, res) => {
           id_estrategia: req.params.strategyId,
           id_prueba: record[i].id_prueba,
           estado: 'registrado',
+          fecha_inicio: new Date(),
         },
         {
           raw: true,
@@ -197,6 +238,18 @@ exports.execute = async (req, res) => {
           tipo_prueba: record[i].tipo_prueba,
           parametro: record[i].parametro,
           ruta_script: record[i].ruta_script,
+          vrt: record[i].vrt,
+          ruta_app_vrt: record[i].ruta_app_vrt,
+          dispositivos: dispositivos
+            ? dispositivos.map((d) => {
+                return { uuid: d.dispositivo };
+              })
+            : null,
+          navegadores: navegadores
+            ? navegadores.map((n) => {
+                return { tipo: n.navegador, version: n.version };
+              })
+            : null,
         }),
         QueueUrl:
           'https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo',
@@ -229,6 +282,7 @@ exports.execute = async (req, res) => {
       });
     }
   } catch (e) {
+    console.log(e);
     res.status(500).json({ message: 'error executing Strategy' });
   }
 };
