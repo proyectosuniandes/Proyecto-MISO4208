@@ -15,7 +15,8 @@ const movil = async (
   parameter,
   strategyId,
   testId,
-  executionId
+  executionId,
+  vrt
 ) => {
   console.log('***** Executing Movil Random *****');
   const appName = path.posix.basename(appRoute);
@@ -34,14 +35,14 @@ const movil = async (
   let i = 0;
   while (i < devices.length) {
     const instance = await execute(devices[i]);
-    await monkey(instance, appName, parameter, devices[i], dirResult);
+    await monkey(instance, appName, parameter, devices[i], dirResult,vrt);
     i++;
   }
-  console.log('both executed');
+  console.log('all executed');
   fs.unlinkSync(path.join(__dirname, '../../adb', appName));
   await uploadFiles(
     dirResult,
-    '/results/' + strategyId + '/' + testId + '/' + executionId
+    '/results/' + strategyId + '/' + testId + '/' + executionId,''
   );
   await result(
     executionId,
@@ -72,7 +73,7 @@ const execute = (device) => {
   });
 };
 
-const monkey = (instance, appName, parameter, device, dirResult) => {
+const monkey = (instance, appName, parameter, device, dirResult,vrt) => {
   return new Promise((resolve) => {
     client.listDevices().then(async (devices) => {
       await client.install(
@@ -80,8 +81,12 @@ const monkey = (instance, appName, parameter, device, dirResult) => {
         path.join(__dirname, '../../adb', appName)
       );
       console.log('installed');
-      shell.cd(process.env.SDK);
+      shell.cd(process.env.ANDROID_SDK);
       console.log('executing ');
+      if (vrt){
+        shell.exec('adb shell screencap /sdcard/download/initialScreen.png');
+        shell.exec('adb pull /sdcard/download/initialScreen.png '+dirResult+'/initialScreen_'+appName+'.png');
+      }
       shell.exec(
         './adb -s ' +
           devices[0].id +
@@ -93,6 +98,10 @@ const monkey = (instance, appName, parameter, device, dirResult) => {
           device.uuid +
           '_log.txt'
       );
+      if (vrt){
+        shell.exec('adb shell screencap /sdcard/download/finalScreen.png');
+        shell.exec('adb pull /sdcard/download/finalScreen.png '+dirResult+'/finalScreen_'+appName+'.png');
+      }
       console.log('stoping instsnce');
       shell.exec('gmsaas instances stop ' + instance);
       resolve(instance);

@@ -79,7 +79,9 @@ CREATE TABLE IF NOT EXISTS script (
 CREATE TABLE IF NOT EXISTS estrategia(
   id_estrategia SERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
-  estado estado_ejecucion NOT NULL
+  estado estado_ejecucion NOT NULL,
+  ruta_consolidado TEXT
+
 );
 
 CREATE TABLE IF NOT EXISTS dispositivos(
