@@ -10,7 +10,7 @@ const fs = require('fs');
 const app = express();
 
 //Settings
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 8081);
 AWS.config.update({ region: 'us-east-2' });
 
 //Middlewares
@@ -19,8 +19,7 @@ app.use(express.json());
 
 //Routes
 const sequelize = require('./database/database');
-const Execution = require('./models/ejecucion');
-const Result = require('./models/resultado');
+const Estrategia = require('./models/estrategia');
 
 //Bases
 var base_reporte;
@@ -143,7 +142,7 @@ async function ejecutarProceso() {
       if (err) return console.log(err);
       console.log('Report has been created!');
     });
-    uploadReport(obj_estrategia.id_estrategia, report);
+    uploadReport(obj_estrategia.id_estrategia, tmp_reporte);
   }
 
   /*var result = await obtenerEjecutados();
@@ -252,38 +251,29 @@ async function obtenerPendientes() {
 }
 
 async function uploadReport(id_estrategia, report) {
-  return new Promise((resolve, reject) => {
-    const s3 = new AWS.S3();
-    s3.upload(
-      {
-        Bucket: 'miso-4208-grupo3/results/' + id_estrategia,
-        Key: 'report.html',
-        Body: report
-      },
-      async (err, data) => {
-        if (err) console.log(err, err.stack);
-        console.log('File uploaded successfully ' + data.Location);
-        //await persist({ id_ejecucion: id_estrategia, ruta_archivo: data.Location });
-        resolve('OK');
-      });
-  });
+  const s3 = new AWS.S3();
+  s3.upload(
+    {
+      Bucket: `miso-4208-grupo3/consolidado/${id_estrategia}`,
+      Key: 'report.html',
+      Body: report
+    },
+    async (err, data) => {
+      if (err) console.log(err, err.stack);
+      console.log('File uploaded successfully ' + data.Location);
+      updateRutaConsolidado(id_estrategia, data.Location)
+    });
 }
 
-//Update execution given executionId
-async function updateExecution(executionId, estado) {
-  await Execution.update(
-    { estado: estado },
+async function updateRutaConsolidado(id_estrategia, ruta_consolidado) {
+  await Estrategia.update(
+    { ruta_consolidado: ruta_consolidado },
     {
       where: {
-        id_ejecucion: executionId
+        id_estrategia: id_estrategia
       }
     }
   );
-}
-
-//Persist results
-async function persist(fields) {
-  await Result.create(fields, { raw: true });
 }
 
 function loadBases() {
