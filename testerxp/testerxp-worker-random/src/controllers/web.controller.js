@@ -18,7 +18,10 @@ const web = async (
   console.log('***** Executing Web Random *****');
   const split = rutaScript.split('.com/');
   const prefix = split[1];
-  const files = await list(prefix);
+  console.log('split: ', split);
+  console.log('prefix: ',prefix);
+  const files = await list(prefix+'/');
+  console.log('files : ',files);
   files.forEach(async (f) => {
     let nameScript = f.Key.split('/');
     nameScript = nameScript[nameScript.length - 1];
@@ -159,6 +162,7 @@ const web = async (
       });
     });
   });
+  console.log('finished');
 };
 
 module.exports = web;
