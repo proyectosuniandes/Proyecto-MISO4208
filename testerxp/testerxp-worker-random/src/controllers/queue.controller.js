@@ -64,7 +64,8 @@ const queue = () => {
               message.parametro,
               message.id_estrategia,
               message.id_prueba,
-              message.id_ejecucion
+              message.id_ejecucion,
+              message.vrt
             );
           }
         }

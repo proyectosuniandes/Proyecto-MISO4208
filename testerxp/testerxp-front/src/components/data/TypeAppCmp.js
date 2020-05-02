@@ -9,7 +9,6 @@ const TypeAppCmp = ({formData}) => {
                 {result => result.loading ? (<Loading/>) : result.error ? (<Error/>)
                     : (
                         <Fragment>
-
                         <TextInput source="tipo_app" label="Tipo" value={result.data.tipo_app} fullWidth/>
                             <div style={{display: 'none'}}>{formData.tipo_app = result.data.tipo_app}</div>
                         </Fragment>

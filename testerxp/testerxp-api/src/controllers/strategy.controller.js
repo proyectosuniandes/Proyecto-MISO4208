@@ -63,9 +63,12 @@ exports.create = async (req, res) => {
         tipo_prueba: req.body.pruebas[i],
         modo_prueba: req.body.modo,
         vrt: false,
+        mutants : false,
+        chaos: false
       };
       if (req.body.vrt) {
-        (prueba.vrt = true), (prueba.ref_app = req.body.id_app);
+        prueba.vrt = true;
+        prueba.ref_app = req.body.id_app;
         prueba.ref_version = req.body.version_vrt;
       }
       const resPrueba = await Test.create(prueba);

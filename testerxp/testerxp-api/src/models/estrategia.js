@@ -18,6 +18,9 @@ const estrategia = sequelize.define(
     estado: {
       type: Sequelize.ENUM('registrado', 'ejecutado', 'pendiente', 'cancelado'),
     },
+    ruta_consolidado: {
+      type: Sequelize.TEXT
+    }
   },
   {
     timestamps: false,

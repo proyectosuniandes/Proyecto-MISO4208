@@ -1,5 +1,5 @@
 import React from "react";
-import {Datagrid, EditButton, List, ReferenceField, TextField} from "react-admin";
+import {Datagrid, EditButton, List, ReferenceField, TextField,UrlField} from "react-admin";
 import UrlFieldCmp from "../components/UrlFieldCmp";
 
 const VersionList = (props) => (
@@ -13,7 +13,7 @@ const VersionList = (props) => (
                 <TextField source="tipo_app" />
             </ReferenceField>
             <TextField source="descripcion" label="Versión"/>
-            <UrlFieldCmp source="ruta_app"  label="Ruta Aplicación"/>
+            <UrlField source="ruta_app"  label="Ruta Aplicación"/>
             <EditButton label="Editar"/>
         </Datagrid>
     </List>

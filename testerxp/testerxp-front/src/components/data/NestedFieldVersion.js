@@ -10,7 +10,7 @@ const NestedFieldVersion = ({record}) => (
             ) : result1.error ? (
                 <Error/>
             ) : (
-                <Query type="getOne" resource="versions" payload={{id: result1.data['prueba.id_version']}}>
+                <Query type="getOne" resource="versions" payload={{id: result1.data[0]['prueba.id_version']}}>
                     {result2 =>
                         result2.loading ? (
                             <Loading/>

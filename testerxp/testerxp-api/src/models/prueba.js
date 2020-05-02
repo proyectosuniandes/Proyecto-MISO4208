@@ -33,6 +33,12 @@ const prueba = sequelize.define(
     ref_app: {
       type: Sequelize.INTEGER,
     },
+    mutants: {
+      type: Sequelize.BOOLEAN
+    },
+    chaos: {
+      type: Sequelize.BOOLEAN
+    }
   },
   {
     timestamps: false,
