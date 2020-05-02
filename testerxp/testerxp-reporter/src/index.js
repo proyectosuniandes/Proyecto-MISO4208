@@ -10,7 +10,7 @@ const fs = require('fs');
 const app = express();
 
 //Settings
-app.set('port', process.env.PORT || 8081);
+app.set('port', process.env.PORT || 8090);
 AWS.config.update({ region: 'us-east-2' });
 
 //Middlewares
@@ -143,20 +143,8 @@ async function ejecutarProceso() {
       console.log('Report has been created!');
     });
     uploadReport(obj_estrategia.id_estrategia, tmp_reporte);
+    updateEstrategia(obj_estrategia.id_estrategia, 'ejecutado');
   }
-
-  /*var result = await obtenerEjecutados();
-  console.log(result);
-  result.forEach(async item => {
-    if (item.tipo_prueba === 'random' && item.tipo_app === 'movil') {
-      await downloadFiles(item.id_ejecucion);
-      var template = fs.readFileSync(path.resolve(__dirname, '../templates/template-adb.html')).toString('utf8');
-      var content = fs.readFileSync(path.resolve(__dirname, '../tmp/report.txt')).toString('utf8');
-      var report = template.replace('[CONTENT]', content);
-      await uploadReport(item.id_ejecucion, report);
-      deleteTempFiles();
-    }
-  });*/
 }
 
 async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
@@ -256,7 +244,8 @@ async function uploadReport(id_estrategia, report) {
     {
       Bucket: `miso-4208-grupo3/consolidado/${id_estrategia}`,
       Key: 'report.html',
-      Body: report
+      Body: report,
+      ContentType: "text/html"
     },
     async (err, data) => {
       if (err) console.log(err, err.stack);
@@ -268,6 +257,17 @@ async function uploadReport(id_estrategia, report) {
 async function updateRutaConsolidado(id_estrategia, ruta_consolidado) {
   await Estrategia.update(
     { ruta_consolidado: ruta_consolidado },
+    {
+      where: {
+        id_estrategia: id_estrategia
+      }
+    }
+  );
+}
+
+async function updateEstrategia(id_estrategia, estado) {
+  await Estrategia.update(
+    { estado: estado },
     {
       where: {
         id_estrategia: id_estrategia
