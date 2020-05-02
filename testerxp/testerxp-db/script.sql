@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS prueba(
   vrt BOOLEAN NOT NULL,
   ref_app INTEGER,
   ref_version INTEGER,
-
+  mutants BOOLEAN NOT NULL,
+  chaos BOOLEAN NOT NULL,
   CONSTRAINT id_version_fkey FOREIGN KEY (id_version, id_app)
     REFERENCES version (id_version, id_app) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -81,7 +82,6 @@ CREATE TABLE IF NOT EXISTS estrategia(
   nombre TEXT NOT NULL,
   estado estado_ejecucion NOT NULL,
   ruta_consolidado TEXT
-
 );
 
 CREATE TABLE IF NOT EXISTS dispositivos(
