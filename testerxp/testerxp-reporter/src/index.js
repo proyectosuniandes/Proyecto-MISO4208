@@ -143,6 +143,7 @@ async function ejecutarProceso() {
       if (err) return console.log(err);
       console.log('Report has been created!');
     });
+    uploadReport(obj_estrategia.id_estrategia, report);
   }
 
   /*var result = await obtenerEjecutados();
@@ -215,6 +216,12 @@ async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
   });
 }
 
+async function compareResemble(first_file, second_file) {
+  var diff = resemble(first_file).compareTo(second_file).ignoreColors().onComplete(function (data) {
+    console.log(data);
+  });
+}
+
 async function deleteTempFiles() {
   var folder = path.resolve(__dirname, '../tmp/');
   fs.readdir(folder, (err, files) => {
@@ -244,20 +251,19 @@ async function obtenerPendientes() {
   }
 }
 
-async function uploadReport(idEjecucion, report) {
+async function uploadReport(id_estrategia, report) {
   return new Promise((resolve, reject) => {
     const s3 = new AWS.S3();
     s3.upload(
       {
-        Bucket: 'miso-4208-grupo3/results/' + idEjecucion,
+        Bucket: 'miso-4208-grupo3/results/' + id_estrategia,
         Key: 'report.html',
         Body: report
       },
       async (err, data) => {
         if (err) console.log(err, err.stack);
-
         console.log('File uploaded successfully ' + data.Location);
-        await persist({ id_ejecucion: idEjecucion, ruta_archivo: data.Location });
+        //await persist({ id_ejecucion: id_estrategia, ruta_archivo: data.Location });
         resolve('OK');
       });
   });
