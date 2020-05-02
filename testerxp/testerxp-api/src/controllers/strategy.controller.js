@@ -14,9 +14,6 @@ AWS.config.update({ region: 'us-east-1' });
 // Retrieve all Strategies from the database.
 exports.findAll = async (req, res) => {
   console.log('***** FindAll Strategies *****');
-  console.log('req.body : ' + util.inspect(req.body, false, null, true /*enable colors */));
-  console.log('req.params : ' + util.inspect(req.params, false, null, true /*enable colors */));
-
   try {
     const { range, sort, filter } = req.query;
     const [from, to] = range ? JSON.parse(range) : [0, 100];
@@ -30,8 +27,6 @@ exports.findAll = async (req, res) => {
     });
     res.set('Content-Range', `${from}-${from + rows.length}/${count}`);
     res.set('X-Total-Count', `${count}`);
-
-    console.log(rows.map((resource) => ({ ...resource, id: resource.id_estrategia })))
     res.json(
       rows.map((resource) => ({ ...resource, id: resource.id_estrategia }))
     );
