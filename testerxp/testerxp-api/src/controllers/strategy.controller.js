@@ -39,6 +39,7 @@ exports.findAll = async (req, res) => {
 //Create and Save a new Strategy
 exports.create = async (req, res) => {
   console.log('***** Create Strategy *****');
+  console.log(req.body);
   try {
     const estrategia = {
       nombre: req.body.nom_estrategia,
@@ -63,8 +64,8 @@ exports.create = async (req, res) => {
         tipo_prueba: req.body.pruebas[i],
         modo_prueba: req.body.modo,
         vrt: false,
-        mutants : false,
-        chaos: false
+        mutants: false,
+        chaos: false,
       };
       if (req.body.vrt) {
         prueba.vrt = true;
@@ -312,3 +313,19 @@ function parseFilterStrategy(filter) {
       {}
     );
 }
+
+exports.findOne = async (req, res) => {
+  console.log('***** FindOne Strategy *****');
+  try {
+    const record = await Strategy.findByPk(req.params.strategyId, {
+      raw: true,
+    });
+    if (!record) {
+      return res.status(404).json({ error: 'Strategy not found' });
+    }
+    res.status(200).json(record);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Error retrieving Strategy' });
+  }
+};
