@@ -10,7 +10,7 @@ const fs = require('fs');
 const app = express();
 
 //Settings
-app.set('port', process.env.PORT || 8081);
+app.set('port', process.env.PORT || 8090);
 AWS.config.update({ region: 'us-east-2' });
 
 //Middlewares
@@ -256,7 +256,8 @@ async function uploadReport(id_estrategia, report) {
     {
       Bucket: `miso-4208-grupo3/consolidado/${id_estrategia}`,
       Key: 'report.html',
-      Body: report
+      Body: report,
+      ContentType: "text/html"
     },
     async (err, data) => {
       if (err) console.log(err, err.stack);
