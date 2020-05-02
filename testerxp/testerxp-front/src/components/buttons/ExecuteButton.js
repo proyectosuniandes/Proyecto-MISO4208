@@ -19,7 +19,7 @@ const ExecuteButton = ({record}) => {
         console.log(record.id_estrategia)
 
         //const urlRest = `http://localhost:8080/strategies/execute/` + record.id_estrategia;
-        const urlRest = `http://3.95.244.7:8080/strategies/execute/` + record.id_estrategia;
+        const urlRest = `http://3.86.81.190:8080/strategies/execute/` + record.id_estrategia;
 
         console.log(urlRest);
 

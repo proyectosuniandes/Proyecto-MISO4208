@@ -2,10 +2,8 @@ import simpleRestProvider from 'ra-data-simple-rest';
 
 const util = require('util');
 
-const dataProvider = simpleRestProvider('http://localhost:8080');
-
-//const dataProvider = simpleRestProvider('http://3.95.244.7:8080');
-
+//const dataProvider = simpleRestProvider('http://localhost:8080');
+const dataProvider = simpleRestProvider('http://3.86.81.190:8080');
 
 function read(reader, prueba, file) {
     return new Promise(resolve => {

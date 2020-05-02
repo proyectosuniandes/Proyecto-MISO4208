@@ -171,7 +171,6 @@ const StrategyCreate = (props: any) => {
                         }
                     </FormDataConsumer>
 
-
                     <br/>
 
                     <FormDataConsumer>
