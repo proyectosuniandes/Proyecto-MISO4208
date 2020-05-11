@@ -5,55 +5,20 @@
                 <h4>Ejecución #[ID_EJECUCION]</h4>
             </div>
         </div>
-        <div class="[SHOW_IMAGEN]">
-            <div class="row">
+        [CONTENT_EJECUCION]
+        <div class="row">
+            <a data-toggle="collapse" href="#id_vrt_[ID_EJECUCION]" aria-expanded="false" aria-controls="id_vrt_[ID_EJECUCION]">
                 <div class="col-md-12">
-                    <h5>Evidencias registradas en imagen</h4>
+                    <h5 class="bold-500">VRT</h5>
+                    <h5 class="bold-400">Comparación</h5>
                 </div>
-            </div>
-            <div class="row"><br /></div>
-            [CONTENT_IMAGEN]
-            <div class="row"><br /></div>
+            </a>
         </div>
-        <div class="[SHOW_VIDEO]">
-            <div class="row">
-                <div class="col-md-12">
-                    <h5>Evidencias registradas en video</h4>
-                </div>
+        <div class="collapse" id="id_vrt_[ID_EJECUCION]">
+            <div class="card card-body">
+                <div class="[SHOW_VRT]"></div>
+                [CONTENT_VRT]
             </div>
-            <div class="row"><br /></div>
-            [CONTENT_VIDEO]
-            <div class="row"><br /></div>
-        </div>
-        <div class="[SHOW_TXT]">
-            <div class="row">
-                <div class="col-md-12">
-                    <h5>Evidencias registradas en texto</h4>
-                </div>
-            </div>
-            <div class="row"><br /></div>
-            [CONTENT_TXT]
-            <div class="row"><br /></div>
-        </div>
-        <div class="[SHOW_JSON]">
-            <div class="row">
-                <div class="col-md-12">
-                    <h5>Informes registrados en JSON</h4>
-                </div>
-            </div>
-            <div class="row"><br /></div>
-            [CONTENT_JSON]
-            <div class="row"><br /></div>
-        </div>
-        <div class="[SHOW_HTML]">
-            <div class="row">
-                <div class="col-md-12">
-                    <h5>Informes generados en HTML</h4>
-                </div>
-            </div>
-            <div class="row"><br /></div>
-            [CONTENT_HTML]
-            <div class="row"><br /></div>
         </div>
     </div>
 </div>

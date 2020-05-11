@@ -5,6 +5,7 @@ const AWS = require('aws-sdk');
 const { QueryTypes } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
+const resemble = require("resemblejs");
 
 //Initializations
 const app = express();
@@ -24,20 +25,13 @@ const Estrategia = require('./models/estrategia');
 //Bases
 var base_reporte;
 var base_ejecucion;
+var base_version;
 var base_imagen;
 var base_video;
 var base_json;
 var base_html;
 var base_txt;
-
-//Temp Variables
-var html_reporte;
-var html_ejecucion;
-var html_imagen;
-var html_video;
-var html_json;
-var html_html;
-var html_txt;
+var base_vrt;
 
 //Initialize cron
 const task = cron.schedule('* * * * *', () => {
@@ -54,9 +48,19 @@ async function ejecutarProceso() {
   lst_pendiente.forEach(function (entry) {
     var lst_estrategia = lst_result.find(x => x.id_estrategia == entry.id_estrategia);
     if (!lst_estrategia) {
+      var lst_version = [];
+      lst_version.push({
+        id_navegador: entry.id_navegador,
+        nombre_navegador: entry.navegador,
+        id_dispositivo: entry.id_dispositivo,
+        nombre_dispositivo: entry.dispositivo,
+        id_version: entry.id_version,
+        nombre_version: entry.descripcion,
+      });
       var lst_ejecucion = [];
       lst_ejecucion.push({
-        id_ejecucion: entry.id_ejecucion
+        id_ejecucion: entry.id_ejecucion,
+        lst_version: lst_version
       });
       var lst_prueba = [];
       lst_prueba.push({
@@ -71,22 +75,53 @@ async function ejecutarProceso() {
     } else {
       var lst_prueba = lst_estrategia.lst_prueba.find(x => x.id_prueba == entry.id_prueba);
       if (!lst_prueba) {
+        var lst_version = [];
+        lst_version.push({
+          id_navegador: entry.id_navegador,
+          nombre_navegador: entry.navegador,
+          id_dispositivo: entry.id_dispositivo,
+          nombre_dispositivo: entry.dispositivo,
+          id_version: entry.id_version,
+          nombre_version: entry.descripcion,
+        });
         var lst_ejecucion = [];
         lst_ejecucion.push({
-          id_ejecucion: entry.id_ejecucion
+          id_ejecucion: entry.id_ejecucion,
+          lst_version: lst_version
         });
         lst_estrategia.lst_prueba.push({
           id_prueba: entry.id_prueba,
           tipo_prueba: entry.tipo_prueba,
           lst_ejecucion: lst_ejecucion
         });
-      }
-      else {
+      } else {
         var lst_ejecucion = lst_prueba.lst_ejecucion.find(x => x.id_ejecucion == entry.id_ejecucion);
         if (!lst_ejecucion) {
-          lst_prueba.lst_ejecucion.push({
-            id_ejecucion: entry.id_ejecucion
+          var lst_version = [];
+          lst_version.push({
+            id_navegador: entry.id_navegador,
+            nombre_navegador: entry.navegador,
+            id_dispositivo: entry.id_dispositivo,
+            nombre_dispositivo: entry.dispositivo,
+            id_version: entry.id_version,
+            nombre_version: entry.descripcion,
           });
+          lst_prueba.lst_ejecucion.push({
+            id_ejecucion: entry.id_ejecucion,
+            lst_version: lst_version
+          });
+        } else {
+          var lst_version = lst_ejecucion.lst_version.find(x => x.id_navegador == entry.id_navegador && x.id_dispositivo == entry.id_dispositivo && x.id_version == entry.id_version);
+          if (!lst_version) {
+            lst_ejecucion.lst_version.push({
+              id_navegador: entry.id_navegador,
+              nombre_navegador: entry.navegador,
+              id_dispositivo: entry.id_dispositivo,
+              nombre_dispositivo: entry.dispositivo,
+              id_version: entry.id_version,
+              nombre_version: entry.descripcion,
+            });
+          }
         }
       }
     }
@@ -95,34 +130,31 @@ async function ejecutarProceso() {
   //console.log(lst_result[0].lst_prueba[0].lst_ejecucion)
 
   for (let es = 0; es < lst_result.length; es++) {
-    var obj_estrategia = lst_result[es];
+    const obj_estrategia = lst_result[es];
     var tmp_reporte = base_reporte;
     for (let pr = 0; pr < obj_estrategia.lst_prueba.length; pr++) {
-      var obj_prueba = obj_estrategia.lst_prueba[pr];
+      const obj_prueba = obj_estrategia.lst_prueba[pr];
       var tmp_ejecucion = '';
       for (let ej = 0; ej < obj_prueba.lst_ejecucion.length; ej++) {
-        var obj_ejecucion = obj_prueba.lst_ejecucion[ej];
+        const obj_ejecucion = obj_prueba.lst_ejecucion[ej];
+        var tmp_version = '';
+        for (let ve = 0; ve < obj_ejecucion.lst_version.length; ve++) {
+          const obj_version = obj_ejecucion.lst_version[ve];
+          var result_version = await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion, obj_version.id_version, obj_version.nombre_navegador);
+          tmp_version += result_version;
+          tmp_version = tmp_version.replace('[NAME_NAVEGADOR]', obj_version.nombre_navegador);
+          tmp_version = tmp_version.replace('[NAME_VERSION]', obj_version.nombre_version);
+        }
 
-        await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion);
+        var result_vrt = await buildVrt(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion);
 
-        var show_imagen = !html_imagen ? 'd-none' : '';
-        var show_video = !html_video ? 'd-none' : '';
-        var show_json = !html_json ? 'd-none' : '';
-        var show_html = !html_html ? 'd-none' : '';
-        var show_txt = !html_txt ? 'd-none' : '';
+        var show_vrt = !result_vrt ? 'd-none' : '';
 
         tmp_ejecucion += base_ejecucion;
-        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_IMAGEN]', html_imagen);
-        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_VIDEO]', html_video);
-        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_JSON]', html_json);
-        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_HTML]', html_html);
-        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_TXT]', html_txt);
-        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_IMAGEN]', show_imagen);
-        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_VIDEO]', show_video);
-        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_JSON]', show_json);
-        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_HTML]', show_html);
-        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_TXT]', show_txt);
-        tmp_ejecucion = tmp_ejecucion.replace('[ID_EJECUCION]', obj_ejecucion.id_ejecucion);
+        tmp_ejecucion = tmp_ejecucion.split('[ID_EJECUCION]').join(obj_ejecucion.id_ejecucion);
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_EJECUCION]', tmp_version);
+        tmp_ejecucion = tmp_ejecucion.replace('[CONTENT_VRT]', result_vrt);
+        tmp_ejecucion = tmp_ejecucion.replace('[SHOW_VRT]', show_vrt);
       }
 
       var content_prueba = '';
@@ -147,21 +179,57 @@ async function ejecutarProceso() {
   }
 }
 
-async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
+async function buildVrt(pIdEstrategia, pIdPrueba, pIdEjecucion) {
   return new Promise((resolve, reject) => {
-
-    html_reporte = '';
-    html_ejecucion = '';
-    html_imagen = '';
-    html_video = '';
-    html_json = '';
-    html_html = '';
-    html_txt = '';
+    var html_vrt = '';
 
     const s3 = new AWS.S3();
     const params = {
       Bucket: 'miso-4208-grupo3',
-      Prefix: `results/${pIdEstrategia}/${pIdPrueba}/${pIdEjecucion}`
+      Prefix: `results/${pIdEstrategia}/${pIdPrueba}/${pIdEjecucion}/VRT`
+    };
+
+    s3.listObjectsV2(params, async function (err, data) {
+      if (err) console.log(err, err.stack);
+
+      for (let i = 0; i < data.Contents.length; i++) {
+        const file = data.Contents[i];
+        if (file.Key.includes('1_')) {
+          const first_file = file.Key;
+          const first_url = s3.getSignedUrl('getObject', {
+            Bucket: data.Name,
+            Key: first_file,
+            Expires: 604800
+          });
+          const second_file = first_file.replace('1_', '2_');
+          const second_url = s3.getSignedUrl('getObject', {
+            Bucket: data.Name,
+            Key: second_file,
+            Expires: 604800
+          });
+
+          var result_vrt = await compareResemble(first_url, second_url);
+          html_vrt += result_vrt;
+        }
+      }
+      resolve(html_vrt);
+    });
+  });
+}
+
+async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion, pIdVersion, pReceiver) {
+  return new Promise((resolve, reject) => {
+
+    var html_imagen = '';
+    var html_video = '';
+    var html_json = '';
+    var html_html = '';
+    var html_txt = '';
+
+    const s3 = new AWS.S3();
+    const params = {
+      Bucket: 'miso-4208-grupo3',
+      Prefix: `results/${pIdEstrategia}/${pIdPrueba}/${pIdEjecucion}/${pIdVersion}_${pReceiver}`
     };
     s3.listObjectsV2(params, function (err, data) {
       if (err) console.log(err, err.stack);
@@ -198,14 +266,37 @@ async function buildHtml(pIdEstrategia, pIdPrueba, pIdEjecucion) {
         }
       });
 
-      resolve('OK');
+      var show_imagen = !html_imagen ? 'd-none' : '';
+      var show_video = !html_video ? 'd-none' : '';
+      var show_json = !html_json ? 'd-none' : '';
+      var show_html = !html_html ? 'd-none' : '';
+      var show_txt = !html_txt ? 'd-none' : '';
+
+      var tmp_version = base_version;
+      tmp_version = tmp_version.replace('[CONTENT_IMAGEN]', html_imagen);
+      tmp_version = tmp_version.replace('[CONTENT_VIDEO]', html_video);
+      tmp_version = tmp_version.replace('[CONTENT_JSON]', html_json);
+      tmp_version = tmp_version.replace('[CONTENT_HTML]', html_html);
+      tmp_version = tmp_version.replace('[CONTENT_TXT]', html_txt);
+      tmp_version = tmp_version.replace('[SHOW_IMAGEN]', show_imagen);
+      tmp_version = tmp_version.replace('[SHOW_VIDEO]', show_video);
+      tmp_version = tmp_version.replace('[SHOW_JSON]', show_json);
+      tmp_version = tmp_version.replace('[SHOW_HTML]', show_html);
+      tmp_version = tmp_version.replace('[SHOW_TXT]', show_txt);
+      tmp_version = tmp_version.split('[ID_VERSION]').join(`${pIdEjecucion}_${pIdVersion}_${pReceiver}`);
+
+      resolve(tmp_version);
     });
   });
 }
 
 async function compareResemble(first_file, second_file) {
-  var diff = resemble(first_file).compareTo(second_file).ignoreColors().onComplete(function (data) {
-    console.log(data);
+  return new Promise((resolve, reject) => {
+    var diff = resemble(first_file).compareTo(second_file).onComplete(function (data) {
+      console.log(data);
+      var object = base_vrt.replace('[URL_VRT_1]', first_file).replace('[URL_VRT_2]', second_file).replace('[URL_VRT_3]', data.getImageDataUrl());
+      resolve(object);
+    });
   });
 }
 
@@ -222,7 +313,7 @@ async function deleteTempFiles() {
 async function obtenerPendientes() {
   try {
     const record = await sequelize.query(
-      "SELECT es.id_estrategia, p.id_prueba, ej.id_ejecucion, p.tipo_prueba FROM estrategia_prueba ep INNER JOIN estrategia es ON es.id_estrategia = ep.id_estrategia AND es.estado = 'pendiente' INNER JOIN prueba p ON p.id_prueba = ep.id_prueba INNER JOIN ejecucion ej ON ej.id_estrategia = ep.id_estrategia AND ej.id_prueba = ep.id_prueba WHERE (SELECT COUNT(1) FROM ejecucion ej1 WHERE ej1.id_estrategia = es.id_estrategia AND ej1.id_prueba = p.id_prueba) = (SELECT COUNT(1) FROM ejecucion ej2 WHERE ej2.id_estrategia = es.id_estrategia AND ej2.id_prueba = p.id_prueba and ej2.estado = 'ejecutado');",
+      "SELECT es.id_estrategia, p.id_prueba, ej.id_ejecucion, p.tipo_prueba, na.id_navegador, na.navegador, di.id_dispositivo, di.dispositivo, ve.id_version, ve.descripcion FROM estrategia_prueba ep INNER JOIN estrategia es ON es.id_estrategia = ep.id_estrategia AND es.estado = 'pendiente' INNER JOIN prueba p ON p.id_prueba = ep.id_prueba INNER JOIN ejecucion ej ON ej.id_estrategia = ep.id_estrategia AND ej.id_prueba = ep.id_prueba INNER JOIN version ve on ve.id_app = p.id_app LEFT JOIN navegadores na on na.id_estrategia = es.id_estrategia LEFT JOIN dispositivos di on di.id_estrategia = es.id_estrategia WHERE (SELECT COUNT(1) FROM ejecucion ej1 WHERE ej1.id_estrategia = es.id_estrategia AND ej1.id_prueba = p.id_prueba) = (SELECT COUNT(1) FROM ejecucion ej2 WHERE ej2.id_estrategia = es.id_estrategia AND ej2.id_prueba = p.id_prueba and ej2.estado = 'ejecutado');",
       {
         type: QueryTypes.SELECT,
         raw: true
@@ -279,11 +370,13 @@ async function updateEstrategia(id_estrategia, estado) {
 function loadBases() {
   base_reporte = fs.readFileSync(path.resolve(__dirname, '../templates/base_reporte.html')).toString('utf8');
   base_ejecucion = fs.readFileSync(path.resolve(__dirname, '../templates/base_ejecucion.html')).toString('utf8');
+  base_version = fs.readFileSync(path.resolve(__dirname, '../templates/base_version.html')).toString('utf8');
   base_imagen = fs.readFileSync(path.resolve(__dirname, '../templates/base_imagen.html')).toString('utf8');
   base_video = fs.readFileSync(path.resolve(__dirname, '../templates/base_video.html')).toString('utf8');
   base_json = fs.readFileSync(path.resolve(__dirname, '../templates/base_json.html')).toString('utf8');
   base_html = fs.readFileSync(path.resolve(__dirname, '../templates/base_html.html')).toString('utf8');
   base_txt = fs.readFileSync(path.resolve(__dirname, '../templates/base_txt.html')).toString('utf8');
+  base_vrt = fs.readFileSync(path.resolve(__dirname, '../templates/base_vrt.html')).toString('utf8');
 }
 
 //Starting the server
