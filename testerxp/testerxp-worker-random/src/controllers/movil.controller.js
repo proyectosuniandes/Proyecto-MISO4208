@@ -23,6 +23,13 @@ const movil = async (
   const appName = path.posix.basename(appRoute);
   const app = await get(appName, '/app');
   fs.writeFileSync(path.join(__dirname, '../../adb', appName), app);
+  let nameVrt;
+  let appVrt;
+  if (vrt){
+    nameVrt = path.posix.basename(vrtRoute);
+    appVrt = await get(nameVrt, '/app');
+    fs.writeFileSync(path.join(__dirname, '../../adb', nameVrt), appVrt);
+  }
   const dirResult = path.join(
     __dirname,
     '../../adbResult',
@@ -33,14 +40,18 @@ const movil = async (
   fs.mkdirSync(dirResult, {
     recursive: true,
   });
+  if(vrt){
+    console.log(dirResult);
+    fs.mkdirSync(path.join(dirResult,'vrt'), {
+      recursive: true,
+    });
+  }
   let i = 0;
   while (i < devices.length) {
     const instance = await execute(devices[i]);
     await monkey(instance, appName, parameter, devices[i], dirResult, vrt);
     if (vrt) {
-      const nameVrt = path.posix.basename(vrtRoute);
-      const appVrt = await get(nameVrt, '/app');
-      fs.writeFileSync(path.join(__dirname, '../../adb', nameVrt), appVrt);
+      console.log('executing vrt on device ', devices[i] );
       const instanceVrt = await execute(devices[i]);
       await monkey(instanceVrt, nameVrt, parameter, devices[i], dirResult, vrt);
     }
@@ -48,6 +59,9 @@ const movil = async (
   }
   console.log('all executed');
   fs.unlinkSync(path.join(__dirname, '../../adb', appName));
+  if(vrt){
+    fs.unlinkSync(path.join(__dirname, '../../adb', nameVrt));
+  }
   await uploadFiles(
     dirResult,
     '/results/' + strategyId + '/' + testId + '/' + executionId,
@@ -63,6 +77,7 @@ const movil = async (
       executionId
   );
   await execution(executionId, 'ejecutado');
+  console.log('finished');
 };
 
 const execute = (device) => {
@@ -75,6 +90,7 @@ const execute = (device) => {
       'gmsaas instances start ' + device.uuid + ' ' + device.uuid
     );
     instance = instance.stdout.trim();
+    console.log('intsnace created', instance);
     console.log('conecting to adb');
     shell.exec('gmsaas instances adbconnect ' + instance);
     console.log('connected');
@@ -96,9 +112,8 @@ const monkey = (instance, appName, parameter, device, dirResult, vrt) => {
         shell.exec('adb shell screencap /sdcard/download/initialScreen.png');
         shell.exec(
           'adb pull /sdcard/download/initialScreen.png ' +
-            dirResult +
-            '/initialScreen_' +
-            appName +
+            dirResult +'/vrt/initialScreen_' +
+            appName +'_'+device.uuid+
             '.png'
         );
       }
@@ -110,17 +125,14 @@ const monkey = (instance, appName, parameter, device, dirResult, vrt) => {
           ' > ' +
           dirResult +
           '/' +
-          device.uuid +
+            appName +'_'+device.uuid+
           '_log.txt'
       );
       if (vrt) {
         shell.exec('adb shell screencap /sdcard/download/finalScreen.png');
         shell.exec(
           'adb pull /sdcard/download/finalScreen.png ' +
-            dirResult +
-            '/finalScreen_' +
-            appName +
-            '.png'
+            dirResult +'/vrt/finalScreen_' +appName +'_'+device.uuid+'.png'
         );
       }
       console.log('stoping instsnce');

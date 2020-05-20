@@ -41,7 +41,7 @@ const get = (key, app) => {
 
 const uploadFiles = (filePath, bucketPath, filesPrefix) => {
   return new Promise((resolve, reject) => {
-    fs.readdir(filePath, (err, files) => {
+    fs.readdir(filePath, async (err, files) => {
       if (err) {
         resolve('no hay archivos');
       }
@@ -50,23 +50,32 @@ const uploadFiles = (filePath, bucketPath, filesPrefix) => {
       }
       for (let i = 0; i < files.length; i++) {
         const f = files[i];
-        const file = fs.readFileSync(path.join(filePath, f));
-        const paramsUpload = {
-          Bucket: bucket + bucketPath,
-          Key: filesPrefix + '_' + f,
-          Body: file,
-        };
-        s3.upload(paramsUpload, async (err, data) => {
-          if (err) {
-            reject(err);
-          }
-          console.log('File uploaded successfully ' + data.Location);
-          fs.unlinkSync(path.join(filePath, f));
+        if(f !== 'vrt'){
+          const file = fs.readFileSync(path.join(filePath, f));
+          const paramsUpload = {
+            Bucket: bucket + bucketPath,
+            Key: filesPrefix + '_' + f,
+            Body: file,
+          };
+          s3.upload(paramsUpload, async (err, data) => {
+            if (err) {
+              reject(err);
+            }
+            console.log('File uploaded successfully ' + data.Location);
+            fs.unlinkSync(path.join(filePath, f));
+            if (files.length - 1 === i) {
+              console.log('last Element');
+              resolve(files);
+            }
+          });
+        }
+        else {
+          await uploadFiles(filePath+'/vrt',bucketPath+'/vrt','');
           if (files.length - 1 === i) {
             console.log('last Element');
             resolve(files);
           }
-        });
+        }
       }
     });
   });
