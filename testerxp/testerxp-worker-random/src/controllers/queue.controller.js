@@ -65,7 +65,8 @@ const queue = () => {
               message.id_estrategia,
               message.id_prueba,
               message.id_ejecucion,
-              message.vrt
+              message.vrt,
+              message.ruta_app_vrt
             );
           }
         }

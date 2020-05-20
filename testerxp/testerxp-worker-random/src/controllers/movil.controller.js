@@ -16,7 +16,8 @@ const movil = async (
   strategyId,
   testId,
   executionId,
-  vrt
+  vrt,
+  vrtRoute
 ) => {
   console.log('***** Executing Movil Random *****');
   const appName = path.posix.basename(appRoute);
@@ -35,14 +36,22 @@ const movil = async (
   let i = 0;
   while (i < devices.length) {
     const instance = await execute(devices[i]);
-    await monkey(instance, appName, parameter, devices[i], dirResult,vrt);
+    await monkey(instance, appName, parameter, devices[i], dirResult, vrt);
+    if (vrt) {
+      const nameVrt = path.posix.basename(vrtRoute);
+      const appVrt = await get(nameVrt, '/app');
+      fs.writeFileSync(path.join(__dirname, '../../adb', nameVrt), appVrt);
+      const instanceVrt = await execute(devices[i]);
+      await monkey(instanceVrt, nameVrt, parameter, devices[i], dirResult, vrt);
+    }
     i++;
   }
   console.log('all executed');
   fs.unlinkSync(path.join(__dirname, '../../adb', appName));
   await uploadFiles(
     dirResult,
-    '/results/' + strategyId + '/' + testId + '/' + executionId,''
+    '/results/' + strategyId + '/' + testId + '/' + executionId,
+    ''
   );
   await result(
     executionId,
@@ -73,7 +82,7 @@ const execute = (device) => {
   });
 };
 
-const monkey = (instance, appName, parameter, device, dirResult,vrt) => {
+const monkey = (instance, appName, parameter, device, dirResult, vrt) => {
   return new Promise((resolve) => {
     client.listDevices().then(async (devices) => {
       await client.install(
@@ -83,9 +92,15 @@ const monkey = (instance, appName, parameter, device, dirResult,vrt) => {
       console.log('installed');
       shell.cd(process.env.ANDROID_SDK);
       console.log('executing ');
-      if (vrt){
+      if (vrt) {
         shell.exec('adb shell screencap /sdcard/download/initialScreen.png');
-        shell.exec('adb pull /sdcard/download/initialScreen.png '+dirResult+'/initialScreen_'+appName+'.png');
+        shell.exec(
+          'adb pull /sdcard/download/initialScreen.png ' +
+            dirResult +
+            '/initialScreen_' +
+            appName +
+            '.png'
+        );
       }
       shell.exec(
         './adb -s ' +
@@ -98,9 +113,15 @@ const monkey = (instance, appName, parameter, device, dirResult,vrt) => {
           device.uuid +
           '_log.txt'
       );
-      if (vrt){
+      if (vrt) {
         shell.exec('adb shell screencap /sdcard/download/finalScreen.png');
-        shell.exec('adb pull /sdcard/download/finalScreen.png '+dirResult+'/finalScreen_'+appName+'.png');
+        shell.exec(
+          'adb pull /sdcard/download/finalScreen.png ' +
+            dirResult +
+            '/finalScreen_' +
+            appName +
+            '.png'
+        );
       }
       console.log('stoping instsnce');
       shell.exec('gmsaas instances stop ' + instance);
