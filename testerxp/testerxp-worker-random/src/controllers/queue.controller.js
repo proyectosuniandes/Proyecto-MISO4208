@@ -55,7 +55,9 @@ const queue = () => {
               message.id_estrategia,
               message.id_prueba,
               message.id_ejecucion,
-              message.navegadores
+              message.navegadores,
+              message.vrt,
+              message.ruta_app_vrt
             );
           } else {
             await movil(
