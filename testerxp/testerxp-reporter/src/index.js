@@ -140,9 +140,11 @@ async function ejecutarProceso() {
         var tmp_version = '';
         for (let ve = 0; ve < obj_ejecucion.lst_version.length; ve++) {
           const obj_version = obj_ejecucion.lst_version[ve];
-          var result_version = await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion, obj_version.id_version, obj_version.nombre_navegador);
+
+          var vReceiver = obj_version.nombre_navegador ? obj_version.nombre_navegador : obj_version.nombre_dispositivo;
+          var result_version = await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion, obj_version.id_version, vReceiver);
           tmp_version += result_version;
-          tmp_version = tmp_version.replace('[NAME_NAVEGADOR]', obj_version.nombre_navegador);
+          tmp_version = tmp_version.replace('[NAME_RECEIVER]', vReceiver);
           tmp_version = tmp_version.replace('[NAME_VERSION]', obj_version.nombre_version);
         }
 
@@ -194,14 +196,16 @@ async function buildVrt(pIdEstrategia, pIdPrueba, pIdEjecucion) {
 
       for (let i = 0; i < data.Contents.length; i++) {
         const file = data.Contents[i];
-        if (file.Key.includes('1_')) {
+        const first = parseInt(path.basename(file.Key)[0]);
+        if (first % 2) {
           const first_file = file.Key;
           const first_url = s3.getSignedUrl('getObject', {
             Bucket: data.Name,
             Key: first_file,
             Expires: 604800
           });
-          const second_file = first_file.replace('1_', '2_');
+          const second = first + 1;
+          const second_file = first_file.replace(first + '_', second + '_');
           const second_url = s3.getSignedUrl('getObject', {
             Bucket: data.Name,
             Key: second_file,
@@ -294,7 +298,10 @@ async function compareResemble(first_file, second_file) {
   return new Promise((resolve, reject) => {
     var diff = resemble(first_file).compareTo(second_file).onComplete(function (data) {
       console.log(data);
-      var object = base_vrt.replace('[URL_VRT_1]', first_file).replace('[URL_VRT_2]', second_file).replace('[URL_VRT_3]', data.getImageDataUrl());
+      var object = '';
+      if (!data.error) {
+        object = base_vrt.replace('[URL_VRT_1]', first_file).replace('[URL_VRT_2]', second_file).replace('[URL_VRT_3]', data.getImageDataUrl());
+      }
       resolve(object);
     });
   });
