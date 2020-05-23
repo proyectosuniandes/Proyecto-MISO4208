@@ -1,15 +1,15 @@
-const { list, get, uploadFiles } = require('./s3.controller.js');
-const fs = require('fs');
+const {list, get, uploadFiles} = require('./s3.controller.js');
+const fs = require('fs'); 
 const path = require('path');
 const cypress = require('cypress');
 const result = require('./result.controller');
 const execution = require('./execution.controller');
 
 //execute random script with cypress
-const web = async (rutaScript,headless,headful,strategyId,testId,executionId,navegadores,vrt,vrtRoute) => {
+const web = async (rutaScript,strategyId,testId,executionId,navegadores,appRoute,headful,headless,versionId,vrt,vrtRoute,vrtVersion) => {
   console.log('***** Executing Web Random *****');
-  const split = rutaScript.split('.com/');
-  const prefix = split[1];
+  let prefix = rutaScript.split('.com/');
+  prefix = prefix[1];
   const files = await list(prefix+'/');
   fs.mkdirSync(path.join(__dirname,'../../cypress/integration',strategyId + '',testId + '',executionId + ''),{recursive: true});
   let i = 0;
@@ -18,28 +18,32 @@ const web = async (rutaScript,headless,headful,strategyId,testId,executionId,nav
     nameScript = nameScript[nameScript.length - 1];
     const file = await get(files[i].Key);
     fs.writeFileSync(path.join(__dirname,'../../cypress/integration',strategyId + '',testId + '',executionId + '',nameScript),file);
-    console.log('file to be tested: ', nameScript);
-    await executeBrowsers(navegadores,headful,headless,nameScript,strategyId,testId,executionId);
-    console.log('executed');
-    await uploadResults(navegadores,strategyId,testId,executionId,nameScript);
-    console.log('finished uploading files');
+    await executeBrowsers(navegadores,appRoute,versionId, headful,headless,nameScript,strategyId,testId,executionId);
+    await uploadResults(navegadores,versionId,strategyId,testId,executionId,nameScript);
+    if (vrt){
+      await executeBrowsers(navegadores,vrtRoute,vrtVersion, headful,headless,nameScript,strategyId,testId,executionId);
+      await uploadResults(navegadores,vrtVersion,strategyId,testId,executionId,nameScript);
+    }
+    fs.unlinkSync(path.join(__dirname,'../../cypress/integration',strategyId + '',testId + '',executionId + '',nameScript));
     i++;
   }
+  console.log('executed and files uploaded');
   await result(executionId,' https://miso-4208-grupo3.s3.us-east-2.amazonaws.com/results/' +strategyId +'/' +testId +'/' +executionId);
   console.log('result created');
   await execution(executionId, 'ejecutado');
   console.log('finished');
 };
 
-const executeBrowsers= (navegadores,headful,headless,nameScript,strategyId,testId,executionId)=>{
+const executeBrowsers= (navegadores,appRoute,versionId,headful,headless,nameScript,strategyId,testId,executionId)=>{
   return new Promise((resolve)=>{
     let promises = [];
     navegadores.forEach((n) => {
       const execution = cypress.run({
         browser: n.tipo,
         config: {
-          screenshotsFolder: path.join(__dirname,'../../cypress/screenshots',n.tipo),
-          videosFolder: path.join(__dirname, '../../cypress/videos/', n.tipo),
+          baseUrl: appRoute,
+          screenshotsFolder: path.join(__dirname,'../../cypress/screenshots',versionId+'_'+n.tipo),
+          videosFolder: path.join(__dirname, '../../cypress/videos/', versionId+'_'+n.tipo),
           trashAssetsBeforeRuns: false,
           chromeWebSecurity: false,
         },
@@ -48,8 +52,8 @@ const executeBrowsers= (navegadores,headful,headless,nameScript,strategyId,testI
         reporter: 'mochawesome',
         reporterOptions: {
           reportFilename: nameScript,
-          reportDir: path.join(__dirname,'../../cypress/results',n.tipo,strategyId + '',testId + '',executionId + ''),
-          html: false,
+          reportDir: path.join(__dirname,'../../cypress/results',versionId+'_'+n.tipo,strategyId + '',testId + '',executionId + ''),
+          html: true,
           json: true,
           quiet: true,
         },
@@ -58,23 +62,21 @@ const executeBrowsers= (navegadores,headful,headless,nameScript,strategyId,testI
       promises.push(execution);
     });
     Promise.all(promises).then(() => {
-      fs.unlinkSync(path.join(__dirname,'../../cypress/integration',strategyId + '',testId + '',executionId + '',nameScript));
       resolve('done');
     });
   });
 }
 
-const uploadResults = (navegadores,strategyId,testId,executionId,nameScript)=>{
-  return new Promise((resolve)=>{
-    let promisesUpload = [];
-    navegadores.forEach(async(n) => {
-      promisesUpload.push(uploadFiles(path.join(__dirname,'../../cypress/screenshots',n.tipo + '',strategyId + '',testId + '',executionId + '',nameScript),'/results/' + strategyId + '/' + testId + '/' + executionId+ '/vrt',n.tipo + '_' + nameScript));
-      promisesUpload.push(uploadFiles(path.join(__dirname,'../../cypress/videos',n.tipo + '',strategyId + '',testId + '',executionId + ''),'/results/' + strategyId + '/' + testId + '/' + executionId,n.tipo + '_' + nameScript));
-      promisesUpload.push(uploadFiles(path.join(__dirname,'../../cypress/results',n.tipo + '',strategyId + '',testId + '',executionId + ''),'/results/' + strategyId + '/' + testId + '/' + executionId,n.tipo + '_' + nameScript));
-    });
-    Promise.all(promisesUpload).then(() => {
-      resolve('done');
-    });
-  })
+const uploadResults =(navegadores,versionId,strategyId,testId,executionId,nameScript)=>{
+  return new Promise(async (resolve)=>{
+    let i =0;
+    while(i < navegadores.length){
+      await uploadFiles(path.join(__dirname,'../../cypress/screenshots',versionId+'_'+navegadores[i].tipo + '',strategyId + '',testId + '',executionId + '',nameScript),'/results/' + strategyId + '/' + testId + '/' + executionId+ '/VRT',versionId+'_'+navegadores[i].tipo);
+      await uploadFiles(path.join(__dirname,'../../cypress/videos',versionId+'_'+navegadores[i].tipo + '',strategyId + '',testId + '',executionId + ''),'/results/' + strategyId + '/' + testId + '/' + executionId+'/'+versionId+'_'+navegadores[i].tipo,null);
+      await uploadFiles(path.join(__dirname,'../../cypress/results',versionId+'_'+navegadores[i].tipo + '',strategyId + '',testId + '',executionId + ''),'/results/' + strategyId + '/' + testId + '/' + executionId+'/'+versionId+'_'+navegadores[i].tipo,null);
+      i++;
+    }
+    resolve('done');
+  });
 }
 module.exports = web;

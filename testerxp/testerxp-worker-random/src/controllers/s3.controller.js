@@ -48,15 +48,29 @@ const uploadFiles = (filePath, bucketPath, filesPrefix) => {
       if (!files.length) {
         resolve('no hay archivos');
       }
-      for (let i = 0; i < files.length; i++) {
+      for (let i=0; i< files.length; i++) {
         const f = files[i];
-        if(f !== 'vrt'){
+        if(f !== 'vrt' && f !== 'assets'){
           const file = fs.readFileSync(path.join(filePath, f));
-          const paramsUpload = {
-            Bucket: bucket + bucketPath,
-            Key: filesPrefix + '_' + f,
-            Body: file,
-          };
+          let paramsUpload;
+          if(filesPrefix !== null){
+            paramsUpload = {
+              Bucket: bucket + bucketPath,
+              Key: filesPrefix + '_' + f,
+              Body: file
+            };
+          }
+          else{
+            paramsUpload = {
+              Bucket: bucket + bucketPath,
+              Key: f,
+              Body: file
+            };
+          }
+          if(f.split('.').pop()==='html'){
+            paramsUpload.ContentType = 'text/html' 
+            console.log('paramsUpload: ', paramsUpload);
+          }
           s3.upload(paramsUpload, async (err, data) => {
             if (err) {
               reject(err);
@@ -69,8 +83,14 @@ const uploadFiles = (filePath, bucketPath, filesPrefix) => {
             }
           });
         }
+        else if (f === 'assets'){
+          await uploadFiles(filePath+'/assets',bucketPath+'/assets',filesPrefix);
+          if (files.length - 1 === i) {
+            console.log('last Element');
+            resolve(files);
+          }
+        }
         else {
-          await uploadFiles(filePath+'/vrt',bucketPath+'/vrt','');
           if (files.length - 1 === i) {
             console.log('last Element');
             resolve(files);

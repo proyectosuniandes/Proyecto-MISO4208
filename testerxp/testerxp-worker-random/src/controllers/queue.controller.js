@@ -3,6 +3,7 @@ const query = require('./strategyTest.controller');
 const execution = require('./execution.controller');
 const web = require('./web.controller');
 const movil = require('./movil.controller');
+const versions = require('./versions.controller');
 
 AWS.config.update({ region: 'us-east-1' });
 
@@ -47,17 +48,22 @@ const queue = () => {
             headless = false;
             headful = true;
           }
+          const id_version = await versions(message.ruta_app);
+          const id_vrt = await versions(message.ruta_app_vrt);  
           if (st.tipo_app === 'web') {
             await web(
               message.ruta_script,
-              headless,
-              headful,
               message.id_estrategia,
               message.id_prueba,
               message.id_ejecucion,
               message.navegadores,
+              message.ruta_app,
+              headful,
+              headless,
+              id_version,
               message.vrt,
-              message.ruta_app_vrt
+              message.ruta_app_vrt,
+              id_vrt
             );
           } else {
             await movil(
@@ -68,7 +74,9 @@ const queue = () => {
               message.id_prueba,
               message.id_ejecucion,
               message.vrt,
-              message.ruta_app_vrt
+              message.ruta_app_vrt,
+              id_version,
+              id_vrt
             );
           }
         }
