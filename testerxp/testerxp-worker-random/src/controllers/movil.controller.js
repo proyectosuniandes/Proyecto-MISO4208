@@ -17,7 +17,9 @@ const movil = async (
   testId,
   executionId,
   vrt,
-  vrtRoute
+  vrtRoute,
+  id_version,
+  id_vrt
 ) => {
   console.log('***** Executing Movil Random *****');
   const appName = path.posix.basename(appRoute);
@@ -48,12 +50,15 @@ const movil = async (
   }
   let i = 0;
   while (i < devices.length) {
+    fs.mkdirSync(path.join(dirResult,devices[i].uuid),{recursive: true});
     const instance = await execute(devices[i]);
-    await monkey(instance, appName, parameter, devices[i], dirResult, vrt);
+    await monkey(instance, appName, parameter, devices[i], dirResult, vrt, id_version);
+    await uploadFiles(path.join(dirResult,devices[i].uuid),'/results/' + strategyId + '/' + testId + '/' + executionId+'/'+id_version+'_'+devices[i].uuid,null);
     if (vrt) {
       console.log('executing vrt on device ', devices[i] );
       const instanceVrt = await execute(devices[i]);
-      await monkey(instanceVrt, nameVrt, parameter, devices[i], dirResult, vrt);
+      await monkey(instanceVrt, nameVrt, parameter, devices[i], dirResult, vrt,id_vrt);
+      await uploadFiles(path.join(dirResult,devices[i].uuid),'/results/' + strategyId + '/' + testId + '/' + executionId+'/'+id_vrt+'_'+devices[i].uuid,null);
     }
     i++;
   }
@@ -62,11 +67,7 @@ const movil = async (
   if(vrt){
     fs.unlinkSync(path.join(__dirname, '../../adb', nameVrt));
   }
-  await uploadFiles(
-    dirResult,
-    '/results/' + strategyId + '/' + testId + '/' + executionId,
-    ''
-  );
+  await uploadFiles(path.join(dirResult,'vrt'),'/results/' + strategyId + '/' + testId + '/' + executionId+'/VRT',null);
   await result(
     executionId,
     ' https://miso-4208-grupo3.s3.us-east-2.amazonaws.com/results/' +
@@ -98,7 +99,7 @@ const execute = (device) => {
   });
 };
 
-const monkey = (instance, appName, parameter, device, dirResult, vrt) => {
+const monkey = (instance, appName, parameter, device, dirResult, vrt, version) => {
   return new Promise((resolve) => {
     client.listDevices().then(async (devices) => {
       await client.install(
@@ -112,9 +113,7 @@ const monkey = (instance, appName, parameter, device, dirResult, vrt) => {
         shell.exec('adb shell screencap /sdcard/download/initialScreen.png');
         shell.exec(
           'adb pull /sdcard/download/initialScreen.png ' +
-            dirResult +'/vrt/initialScreen_' +
-            appName +'_'+device.uuid+
-            '.png'
+            dirResult +'/vrt/'+version+'_'+device.uuid+'_initialScreen.png'
         );
       }
       shell.exec(
@@ -123,16 +122,14 @@ const monkey = (instance, appName, parameter, device, dirResult, vrt) => {
           ' shell monkey ' +
           parameter +
           ' > ' +
-          dirResult +
-          '/' +
-            appName +'_'+device.uuid+
-          '_log.txt'
+          path.join(dirResult,device.uuid) +
+          '/log.txt'
       );
       if (vrt) {
         shell.exec('adb shell screencap /sdcard/download/finalScreen.png');
         shell.exec(
           'adb pull /sdcard/download/finalScreen.png ' +
-            dirResult +'/vrt/finalScreen_' +appName +'_'+device.uuid+'.png'
+            dirResult +'/vrt/'+version+'_'+device.uuid+'_finalScreen.png'
         );
       }
       console.log('stoping instsnce');

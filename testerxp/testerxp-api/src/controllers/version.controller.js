@@ -2,6 +2,8 @@ const Version = require('../models/version');
 const App = require('../models/app');
 const AWS = require('aws-sdk');
 const path = require('path');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 // Retrieve all Versions from the database.
 exports.findAll = async (req, res) => {
