@@ -1,7 +1,6 @@
 import React, {Fragment} from 'react';
-import {Query, Loading, Error, TextInput,FormDataConsumer,ReferenceInput,SelectInput} from 'react-admin';
-import { Field } from 'react-final-form'
-import TextField from '@material-ui/core/TextField'
+import {Error, Loading, Query, TextInput} from 'react-admin';
+
 const TypeAppCmp = ({formData}) => {
     return (
         <Fragment>

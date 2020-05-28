@@ -1,6 +1,6 @@
 import React from "react";
 import {Datagrid, EditButton, List, ReferenceField, TextField,UrlField} from "react-admin";
-import UrlFieldCmp from "../components/UrlFieldCmp";
+
 
 const VersionList = (props) => (
     <List {...props} title="Lista de Versiones" sort={{field: 'id_app', order: 'ASC'}}>

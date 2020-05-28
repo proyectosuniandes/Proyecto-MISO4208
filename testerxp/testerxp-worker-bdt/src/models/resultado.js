@@ -14,7 +14,12 @@ const resultado = sequelize.define(
     },
     ruta_archivo: {
       type: Sequelize.TEXT
-    }
+    },
+      fecha: {
+          type: 'TIMESTAMP',
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+          allowNull: false
+      }
   },
   {
     timestamps: false,

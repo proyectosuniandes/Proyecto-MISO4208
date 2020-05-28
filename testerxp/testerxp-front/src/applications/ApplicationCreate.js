@@ -6,12 +6,6 @@ import {Card} from 'primereact/card';
 const ApplicationCreate = props => (
     <Create {...props}>
         <SimpleForm>
-
-
-
-
-
-
             <Card style={{width: '100%'}}>
                 <Typography variant="h6" gutterBottom>Aplicación <hr/></Typography>
                 <Box display="flex" justifyContent="center" m={1} p={1} bgcolor="background.paper">

@@ -1,6 +1,15 @@
 import simpleRestProvider from 'ra-data-simple-rest';
 
 const util = require('util');
+const AWS = require('aws-sdk');
+
+AWS.config.update({
+    accessKeyId: "AKIA6FD2VJYWCU5ZVJEO",
+    secretAccessKey: "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",
+    "region": 'us-east-1'
+}); // for simplicity. In prod, use loadConfigFromFile, or env variables
+
+
 
 //const dataProvider = simpleRestProvider('http://localhost:8080');
 const dataProvider = simpleRestProvider('http://3.86.81.190:8080');
@@ -57,7 +66,7 @@ async function filesUpload(params) {
         } else {
             var readerBDTOne = new FileReader();
             await readerBDTOne.readAsDataURL(params.data.filesBDT.rawFile);
-            console.log(params.data.filesRANDOM);
+            console.log(params.data.filesBDT);
             fileList.push(await read(readerBDTOne, 'BDT', params.data.filesBDT));
         }
 
@@ -107,7 +116,7 @@ const DataProvideUpload = {
             return dataProvider.update(resource, params);
         }
     },
-    create: (resource, params) => {
+    create: async (resource, params) => {
 
         if (resource === 'strategies') {
             console.log('resource :' + resource);
@@ -160,6 +169,40 @@ const DataProvideUpload = {
 
             }
 
+        } else if (resource === 'mutation') {
+
+            //const queueURL = 'https://sqs.us-east-1.amazonaws.com/973067341356/bdt.fifo';
+            console.log('resource :' + resource);
+            console.log('params : ' + util.inspect(params, false, null, true /*enable colors */));
+
+            if (params.data) {
+
+                var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+
+                const sendParams = {
+                    MessageBody: JSON.stringify({
+                        id_app: params.data.id_app,
+                        tipo_prueba: 'MUTANTE',
+                        version_app: params.data.version_app,
+                        paquete: params.data.paquete,
+                        operadores: params.data.operadores,
+                    }),
+                    MessageDeduplicationId: ""+params.data.version_app,  // Required for FIFO queues
+                    MessageGroupId: ""+params.data.id_app,  // Required for FIFO queues
+                    QueueUrl: 'https://sqs.us-east-1.amazonaws.com/973067341356/bdt.fifo' //'https://sqs.us-east-1.amazonaws.com/973067341356/dispatcher.fifo',
+                };
+
+                await sqs.sendMessage(sendParams, function (err, data) {
+                    if (err) {
+                        console.log('Error', err);
+                    } else {
+                        console.log("Success", data.MessageId);
+                    }
+                });
+                alert(' Mutaciones Enviadas para su Generacion ...');
+                return true;
+            }
+
         }
 
         console.log('resource :' + resource);
@@ -168,5 +211,6 @@ const DataProvideUpload = {
 
     },
 }
+
 
 export default DataProvideUpload;

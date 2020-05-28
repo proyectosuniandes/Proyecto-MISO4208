@@ -1,15 +1,43 @@
 import React from 'react';
-import { MenuItemLink } from 'react-admin';
-import { withRouter } from 'react-router-dom';
+import {useSelector} from 'react-redux';
+import {DashboardMenuItem, getResources, MenuItemLink} from 'react-admin';
+import DefaultIcon from '@material-ui/icons/ViewList';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 
-const MyMenu = ({ resources, onMenuClick, logout }) => (
-    <div>
-        {resources.map(resource => (
-            <MenuItemLink to={`/${resource.name}`} primaryText={resource.name} onClick={onMenuClick} />
-        ))}
-        <MenuItemLink to="/reference/create" primaryText="New Reference" onClick={onMenuClick} />
-    </div>
-);
+const Menu = ({onMenuClick}) => {
+    const open = useSelector(state => state.admin.ui.sidebarOpen);
+    const resources = useSelector(getResources);
+    return (
+        <div>
+            {' '}
+            <DashboardMenuItem onClick={onMenuClick} sidebarIsOpen={open}/>
+            {resources.filter(r => r.hasList).map(resource => (
+                <MenuItemLink
+                    key={resource.name}
+                    to={`/${resource.name}`}
+                    primaryText={
+                        (resource.options && resource.options.label) ||
+                        resource.name
+                    }
+                    leftIcon={
+                        resource.icon ? <resource.icon/> : <DefaultIcon/>
+                    }
+                    onClick={onMenuClick}
+                    sidebarIsOpen={open}
+                />
+            ))}
 
-export default withRouter(MyMenu);
+            <MenuItemLink
+                to={`/mutation`}
+                primaryText="Mutaciones"
+                leftIcon={<SettingsIcon/>}
+                onClick={onMenuClick}
+                sidebarIsOpen={open}
+            />
+
+        </div>
+    );
+};
+
+export default Menu;

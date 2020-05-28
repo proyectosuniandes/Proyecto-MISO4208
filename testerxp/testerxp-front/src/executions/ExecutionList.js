@@ -1,6 +1,5 @@
 import React from "react";
-import {Datagrid, EditButton, List, ReferenceField, TextField} from "react-admin";
-import UrlFieldCmp from "../components/UrlFieldCmp";
+import {Datagrid, List, TextField} from "react-admin";
 
 const ExecutionList = (props) => (
     <List {...props} title="Lista de Ejecuciones" >
@@ -14,6 +13,8 @@ const ExecutionList = (props) => (
             </ReferenceField>*/}
             <TextField source="id_estrategia" label="id Estrategia"/>
             <TextField source="id_prueba" label="id prueba"/>
+            <TextField source="estado" label="Estado"/>
+            <TextField source="fecha_inicio" label="Fecha Inicio"/>
         </Datagrid>
     </List>
 );

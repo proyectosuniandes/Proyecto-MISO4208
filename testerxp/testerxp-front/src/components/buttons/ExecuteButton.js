@@ -1,25 +1,18 @@
 import React from 'react';
-import {useNotify, useRedirect, Button} from 'react-admin';
-import {useHistory} from 'react-router-dom';
-import {
-    BrowserRouter as Router, Route,
-    Redirect, Switch
-} from 'react-router-dom';
+import {Button, useNotify} from 'react-admin';
 
 const util = require('util');
 
 const ExecuteButton = ({record}) => {
     const notify = useNotify();
-    const redirect = useRedirect();
-    let history = useHistory();
     const approve = () => {
 
         //const {record} = this.props;
         console.log(util.inspect(record, false, null, true /* enable colors */))
-        console.log(record.id_estrategia)
+        console.log('idEstrategia :' + record.id_estrategia)
 
-        //const urlRest = `http://localhost:8080/strategies/execute/` + record.id_estrategia;
-        const urlRest = `http://3.86.81.190:8080/strategies/execute/` + record.id_estrategia;
+        //const urlRest = 'http://localhost:8080/strategies/execute/' + record.id_estrategia;
+        const urlRest = 'http://3.86.81.190:8080/strategies/execute/' + record.id_estrategia;
 
         console.log(urlRest);
 
@@ -27,7 +20,11 @@ const ExecuteButton = ({record}) => {
             method: 'GET'
         })
             .then(function (response) {
-                return response.json();
+                console.log(util.inspect(response, false, null, true /* enable colors */))
+                if(response.ok) {
+                    //window.location.hash = "/executions";
+                    return response;
+                }
             })
             .then(function (data) {
                 console.log('data = ', data);
@@ -37,7 +34,7 @@ const ExecuteButton = ({record}) => {
             });
 
         notify('Estategia : ' + record.nombre + ' Lanzada para su Ejecución');
-        redirect('/#/executions/');
+
 
     };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import {ChipField, Datagrid, List, ReferenceManyField, SingleFieldList, TextField,SimpleForm} from "react-admin";
+import {ChipField, Datagrid, List, ReferenceManyField, SingleFieldList, TextField, UrlField} from "react-admin";
 
 import NestedFieldApp from '../components/data/NestedFieldApp.js'
 import NestedFieldVersion from '../components/data/NestedFieldVersion.js'
@@ -7,12 +7,8 @@ import NestedFieldVersion from '../components/data/NestedFieldVersion.js'
 
 import ExecuteButton from '../components/buttons/ExecuteButton';
 
-const redirect = (basePath) => `/executions`;
-
 const StrategyList = (props) => (
     <List {...props} title="Lista de Estrategias de Prueba" sort={{field: 'id_estrategia', order: 'ASC'}}>
-
-
 
         <Datagrid rowClick="edit">
 
@@ -30,13 +26,15 @@ const StrategyList = (props) => (
             </ReferenceManyField>
 
 
-     {/*     <NestedFieldApp label= "Aplicación"/>
+           <NestedFieldApp label= "Aplicación"/>
 
-          <NestedFieldVersion label="Versión"/>
-*/}
-            {/*<EditButton label="Editar"/>*/}
+           <NestedFieldVersion label="Versión"/>
 
-            <ExecuteButton redirect={redirect}/>
+            <TextField source="estado" label="Estado"/>
+            <UrlField source="ruta_consolidado"  label="Ruta Resultado"/>
+
+
+            <ExecuteButton/>
 
         </Datagrid>
 

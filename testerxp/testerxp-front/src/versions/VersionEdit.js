@@ -3,31 +3,23 @@ import 'primereact/resources/themes/nova-light/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
-import {
-    Edit,
-    FileField,
-    FileInput,
-    FormDataConsumer, ReferenceInput, SelectInput,
-    SimpleForm,
-    TextInput
-} from "react-admin";
+import {Edit, FileField, FileInput, FormDataConsumer, SimpleForm, TextInput} from "react-admin";
 
 import {Box, Typography} from '@material-ui/core';
 
-import {makeStyles, Theme} from '@material-ui/core/styles';
+import {Theme} from '@material-ui/core/styles';
 import {Styles} from '@material-ui/styles/withStyles';
 import {Card} from "primereact/card";
-import TypeAppCmp from "../components/data/TypeAppCmp";
 
 export const styles: Styles<Theme, any> = {
     izq: {display: 'inline-block'},
     der: {display: 'inline-block', marginLeft: 32},
     ruta: {width: 800},
 };
-const useStyles = makeStyles(styles);
+
 
 const VersionEdit = (props: any) => {
-    const classes = useStyles();
+
     return (
 
         <Edit {...props}>

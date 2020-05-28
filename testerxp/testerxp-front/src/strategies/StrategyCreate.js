@@ -154,7 +154,6 @@ const StrategyCreate = (props: any) => {
 
                     <br/>
 
-
                     <FormDataConsumer>
                         {({formData, ...rest}) => formData.tipo_app === 'web' &&
                             <Card style={{width: '100%'}}>
