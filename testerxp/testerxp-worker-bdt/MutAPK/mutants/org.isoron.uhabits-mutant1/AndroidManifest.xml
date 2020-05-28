@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.isoron.uhabits" platformBuildVersionCode="25" platformBuildVersionName="7.1.1">
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:maxSdkVersion="18" android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:maxSdkVersion="18" android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <meta-data android:name="android.support.VERSION" android:value="25.3.0"/>
+    <application android:allowBackup="true" android:backupAgent="org.isoron.uhabits.HabitsBackupAgent" android:icon="@mipmap/ic_launcher" android:label="@string/main_activity_title" android:name="org.isoron.uhabits.HabitsApplication" android:supportsRtl="true" android:theme="@style/AppBaseTheme">
+        <meta-data android:name="com.google.android.backup.api_key" android:value="AEdPqrEAAAAI6aeWncbnMNo8E5GWeZ44dlc5cQ7tCROwFhOtiw"/>
+        <activity-alias android:label="@string/main_activity_title" android:launchMode="singleTop" android:name="org.isoron.uhabits.MainActivity" android:targetActivity="org.isoron.uhabits.activities.habits.list.ListHabitsActivity">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity android:label="@string/title_activity_show_habit" android:name="org.isoron.uhabits.activities.habits.show.ShowHabitActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".activities.habits.list.ListHabitsActivity"/>
+        </activity>
+        <activity android:label="@string/settings" android:name="org.isoron.uhabits.activities.settings.SettingsActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".activities.habits.list.ListHabitsActivity"/>
+        </activity>
+        <activity android:label="" android:name="org.isoron.uhabits.activities.intro.IntroActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name="org.isoron.uhabits.widgets.HabitPickerDialog" android:theme="@style/Theme.AppCompat.Light.Dialog">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+        <activity android:label="@string/about" android:name="org.isoron.uhabits.activities.about.AboutActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".activities.habits.list.ListHabitsActivity"/>
+        </activity>
+        <receiver android:label="@string/checkmark" android:name="org.isoron.uhabits.widgets.CheckmarkWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_checkmark_info"/>
+        </receiver>
+        <receiver android:label="@string/history" android:name="org.isoron.uhabits.widgets.HistoryWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_history_info"/>
+        </receiver>
+        <receiver android:label="@string/habit_strength" android:name="org.isoron.uhabits.widgets.ScoreWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_score_info"/>
+        </receiver>
+        <receiver android:label="@string/streaks" android:name="org.isoron.uhabits.widgets.StreakWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_streak_info"/>
+        </receiver>
+        <receiver android:label="@string/frequency" android:name="org.isoron.uhabits.widgets.FrequencyWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_frequency_info"/>
+        </receiver>
+        <receiver android:name="org.isoron.uhabits.receivers.ReminderReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name="org.isoron.uhabits.receivers.WidgetReceiver">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="org.isoron.uhabits.ACTION_TOGGLE_REPETITION"/>
+                <data android:host="org.isoron.uhabits" android:scheme="content"/>
+            </intent-filter>
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="org.isoron.uhabits.ACTION_ADD_REPETITION"/>
+                <data android:host="org.isoron.uhabits" android:scheme="content"/>
+            </intent-filter>
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="org.isoron.uhabits.ACTION_REMOVE_REPETITION"/>
+                <data android:host="org.isoron.uhabits" android:scheme="content"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name="org.isoron.uhabits.receivers.PebbleReceiver">
+            <intent-filter>
+                <action android:name="com.getpebble.action.app.RECEIVE"/>
+            </intent-filter>
+        </receiver>
+        <activity android:exported="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="org.isoron.uhabits.automation.EditSettingActivity">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"/>
+            </intent-filter>
+        </activity>
+        <receiver android:exported="true" android:name="org.isoron.uhabits.automation.FireSettingReceiver">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>
+            </intent-filter>
+        </receiver>
+        <provider android:authorities="org.isoron.uhabits" android:exported="false" android:grantUriPermissions="true" android:name="android.support.v4.content.FileProvider">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"/>
+        </provider>
+    </application>
+</manifest>

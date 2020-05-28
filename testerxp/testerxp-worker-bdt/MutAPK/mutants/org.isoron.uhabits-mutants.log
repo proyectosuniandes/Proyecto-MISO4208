@@ -1,0 +1,5 @@
+ThreadPool: 8
+Mutant 1: mutants//org.isoron.uhabits-mutant1/src//AndroidManifest.xml; ActivityNotDefined in line { 8 }
+	For mutant 1 the lines between 9 and 9 have been deleted.
+Mutant 2: /home/hanner/Proyectos/Uniandes/Pruebas/workspace/Proyecto-MISO4208/testerxp/testerxp-worker-bdt/MutAPK/mutants//org.isoron.uhabits-mutant2/src//smali/org/isoron/uhabits/intents/IntentFactory.smali; DifferentActivityIntentDefinition in line { 181 }
+	For mutant 2 component name at line 181 has been change from "Lorg/isoron/uhabits/activities/settings/SettingsActivity;" to "Lorg/isoron/uhabits/activities/about/AboutActivity;"
