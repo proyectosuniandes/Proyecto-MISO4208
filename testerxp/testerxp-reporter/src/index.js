@@ -141,10 +141,12 @@ async function ejecutarProceso() {
         for (let ve = 0; ve < obj_ejecucion.lst_version.length; ve++) {
           const obj_version = obj_ejecucion.lst_version[ve];
 
-          var vReceiver = obj_version.nombre_navegador ? obj_version.nombre_navegador : obj_version.nombre_dispositivo;
-          var result_version = await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion, obj_version.id_version, vReceiver);
+          const vNameReceiver = obj_version.nombre_navegador ? obj_version.nombre_navegador : obj_version.nombre_dispositivo;
+          const vTypeReceiver = obj_version.nombre_navegador ? "Navegador" : "Dispositivo";
+          var result_version = await buildHtml(obj_estrategia.id_estrategia, obj_prueba.id_prueba, obj_ejecucion.id_ejecucion, obj_version.id_version, vNameReceiver);
           tmp_version += result_version;
-          tmp_version = tmp_version.replace('[NAME_RECEIVER]', vReceiver);
+          tmp_version = tmp_version.replace('[NAME_RECEIVER]', vNameReceiver);
+          tmp_version = tmp_version.replace('[TYPE_RECEIVER]', vTypeReceiver);
           tmp_version = tmp_version.replace('[NAME_VERSION]', obj_version.nombre_version);
         }
 
