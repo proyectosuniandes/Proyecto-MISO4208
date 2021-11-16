@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "adbkit": "^2.11.1",
-    "aws-sdk": "^2.654.0",
+    "aws-sdk": "^2.814.0",
     "cypress": "^4.3.0",
     "express": "^4.17.1",
     "mocha": "^7.1.1",
