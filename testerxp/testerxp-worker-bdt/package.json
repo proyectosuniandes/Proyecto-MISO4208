@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "aws-sdk": "^2.645.0",
+    "aws-sdk": "^2.814.0",
     "calabash": "^0.1.2",
     "express": "^4.17.1",
     "node-cron": "^2.0.3",
