@@ -6,7 +6,7 @@
   "dependencies": {
     "aws-sdk": "^2.645.0",
     "calabash": "^0.1.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "node-cron": "^2.0.3",
     "pg": "^7.18.2",
     "selenium-cucumber-js": "^1.7.0",
